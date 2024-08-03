@@ -44,7 +44,7 @@ jobs:
       - name: Putting data
         env:
             DATA: ${{ secrets.CHATCHAT_GOOGLE_SERVICES_JSON }}
-        run: echo $DATA > /home/runner/work/<Project-Name>/<Project-Name>/app/google-services.json
+        run: echo $DATA > /home/runner/work/<ChatChat>/<ChatChat>/app/google-services.json
 
       - name: Check build
         run: ./gradlew assembleDebug
