@@ -39,11 +39,11 @@ jobs:
 
 
       - name: Create file
-        run: cat /home/runner/work/<Project-Name>/<Project-Name>/app/google-services.json | base64
+        run: cat /home/runner/work/<ChatChat>/<ChatChat>/app/google-services.json | base64
 
       - name: Putting data
         env:
-            DATA: ${{ secrets.CHATCHAT_GOOGLE_SERVICES_JSON }}
+            DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: echo $DATA > /home/runner/work/<ChatChat>/<ChatChat>/app/google-services.json
 
       - name: Check build
