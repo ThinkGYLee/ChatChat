@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.spotless) apply false
+    alias(libs.plugins.firebase) apply false
 }
 subprojects {
     plugins.apply("com.diffplug.spotless")
