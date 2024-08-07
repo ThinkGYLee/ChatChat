@@ -11,6 +11,8 @@ composeBom = "2024.06.00"
 spotless = "6.11.0"
 firebase = "4.4.2"
 firebaseBom = "33.1.2"
+firebaseAuth = "23.0.0"
+playServicesAuth = "21.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,6 +31,9 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-crashlystics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+firebase-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = 'playServicesAuth' }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
