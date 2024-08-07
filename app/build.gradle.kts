@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.spotless)
     alias(libs.plugins.firebase)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -84,4 +86,8 @@ dependencies {
     implementation(libs.firebase.crashlystics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.services.auth)
+
+    implementation(libs.dagger.hilt.android)
+    ksp(libs.dagger.hilt.compiler)
+    implementation(libs.dagger.hilt.navigation)
 }
