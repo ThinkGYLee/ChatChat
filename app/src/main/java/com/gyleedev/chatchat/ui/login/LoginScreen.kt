@@ -21,7 +21,13 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text(text = "") }) },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = "Title")
+                }
+            )
+        },
         modifier = modifier
     ) { innerPadding ->
         Column(
@@ -30,9 +36,15 @@ fun LoginScreen(
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
         ) {
-            
+
             Row {
                 Text(text = "title")
+            }
+            Row {
+
+            }
+            Row {
+
             }
 
         }
