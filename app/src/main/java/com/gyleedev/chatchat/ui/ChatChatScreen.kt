@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -32,6 +33,11 @@ sealed class BottomNavItem(
         Icons.Outlined.Home,
         HOME
     )
+
+    data object Setting : BottomNavItem(
+        Icons.Outlined.Settings,
+        SETTING
+    )
 }
 
 @Composable
@@ -51,6 +57,10 @@ fun ChatChatScreen(
                 .consumeWindowInsets(paddingValue)
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
+                LoginScreen(modifier = Modifier.fillMaxSize())
+            }
+
+            composable(route = BottomNavItem.Setting.screenRoute) {
                 LoginScreen(modifier = Modifier.fillMaxSize())
             }
         }
