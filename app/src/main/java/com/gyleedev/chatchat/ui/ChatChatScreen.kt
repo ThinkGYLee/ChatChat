@@ -23,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.gyleedev.chatchat.ui.home.HomeScreen
 import com.gyleedev.chatchat.ui.login.LoginScreen
 
 sealed class BottomNavItem(
@@ -57,7 +58,7 @@ fun ChatChatScreen(
                 .consumeWindowInsets(paddingValue)
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
-                LoginScreen(modifier = Modifier.fillMaxSize())
+                HomeScreen(modifier = Modifier.fillMaxSize())
             }
 
             composable(route = BottomNavItem.Setting.screenRoute) {
