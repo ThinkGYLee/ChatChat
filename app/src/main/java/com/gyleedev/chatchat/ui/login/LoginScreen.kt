@@ -84,6 +84,11 @@ fun LoginScreen(
     }
 }
 
+@Composable
+fun LoginBox(modifier: Modifier = Modifier) {
+
+}
+
 @Preview
 @Composable
 fun LoginScreenPreview() {
