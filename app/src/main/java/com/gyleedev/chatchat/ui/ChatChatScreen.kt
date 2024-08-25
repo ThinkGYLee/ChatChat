@@ -74,7 +74,8 @@ fun BottomNavigation(
     modifier: Modifier = Modifier
 ) {
     val items = listOf(
-        BottomNavItem.Home
+        BottomNavItem.Home,
+        BottomNavItem.Setting
     )
     NavigationBar(
         modifier = modifier.fillMaxWidth(),
