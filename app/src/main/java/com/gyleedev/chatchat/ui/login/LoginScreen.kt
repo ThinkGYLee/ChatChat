@@ -64,29 +64,35 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
             HorizontalDivider()
             Spacer(modifier = Modifier.height(32.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(0.1.dp, Color.Black)
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.icons8__),
-                    contentDescription = "google icon",
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(text = "Google로 시작하기")
-                Spacer(modifier = Modifier.width(16.dp))
-            }
+
+            LoginBox(icon = R.drawable.icons8__, name = "Google")
+
         }
     }
 }
 
 @Composable
-fun LoginBox(modifier: Modifier = Modifier) {
-
+fun LoginBox(
+    icon: Int,
+    name: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(0.1.dp, Color.Black)
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = icon),
+            contentDescription = "google icon",
+            modifier = Modifier.size(24.dp)
+        )
+        Text(text = "$name 으로 시작하기")
+        Spacer(modifier = Modifier.width(16.dp))
+    }
 }
 
 @Preview
