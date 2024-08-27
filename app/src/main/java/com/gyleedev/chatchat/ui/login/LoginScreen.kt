@@ -81,7 +81,7 @@ fun LoginBox(
         modifier = modifier
             .fillMaxWidth()
             .border(0.1.dp, Color.Black)
-            .padding(8.dp),
+            .padding(20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
