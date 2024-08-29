@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.ui.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,7 +66,7 @@ fun LoginScreen(
             HorizontalDivider()
             Spacer(modifier = Modifier.height(32.dp))
 
-            LoginBox(icon = R.drawable.icons8__, name = "Google")
+            LoginBox(icon = R.drawable.icons8__, name = "Google", onClick = {})
 
         }
     }
@@ -75,13 +76,17 @@ fun LoginScreen(
 fun LoginBox(
     icon: Int,
     name: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .border(0.1.dp, Color.Black)
-            .padding(20.dp),
+            .padding(20.dp)
+            .clickable {
+                onClick()
+            },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
