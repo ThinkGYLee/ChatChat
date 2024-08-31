@@ -38,7 +38,6 @@ fun LoginScreen(
 ) {
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
-
         }
     }
 
@@ -67,7 +66,6 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             LoginBox(icon = R.drawable.icons8__, name = "Google", onClick = {})
-
         }
     }
 }

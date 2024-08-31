@@ -22,7 +22,6 @@ fun HomeScreen(
 ) {
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
-
         }
     }
 
@@ -42,17 +41,13 @@ fun HomeScreen(
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
         ) {
-
             Row {
                 Text(text = "title")
             }
             Row {
-
             }
             Row {
-
             }
-
         }
     }
 }

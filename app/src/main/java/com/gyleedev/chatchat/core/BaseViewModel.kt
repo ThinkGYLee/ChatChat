@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import java.net.SocketException
 import java.net.UnknownHostException
 
-
 abstract class BaseViewModel : ViewModel() {
     private val _fetchState = MutableSharedFlow<FetchState>()
     val fetchState: SharedFlow<FetchState> = _fetchState
