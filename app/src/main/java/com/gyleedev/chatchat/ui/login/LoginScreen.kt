@@ -22,6 +22,7 @@ import androidx.compose.foundation.text2.BasicSecureTextField
 import androidx.compose.foundation.text2.BasicTextField2
 import androidx.compose.foundation.text2.input.TextFieldLineLimits
 import androidx.compose.foundation.text2.input.TextFieldState
+import androidx.compose.foundation.text2.input.delete
 import androidx.compose.foundation.text2.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -84,8 +85,22 @@ fun LoginScreen(
                 Text(text = "소셜 로그인으로 가입할 수 있습니다.")
             }
             Spacer(modifier = Modifier.height(32.dp))
-            IdTextField(searchQuery = idQuery, onReset = { /*TODO*/ })
-            PasswordTextField(searchQuery = passwordQuery, onReset = { /*TODO*/ })
+            IdTextField(searchQuery = idQuery, onReset = {
+                idQuery.edit {
+                    delete(
+                        0,
+                        idQuery.text.length
+                    )
+                }
+            })
+            PasswordTextField(searchQuery = passwordQuery,onReset = {
+                passwordQuery.edit {
+                    delete(
+                        0,
+                        passwordQuery.text.length
+                    )
+                }
+            })
             Spacer(modifier = Modifier.height(32.dp))
 
             HorizontalDivider()
@@ -192,7 +207,7 @@ fun PasswordTextField(
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(modifier = modifier.border(0.1.dp, Color.Black), verticalAlignment = Alignment.CenterVertically) {
-        BasicTextField2(
+        BasicSecureTextField(
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colorScheme.surface,
@@ -203,7 +218,6 @@ fun PasswordTextField(
                 }
                 .padding(horizontal = 16.dp),
             state = searchQuery,
-            lineLimits = TextFieldLineLimits.SingleLine,
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
             decorator = { innerTextField ->
                 Row(
