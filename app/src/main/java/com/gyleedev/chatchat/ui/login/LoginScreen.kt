@@ -26,6 +26,7 @@ import androidx.compose.foundation.text2.input.delete
 import androidx.compose.foundation.text2.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -61,6 +62,7 @@ fun LoginScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
+
         }
     }
 
@@ -101,6 +103,11 @@ fun LoginScreen(
                     )
                 }
             })
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
+                Text(text = "로그인")
+            }
             Spacer(modifier = Modifier.height(32.dp))
 
             HorizontalDivider()
