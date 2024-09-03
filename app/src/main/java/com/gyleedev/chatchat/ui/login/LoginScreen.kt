@@ -56,13 +56,11 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-
     val idQuery = rememberTextFieldState()
     val passwordQuery = rememberTextFieldState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
-
         }
     }
 
@@ -95,7 +93,7 @@ fun LoginScreen(
                     )
                 }
             })
-            PasswordTextField(searchQuery = passwordQuery,onReset = {
+            PasswordTextField(searchQuery = passwordQuery, onReset = {
                 passwordQuery.edit {
                     delete(
                         0,
@@ -105,7 +103,14 @@ fun LoginScreen(
             })
             Spacer(modifier = Modifier.height(32.dp))
 
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
+            Button(
+                onClick = {
+                    viewModel.logInButtonClick(
+                        idQuery.text.toString(),
+                        passwordQuery.text.toString()
+                    )
+                }, modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(text = "로그인")
             }
             Spacer(modifier = Modifier.height(32.dp))
@@ -156,7 +161,10 @@ fun IdTextField(
 ) {
     var alpha by remember { mutableFloatStateOf(1f) }
 
-    Row(modifier = modifier.border(0.1.dp, Color.Black), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier.border(0.1.dp, Color.Black),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         BasicTextField2(
             modifier = Modifier
                 .background(
@@ -213,7 +221,10 @@ fun PasswordTextField(
 ) {
     var alpha by remember { mutableFloatStateOf(1f) }
 
-    Row(modifier = modifier.border(0.1.dp, Color.Black), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier.border(0.1.dp, Color.Black),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         BasicSecureTextField(
             modifier = Modifier
                 .background(
