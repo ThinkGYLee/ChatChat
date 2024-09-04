@@ -120,6 +120,13 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             LoginBox(icon = R.drawable.icons8__, name = "Google", onClick = {})
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            LoginBox(
+                icon = R.drawable.icons8_facebook_96,
+                name = "Facebook",
+                onClick = { /*TODO*/ })
         }
     }
 }
