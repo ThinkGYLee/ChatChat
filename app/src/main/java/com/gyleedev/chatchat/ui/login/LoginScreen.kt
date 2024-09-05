@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -112,6 +113,19 @@ fun LoginScreen(
                 }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "로그인")
+            }
+            Spacer(modifier = Modifier.height(32.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Text(text = "아이디 찾기")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "|")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "비밀번호 찾기")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "|")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "회원가입", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+
             }
             Spacer(modifier = Modifier.height(32.dp))
 
