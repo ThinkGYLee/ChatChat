@@ -35,9 +35,14 @@ sealed class BottomNavItem(
         HOME
     )
 
-    data object Setting : BottomNavItem(
+    data object LOGIN : BottomNavItem(
         Icons.Outlined.Settings,
-        SETTING
+        com.gyleedev.chatchat.ui.LOGIN
+    )
+
+    data object SIGNIN : BottomNavItem(
+        Icons.Outlined.Settings,
+        com.gyleedev.chatchat.ui.SIGNIN
     )
 }
 
@@ -61,7 +66,11 @@ fun ChatChatScreen(
                 HomeScreen(modifier = Modifier.fillMaxSize())
             }
 
-            composable(route = BottomNavItem.Setting.screenRoute) {
+            composable(route = BottomNavItem.LOGIN.screenRoute) {
+                LoginScreen(modifier = Modifier.fillMaxSize())
+            }
+
+            composable(route = BottomNavItem.SIGNIN.screenRoute) {
                 LoginScreen(modifier = Modifier.fillMaxSize())
             }
         }
@@ -75,7 +84,7 @@ fun BottomNavigation(
 ) {
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.Setting
+        BottomNavItem.LOGIN
     )
     NavigationBar(
         modifier = modifier.fillMaxWidth(),
