@@ -54,6 +54,7 @@ import com.gyleedev.chatchat.R
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun LoginScreen(
+    onSignInClicked: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
@@ -110,7 +111,8 @@ fun LoginScreen(
                         idQuery.text.toString(),
                         passwordQuery.text.toString()
                     )
-                }, modifier = Modifier.fillMaxWidth()
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "로그인")
             }
@@ -124,8 +126,14 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "|")
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "회원가입", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-
+                Text(
+                    text = "회원가입",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable {
+                        onSignInClicked()
+                    }
+                )
             }
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -140,7 +148,8 @@ fun LoginScreen(
             LoginBox(
                 icon = R.drawable.icons8_facebook_96,
                 name = "Facebook",
-                onClick = { /*TODO*/ })
+                onClick = { /*TODO*/ }
+            )
         }
     }
 }
@@ -295,5 +304,5 @@ fun PasswordTextField(
 @Preview
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen()
+    LoginScreen(onSignInClicked = {})
 }

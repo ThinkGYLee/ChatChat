@@ -25,6 +25,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.gyleedev.chatchat.ui.home.HomeScreen
 import com.gyleedev.chatchat.ui.login.LoginScreen
+import com.gyleedev.chatchat.ui.signin.SignInScreen
 
 sealed class BottomNavItem(
     val icons: ImageVector,
@@ -67,11 +68,13 @@ fun ChatChatScreen(
             }
 
             composable(route = BottomNavItem.LOGIN.screenRoute) {
-                LoginScreen(modifier = Modifier.fillMaxSize())
+                LoginScreen(modifier = Modifier.fillMaxSize(), onSignInClicked = {
+                    navController.navigate(BottomNavItem.SIGNIN.screenRoute)
+                })
             }
 
             composable(route = BottomNavItem.SIGNIN.screenRoute) {
-                LoginScreen(modifier = Modifier.fillMaxSize())
+                SignInScreen(modifier = Modifier.fillMaxSize())
             }
         }
     }
