@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -258,31 +259,28 @@ fun IdScreen(idQuery: TextFieldState, onReset: () -> Unit, modifier: Modifier = 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PassWordScreen(
+fun PasswordScreen(
     passwordQuery: TextFieldState,
     passwordCheckQuery: TextFieldState,
-    onReset: () -> Unit,
+    onPasswordReset: () -> Unit,
+    onPasswordCheckReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val passwordValid = remember {
+        mutableStateOf(
+            false
+        )
+    }
+
     Column(modifier = modifier) {
         Text(text = "비밀번호를 입력해주세요")
         Spacer(modifier = Modifier.height(36.dp))
         PasswordTextField(passwordQuery = passwordQuery, onReset = {
-            passwordQuery.edit {
-                delete(
-                    0,
-                    passwordQuery.text.length
-                )
-            }
+            onPasswordReset()
         })
         Spacer(modifier = Modifier.height(36.dp))
         PasswordTextField(passwordQuery = passwordCheckQuery, onReset = {
-            passwordCheckQuery.edit {
-                delete(
-                    0,
-                    passwordCheckQuery.text.length
-                )
-            }
+            onPasswordCheckReset()
         })
 
         Button(
