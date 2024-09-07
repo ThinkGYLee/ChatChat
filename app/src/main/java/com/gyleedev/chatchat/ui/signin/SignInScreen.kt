@@ -23,6 +23,7 @@ import androidx.compose.foundation.text2.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -129,9 +130,18 @@ fun SignInScreen(
                 enabled = signInIsAvailable.value,
                 onClick = {
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        shape = RoundedCornerShape(8.dp),
+                        color = ButtonDefaults.buttonColors().containerColor
+                    )
             ) {
-                Text(text = "회원 가입", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = "회원 가입",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = ButtonDefaults.buttonColors().contentColor
+                )
             }
         }
     }
