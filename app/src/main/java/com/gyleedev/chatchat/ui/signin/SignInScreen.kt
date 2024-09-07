@@ -33,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -53,6 +53,22 @@ fun SignInScreen(
     val idQuery = rememberTextFieldState()
     val passwordQuery = rememberTextFieldState()
     val passwordCheckQuery = rememberTextFieldState()
+    val signInIsAvailable = viewModel.signInIsAvailable.collectAsStateWithLifecycle()
+    val idIsAvailable = viewModel.idIsAvailable.collectAsStateWithLifecycle()
+    val passwordIsAvailable = viewModel.passwordIsAvailable.collectAsStateWithLifecycle()
+    val passwordIsSame = viewModel.passwordIsSame.collectAsStateWithLifecycle()
+
+    LaunchedEffect(idQuery.text) {
+        viewModel.editId(idQuery.text.toString())
+    }
+
+    LaunchedEffect(passwordQuery.text) {
+        viewModel.editPassword(passwordQuery.text.toString())
+    }
+
+    LaunchedEffect(passwordCheckQuery.text) {
+        viewModel.editPasswordCheck(passwordCheckQuery.text.toString())
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
@@ -76,7 +92,7 @@ fun SignInScreen(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            IdScreen(idQuery = idQuery, onReset = {
+            IdScreen(idQuery = idQuery, idIsAvailable = idIsAvailable.value, onReset = {
                 idQuery.edit {
                     delete(
                         0,
@@ -84,28 +100,38 @@ fun SignInScreen(
                     )
                 }
             })
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            PasswordTextField(passwordQuery = passwordQuery, onReset = {
-                passwordQuery.edit {
-                    delete(
-                        0,
-                        passwordQuery.text.length
-                    )
+            PasswordScreen(
+                passwordQuery = passwordQuery,
+                passwordCheckQuery = passwordCheckQuery,
+                passwordIsAvailable = passwordIsAvailable.value,
+                passwordIsSame = passwordIsSame.value,
+                onPasswordReset = {
+                    passwordQuery.edit {
+                        delete(
+                            0,
+                            passwordQuery.text.length
+                        )
+                    }
+                },
+                onPasswordCheckReset = {
+                    passwordCheckQuery.edit {
+                        delete(
+                            0,
+                            passwordCheckQuery.text.length
+                        )
+                    }
                 }
-            })
-            Spacer(modifier = Modifier.height(32.dp))
+            )
 
             Button(
+                enabled = signInIsAvailable.value,
                 onClick = {
-                    viewModel.logInButtonClick(
-                        idQuery.text.toString(),
-                        passwordQuery.text.toString()
-                    )
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "회원 가입하기")
+                Text(text = "회원 가입", style = MaterialTheme.typography.bodyLarge)
             }
         }
     }
@@ -174,6 +200,7 @@ fun IdTextField(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PasswordTextField(
+    hint: String,
     passwordQuery: TextFieldState,
     onReset: () -> Unit,
     modifier: Modifier = Modifier
@@ -205,7 +232,7 @@ fun PasswordTextField(
                     Box(modifier = Modifier.weight(10f)) {
                         if (passwordQuery.text.isEmpty()) {
                             Text(
-                                text = "비밀번호",
+                                text = hint,
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color(0xFF848484),
                                 modifier = Modifier
@@ -232,28 +259,20 @@ fun PasswordTextField(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun IdScreen(idQuery: TextFieldState, onReset: () -> Unit, modifier: Modifier = Modifier) {
+fun IdScreen(
+    idQuery: TextFieldState,
+    idIsAvailable: Boolean,
+    onReset: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val idComment = if (idIsAvailable || idQuery.text.isEmpty()) "" else "이메일 형식을 지켜주세요"
     Column(modifier = modifier) {
         Text(text = "이메일을 입력해주세요")
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         IdTextField(idQuery = idQuery, onReset = {
-            idQuery.edit {
-                delete(
-                    0,
-                    idQuery.text.length
-                )
-            }
+            onReset()
         })
-        Spacer(modifier = Modifier.height(36.dp))
-        Button(
-            onClick = {
-
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "다음")
-        }
-
+        Text(text = idComment, style = MaterialTheme.typography.labelMedium, color = Color.Red)
     }
 }
 
@@ -262,39 +281,41 @@ fun IdScreen(idQuery: TextFieldState, onReset: () -> Unit, modifier: Modifier = 
 fun PasswordScreen(
     passwordQuery: TextFieldState,
     passwordCheckQuery: TextFieldState,
+    passwordIsAvailable: Boolean,
+    passwordIsSame: Boolean,
     onPasswordReset: () -> Unit,
     onPasswordCheckReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val passwordValid = remember {
-        mutableStateOf(
-            false
-        )
-    }
-
+    val passwordComment =
+        if (passwordIsAvailable || passwordQuery.text.isEmpty()) "" else "8자리 이상을 입력해 주세요"
+    val passwordCheckComment =
+        if (passwordIsSame || passwordCheckQuery.text.isEmpty()) "" else "비밀번호가 일치하지 않습니다"
     Column(modifier = modifier) {
         Text(text = "비밀번호를 입력해주세요")
-        Spacer(modifier = Modifier.height(36.dp))
-        PasswordTextField(passwordQuery = passwordQuery, onReset = {
+        Spacer(modifier = Modifier.height(16.dp))
+        PasswordTextField(hint = "비밀번호", passwordQuery = passwordQuery, onReset = {
             onPasswordReset()
         })
-        Spacer(modifier = Modifier.height(36.dp))
-        PasswordTextField(passwordQuery = passwordCheckQuery, onReset = {
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = passwordComment,
+            style = MaterialTheme.typography.labelMedium,
+            color = Color.Red
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        PasswordTextField(hint = "다시 한번 입력하세요", passwordQuery = passwordCheckQuery, onReset = {
             onPasswordCheckReset()
         })
-
-        Button(
-            onClick = {
-
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "다음")
-        }
-
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = passwordCheckComment,
+            style = MaterialTheme.typography.labelMedium,
+            color = Color.Red
+        )
+        Spacer(modifier = Modifier.height(28.dp))
     }
 }
-
 
 @Preview
 @Composable

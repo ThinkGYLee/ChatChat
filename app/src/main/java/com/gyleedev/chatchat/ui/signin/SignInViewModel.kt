@@ -12,13 +12,16 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor() : BaseViewModel() {
 
     private val _idQuery = MutableStateFlow("")
-    val idQuery: StateFlow<String> = _idQuery
-
     private val _passwordQuery = MutableStateFlow("")
-    val passwordQuery: StateFlow<String> = _passwordQuery
-
     private val _passwordCheckQuery = MutableStateFlow("")
-    val passwordCheckQuery: StateFlow<String> = _passwordCheckQuery
+
+    private val _idIsAvailable = MutableStateFlow(false)
+    val idIsAvailable: StateFlow<Boolean> = _idIsAvailable
+    private val _passwordIsAvailable = MutableStateFlow(false)
+    val passwordIsAvailable: StateFlow<Boolean> = _passwordIsAvailable
+    private val _passwordCheckIsAvailable = MutableStateFlow(false)
+    private val _passwordIsSame = MutableStateFlow(false)
+    val passwordIsSame: StateFlow<Boolean> = _passwordIsSame
 
     private val _signInIsAvailable = MutableStateFlow(false)
     val signInIsAvailable: StateFlow<Boolean> = _signInIsAvailable
@@ -46,23 +49,12 @@ class SignInViewModel @Inject constructor() : BaseViewModel() {
 
     private fun checkSignInAvailable() {
         viewModelScope.launch {
-            val checkId = idQuery.value.isNotEmpty()
-            val checkPasswordLength = passwordQuery.value.length > 8
-            val checkPasswordCheckLength = passwordCheckQuery.value.length > 8
-            val checkPasswordSame = passwordQuery.value == passwordCheckQuery.value
-            if (checkId && checkPasswordLength && checkPasswordCheckLength && checkPasswordSame) {
-                _signInIsAvailable.emit(true)
-            } else {
-                _signInIsAvailable.emit(false)
-            }
+            val pattern = android.util.Patterns.EMAIL_ADDRESS
+            _idIsAvailable.emit(pattern.matcher(_idQuery.value).matches())
+            _passwordIsAvailable.emit(_passwordQuery.value.length >= 8)
+            _passwordCheckIsAvailable.emit(_passwordCheckQuery.value.length >= 8)
+            _passwordIsSame.emit(_passwordQuery.value == _passwordCheckQuery.value)
+            _signInIsAvailable.emit(_idIsAvailable.value && _passwordIsAvailable.value && _passwordCheckIsAvailable.value && _passwordIsSame.value)
         }
-
-    }
-
-    fun logInButtonClick(
-        id: String,
-        password: String
-    ) {
-        println("id : $id / password : $password")
     }
 }
