@@ -61,6 +61,14 @@ fun LoginScreen(
     val idQuery = rememberTextFieldState()
     val passwordQuery = rememberTextFieldState()
 
+    LaunchedEffect(idQuery.text) {
+        viewModel.editId(idQuery.text.toString())
+    }
+
+    LaunchedEffect(passwordQuery.text) {
+        viewModel.editPassword(passwordQuery.text.toString())
+    }
+
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
         }
