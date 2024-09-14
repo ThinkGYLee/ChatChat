@@ -115,10 +115,7 @@ fun LoginScreen(
 
             Button(
                 onClick = {
-                    viewModel.logInButtonClick(
-                        idQuery.text.toString(),
-                        passwordQuery.text.toString()
-                    )
+                    viewModel.logInButtonClick()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {

@@ -30,9 +30,7 @@ class LoginViewModel @Inject constructor() : BaseViewModel() {
     }
 
     fun logInButtonClick(
-        id: String,
-        password: String
     ) {
-        println("id : $id / password : $password")
+        println("id : ${idQuery.value} / password : ${passwordQuery.value}")
     }
 }
