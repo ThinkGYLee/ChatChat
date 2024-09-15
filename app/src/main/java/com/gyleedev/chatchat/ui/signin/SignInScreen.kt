@@ -1,6 +1,5 @@
 package com.gyleedev.chatchat.ui.signin
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,12 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text2.BasicSecureTextField
-import androidx.compose.foundation.text2.BasicTextField2
-import androidx.compose.foundation.text2.input.TextFieldLineLimits
-import androidx.compose.foundation.text2.input.TextFieldState
-import androidx.compose.foundation.text2.input.delete
-import androidx.compose.foundation.text2.input.rememberTextFieldState
+import androidx.compose.foundation.text.BasicSecureTextField
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.delete
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -45,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(
     modifier: Modifier = Modifier,
@@ -147,7 +146,7 @@ fun SignInScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
 fun IdTextField(
     idQuery: TextFieldState,
@@ -160,7 +159,7 @@ fun IdTextField(
         modifier = modifier.border(0.1.dp, Color.Black),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BasicTextField2(
+        BasicTextField(
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colorScheme.surface,
@@ -207,7 +206,7 @@ fun IdTextField(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
 fun PasswordTextField(
     hint: String,
@@ -267,7 +266,7 @@ fun PasswordTextField(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
 fun IdScreen(
     idQuery: TextFieldState,
@@ -286,7 +285,7 @@ fun IdScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
 fun PasswordScreen(
     passwordQuery: TextFieldState,
