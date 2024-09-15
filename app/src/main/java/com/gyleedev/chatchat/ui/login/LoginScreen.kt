@@ -1,6 +1,7 @@
 package com.gyleedev.chatchat.ui.login
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,12 +19,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text2.BasicSecureTextField
-import androidx.compose.foundation.text2.BasicTextField2
-import androidx.compose.foundation.text2.input.TextFieldLineLimits
-import androidx.compose.foundation.text2.input.TextFieldState
-import androidx.compose.foundation.text2.input.delete
-import androidx.compose.foundation.text2.input.rememberTextFieldState
+import androidx.compose.foundation.text.BasicSecureTextField
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.delete
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -51,7 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gyleedev.chatchat.R
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onSignInClicked: () -> Unit,
@@ -107,7 +109,7 @@ fun LoginScreen(
                 passwordQuery.edit {
                     delete(
                         0,
-                        passwordQuery.text.length
+                        idQuery.text.length
                     )
                 }
             })
@@ -187,7 +189,7 @@ fun LoginBox(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
 fun IdTextField(
     searchQuery: TextFieldState,
@@ -200,7 +202,7 @@ fun IdTextField(
         modifier = modifier.border(0.1.dp, Color.Black),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BasicTextField2(
+        BasicTextField(
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colorScheme.surface,
@@ -247,7 +249,7 @@ fun IdTextField(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
 fun PasswordTextField(
     searchQuery: TextFieldState,
@@ -306,6 +308,7 @@ fun PasswordTextField(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun LoginScreenPreview() {
