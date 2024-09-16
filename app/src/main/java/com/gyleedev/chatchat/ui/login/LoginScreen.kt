@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.chatchat.R
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -62,6 +63,12 @@ fun LoginScreen(
 ) {
     val idQuery = rememberTextFieldState()
     val passwordQuery = rememberTextFieldState()
+    val idIsAvailable by viewModel.idIsAvailable.collectAsStateWithLifecycle()
+    val passwordIsAvailable by viewModel.passwordIsAvailable.collectAsStateWithLifecycle()
+    val signInIsAvailable = viewModel.logInIsAvailable.collectAsStateWithLifecycle()
+    val idComment = if (idIsAvailable || idQuery.text.isEmpty()) "" else "이메일 형식을 지켜주세요"
+    val passwordComment =
+        if (passwordIsAvailable || passwordQuery.text.isEmpty()) "" else "8자리 이상을 입력해 주세요"
 
     LaunchedEffect(idQuery.text) {
         viewModel.editId(idQuery.text.toString())
@@ -105,6 +112,8 @@ fun LoginScreen(
                     )
                 }
             })
+            Text(text = idComment, style = MaterialTheme.typography.labelMedium, color = Color.Red)
+            Spacer(modifier = Modifier.height(20.dp))
             PasswordTextField(searchQuery = passwordQuery, onReset = {
                 passwordQuery.edit {
                     delete(
@@ -113,7 +122,12 @@ fun LoginScreen(
                     )
                 }
             })
-            Spacer(modifier = Modifier.height(32.dp))
+            Text(
+                text = passwordComment,
+                style = MaterialTheme.typography.labelMedium,
+                color = Color.Red
+            )
+            Spacer(modifier = Modifier.height(40.dp))
 
             Button(
                 onClick = {
