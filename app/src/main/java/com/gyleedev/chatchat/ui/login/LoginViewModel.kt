@@ -17,6 +17,11 @@ class LoginViewModel @Inject constructor() : BaseViewModel() {
     private val _passwordQuery = MutableStateFlow("")
     val passwordQuery: StateFlow<String> = _passwordQuery
 
+    private val _idIsAvailable = MutableStateFlow(false)
+    val idIsAvailable: StateFlow<Boolean> = _idIsAvailable
+    private val _passwordIsAvailable = MutableStateFlow(false)
+    val passwordIsAvailable: StateFlow<Boolean> = _passwordIsAvailable
+
     fun editId(id: String) {
         viewModelScope.launch {
             _idQuery.emit(id)
