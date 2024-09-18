@@ -65,7 +65,7 @@ fun LoginScreen(
     val passwordQuery = rememberTextFieldState()
     val idIsAvailable by viewModel.idIsAvailable.collectAsStateWithLifecycle()
     val passwordIsAvailable by viewModel.passwordIsAvailable.collectAsStateWithLifecycle()
-    val signInIsAvailable = viewModel.logInIsAvailable.collectAsStateWithLifecycle()
+    val signInIsAvailable by viewModel.logInIsAvailable.collectAsStateWithLifecycle()
     val idComment = if (idIsAvailable || idQuery.text.isEmpty()) "" else "이메일 형식을 지켜주세요"
     val passwordComment =
         if (passwordIsAvailable || passwordQuery.text.isEmpty()) "" else "8자리 이상을 입력해 주세요"
@@ -130,6 +130,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             Button(
+                enabled = signInIsAvailable,
                 onClick = {
                     viewModel.logInButtonClick()
                 },
