@@ -128,6 +128,7 @@ fun SignInScreen(
             Button(
                 enabled = signInIsAvailable.value,
                 onClick = {
+                    viewModel.signInRequest()
                 },
                 modifier = Modifier
                     .fillMaxWidth()

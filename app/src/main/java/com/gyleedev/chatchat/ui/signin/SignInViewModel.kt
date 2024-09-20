@@ -1,6 +1,10 @@
 package com.gyleedev.chatchat.ui.signin
 
+import android.content.ContentValues.TAG
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.gyleedev.chatchat.core.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,7 +13,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignInViewModel @Inject constructor() : BaseViewModel() {
+class SignInViewModel @Inject constructor(
+    private val auth: FirebaseAuth
+) : BaseViewModel() {
+
 
     private val _idQuery = MutableStateFlow("")
     private val _passwordQuery = MutableStateFlow("")
@@ -56,5 +63,24 @@ class SignInViewModel @Inject constructor() : BaseViewModel() {
             _passwordIsSame.emit(_passwordQuery.value == _passwordCheckQuery.value)
             _signInIsAvailable.emit(_idIsAvailable.value && _passwordIsAvailable.value && _passwordCheckIsAvailable.value && _passwordIsSame.value)
         }
+    }
+
+    fun signInRequest() {
+        auth.createUserWithEmailAndPassword(_idQuery.value, _passwordQuery.value)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "createUserWithEmail:success")
+                    val user = auth.currentUser
+                    println(user)
+                    //updateUI(user)
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
+
+                    println("Authentication failed. :${task.exception?.message}")
+                    //updateUI(null)
+                }
+            }
     }
 }
