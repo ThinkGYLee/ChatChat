@@ -118,7 +118,7 @@ fun LoginScreen(
                 passwordQuery.edit {
                     delete(
                         0,
-                        idQuery.text.length
+                        passwordQuery.text.length
                     )
                 }
             })
