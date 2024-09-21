@@ -204,7 +204,6 @@ fun LoginBox(
     }
 }
 
-
 @Composable
 fun IdTextField(
     searchQuery: TextFieldState,
@@ -263,7 +262,6 @@ fun IdTextField(
         )
     }
 }
-
 
 @Composable
 fun PasswordTextField(

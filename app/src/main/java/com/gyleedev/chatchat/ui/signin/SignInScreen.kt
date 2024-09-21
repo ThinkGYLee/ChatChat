@@ -147,7 +147,6 @@ fun SignInScreen(
     }
 }
 
-
 @Composable
 fun IdTextField(
     idQuery: TextFieldState,
@@ -206,7 +205,6 @@ fun IdTextField(
         )
     }
 }
-
 
 @Composable
 fun PasswordTextField(
@@ -267,7 +265,6 @@ fun PasswordTextField(
     }
 }
 
-
 @Composable
 fun IdScreen(
     idQuery: TextFieldState,
@@ -285,7 +282,6 @@ fun IdScreen(
         Text(text = idComment, style = MaterialTheme.typography.labelMedium, color = Color.Red)
     }
 }
-
 
 @Composable
 fun PasswordScreen(

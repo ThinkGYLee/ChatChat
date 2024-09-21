@@ -2,7 +2,6 @@ package com.gyleedev.chatchat.ui.signin
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.gyleedev.chatchat.core.BaseViewModel
@@ -16,7 +15,6 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor(
     private val auth: FirebaseAuth
 ) : BaseViewModel() {
-
 
     private val _idQuery = MutableStateFlow("")
     private val _passwordQuery = MutableStateFlow("")
@@ -73,13 +71,13 @@ class SignInViewModel @Inject constructor(
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
                     println(user)
-                    //updateUI(user)
+                    // updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
 
                     println("Authentication failed. :${task.exception?.message}")
-                    //updateUI(null)
+                    // updateUI(null)
                 }
             }
     }
