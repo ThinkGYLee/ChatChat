@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.ui.home
+package com.gyleedev.chatchat.ui.friendlist
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,9 +16,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun FriendListScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: FriendListViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
