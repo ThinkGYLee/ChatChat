@@ -24,7 +24,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.gyleedev.chatchat.ui.home.HomeScreen
+import com.gyleedev.chatchat.ui.chatlist.ChatListScreen
+import com.gyleedev.chatchat.ui.friendlist.FriendListScreen
 import com.gyleedev.chatchat.ui.login.LoginScreen
 import com.gyleedev.chatchat.ui.signin.SignInScreen
 
@@ -71,11 +72,11 @@ fun ChatChatScreen(
                 .consumeWindowInsets(paddingValue)
         ) {
             composable(route = BottomNavItem.FRIENDLIST.screenRoute) {
-                HomeScreen(modifier = Modifier.fillMaxSize())
+                FriendListScreen(modifier = Modifier.fillMaxSize())
             }
 
             composable(route = BottomNavItem.CHATLIST.screenRoute) {
-                HomeScreen(modifier = Modifier.fillMaxSize())
+                ChatListScreen(modifier = Modifier.fillMaxSize())
             }
 
             composable(route = BottomNavItem.LOGIN.screenRoute) {
