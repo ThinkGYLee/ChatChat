@@ -5,7 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,10 +32,6 @@ sealed class BottomNavItem(
     val icons: ImageVector,
     val screenRoute: String
 ) {
-    data object Home : BottomNavItem(
-        Icons.Outlined.Home,
-        HOME
-    )
 
     data object LOGIN : BottomNavItem(
         Icons.Outlined.Settings,
@@ -44,6 +41,16 @@ sealed class BottomNavItem(
     data object SIGNIN : BottomNavItem(
         Icons.Outlined.Settings,
         com.gyleedev.chatchat.ui.SIGNIN
+    )
+
+    data object FRIENDLIST : BottomNavItem(
+        Icons.Outlined.AccountCircle,
+        com.gyleedev.chatchat.ui.FRIENDLIST
+    )
+
+    data object CHATLIST : BottomNavItem(
+        Icons.Outlined.Email,
+        com.gyleedev.chatchat.ui.CHATLIST
     )
 }
 
@@ -58,19 +65,24 @@ fun ChatChatScreen(
     ) { paddingValue ->
         NavHost(
             navController = navController,
-            startDestination = BottomNavItem.Home.screenRoute,
+            startDestination = BottomNavItem.FRIENDLIST.screenRoute,
             modifier = Modifier
                 .padding(paddingValue)
                 .consumeWindowInsets(paddingValue)
         ) {
-            composable(route = BottomNavItem.Home.screenRoute) {
+            composable(route = BottomNavItem.FRIENDLIST.screenRoute) {
+                HomeScreen(modifier = Modifier.fillMaxSize())
+            }
+
+            composable(route = BottomNavItem.CHATLIST.screenRoute) {
                 HomeScreen(modifier = Modifier.fillMaxSize())
             }
 
             composable(route = BottomNavItem.LOGIN.screenRoute) {
-                LoginScreen(modifier = Modifier.fillMaxSize(), onSignInClicked = {
-                    navController.navigate(BottomNavItem.SIGNIN.screenRoute)
-                })
+                LoginScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    onSignInClicked = { navController.navigate(BottomNavItem.SIGNIN.screenRoute) }
+                )
             }
 
             composable(route = BottomNavItem.SIGNIN.screenRoute) {
@@ -86,7 +98,8 @@ fun BottomNavigation(
     modifier: Modifier = Modifier
 ) {
     val items = listOf(
-        BottomNavItem.Home,
+        BottomNavItem.FRIENDLIST,
+        BottomNavItem.CHATLIST,
         BottomNavItem.LOGIN
     )
     NavigationBar(
