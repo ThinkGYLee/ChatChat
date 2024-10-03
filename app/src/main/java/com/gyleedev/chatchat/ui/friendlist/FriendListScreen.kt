@@ -2,20 +2,24 @@ package com.gyleedev.chatchat.ui.friendlist
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -50,10 +54,24 @@ fun FriendListScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 20.dp)
         ) {
             Row {
-                Text(text = "친구")
+                Text(text = "친구", style = MaterialTheme.typography.labelMedium, modifier = Modifier.alignByBaseline())
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "4", style = MaterialTheme.typography.labelMedium, modifier = Modifier.alignByBaseline())
+            }
+            Row(modifier = Modifier.padding(vertical = 12.dp)) {
+                Text(text = "이금용")
+            }
+            Row(modifier = Modifier.padding(vertical = 12.dp)) {
+                Text(text = "이호용")
+            }
+            Row(modifier = Modifier.padding(vertical = 12.dp)) {
+                Text(text = "엄마")
+            }
+            Row(modifier = Modifier.padding(vertical = 12.dp)) {
+                Text(text = "아빠")
             }
         }
     }
