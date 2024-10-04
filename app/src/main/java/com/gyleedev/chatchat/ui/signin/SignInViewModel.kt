@@ -4,7 +4,10 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.gyleedev.chatchat.core.BaseViewModel
+import com.gyleedev.chatchat.domain.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val firebase: Firebase
 ) : BaseViewModel() {
 
     private val _idQuery = MutableStateFlow("")
@@ -71,6 +75,7 @@ class SignInViewModel @Inject constructor(
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
                     println(user)
+                    user?.uid?.let { writeUserToDatabase(_idQuery.value, it) }
                     // updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
@@ -80,5 +85,12 @@ class SignInViewModel @Inject constructor(
                     // updateUI(null)
                 }
             }
+    }
+
+    private fun writeUserToDatabase(email: String, uid: String) {
+        val user = UserData(email = email, name = null)
+        firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/").reference.child(
+            "users"
+        ).child(uid).setValue(user)
     }
 }
