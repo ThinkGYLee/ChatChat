@@ -93,4 +93,11 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.dagger.hilt.navigation)
+
+    implementation(libs.google.gson)
+
+    ksp(libs.room.compiler)
+    implementation(libs.room.paging)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
 }
