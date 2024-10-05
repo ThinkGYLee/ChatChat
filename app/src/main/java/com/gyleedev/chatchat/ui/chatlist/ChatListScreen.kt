@@ -50,7 +50,7 @@ fun ChatListScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 20.dp)
         ) {
             Row {
                 Text(text = "채팅")

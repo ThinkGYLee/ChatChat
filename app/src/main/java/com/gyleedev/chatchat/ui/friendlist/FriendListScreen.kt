@@ -19,7 +19,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -57,9 +56,17 @@ fun FriendListScreen(
                 .padding(horizontal = 20.dp)
         ) {
             Row {
-                Text(text = "친구", style = MaterialTheme.typography.labelMedium, modifier = Modifier.alignByBaseline())
+                Text(
+                    text = "친구",
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.alignByBaseline()
+                )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "4", style = MaterialTheme.typography.labelMedium, modifier = Modifier.alignByBaseline())
+                Text(
+                    text = "4",
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.alignByBaseline()
+                )
             }
             Row(modifier = Modifier.padding(vertical = 12.dp)) {
                 Text(text = "이금용")
