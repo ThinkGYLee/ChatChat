@@ -9,6 +9,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.gyleedev.chatchat.data.database.UserDao
+import com.gyleedev.chatchat.data.database.toEntity
 import com.gyleedev.chatchat.data.database.toModel
 import com.gyleedev.chatchat.domain.UserData
 import javax.inject.Inject
@@ -40,7 +41,12 @@ class UserRepositoryImpl @Inject constructor(
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
                     println(user)
-                    user?.uid?.let { writeUserToDatabase(id, it) }
+                    val userData =
+                        user?.uid?.let { UserData(email = id, name = "Anonymous User", uid = it) }
+                    if (userData != null) {
+                        writeUserToRealtimeDatabase(userData)
+                    }
+
                     // updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
@@ -52,11 +58,14 @@ class UserRepositoryImpl @Inject constructor(
             }
     }
 
-    private fun writeUserToDatabase(email: String, uid: String) {
-        val user = UserData(email = email, name = "Anonymous User", uid = uid)
+    private fun writeUserToRealtimeDatabase(user: UserData) {
         database.reference.child(
             "users"
-        ).child(uid).setValue(user)
+        ).child(user.uid).setValue(user)
+    }
+
+    private fun writeUserToRoomDatabase(user: UserData) {
+        userDao.insertUser(user.toEntity())
     }
 
     override fun logInRequest(id: String, password: String) {
