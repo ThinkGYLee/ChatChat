@@ -88,7 +88,7 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun writeUserToDatabase(email: String, uid: String) {
-        val user = UserData(email = email, name = null)
+        val user = UserData(email = email, name = "Anonymous User")
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/").reference.child(
             "users"
         ).child(uid).setValue(user)
