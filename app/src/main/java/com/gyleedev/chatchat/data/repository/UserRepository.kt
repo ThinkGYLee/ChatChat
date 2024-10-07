@@ -19,6 +19,7 @@ interface UserRepository {
     fun signInUser(id: String, password: String)
     fun logInRequest(id: String, password: String)
     fun searchUser(email: String)
+    fun fetchUserExists(): Boolean
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -100,5 +101,9 @@ class UserRepositoryImpl @Inject constructor(
                 println(error)
             }
         })
+    }
+
+    override fun fetchUserExists(): Boolean {
+        return auth.currentUser != null
     }
 }

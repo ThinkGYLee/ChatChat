@@ -4,34 +4,39 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.gyleedev.chatchat.domain.UserState
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private lateinit var auth: FirebaseAuth
 
+    private val viewModel by viewModels<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        installSplashScreen()
-        auth = Firebase.auth
+        val splashScreen = installSplashScreen()
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isUserExists.collect {
+                    splashScreen.setKeepOnScreenCondition {
+                        it == UserState.Loading
+                    }
+                }
+            }
+        }
+
         enableEdgeToEdge()
         setContent {
             ChatChatTheme {
                 ChatChatScreen()
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val currentUser = auth.currentUser
-        /*if (currentUser != null) {
-            //reload()
-        }*/
     }
 }
