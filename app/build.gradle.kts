@@ -89,6 +89,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.androidx.lifecycle.compose)
     implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.core.splash)
 
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.hilt.compiler)
