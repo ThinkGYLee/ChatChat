@@ -3,8 +3,11 @@ package com.gyleedev.chatchat.ui.login
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.data.repository.UserRepository
+import com.gyleedev.chatchat.domain.LogInResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,6 +30,9 @@ class LoginViewModel @Inject constructor(
 
     private val _logInIsAvailable = MutableStateFlow(false)
     val logInIsAvailable: StateFlow<Boolean> = _logInIsAvailable
+
+    private val _logInResult = MutableSharedFlow<LogInResult>()
+    val logInResult: SharedFlow<LogInResult> = _logInResult
 
     fun editId(id: String) {
         viewModelScope.launch {
@@ -52,6 +58,9 @@ class LoginViewModel @Inject constructor(
     }
 
     fun logInButtonClick() {
-        userRepository.signInUser(id = idQuery.value, password = passwordQuery.value)
+        viewModelScope.launch {
+            val result = userRepository.logInRequest(id = idQuery.value, password = passwordQuery.value)
+            _logInResult.emit(result)
+        }
     }
 }
