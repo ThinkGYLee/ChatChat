@@ -83,7 +83,12 @@ fun ChatChatScreen(
             composable(route = BottomNavItem.LOGIN.screenRoute) {
                 LoginScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onSignInClicked = { navController.navigate(BottomNavItem.SIGNIN.screenRoute) }
+                    onSignInClicked = { navController.navigate(BottomNavItem.SIGNIN.screenRoute) },
+                    onLogInComplete = {
+                        navController.navigate(BottomNavItem.CHATLIST.screenRoute) {
+                            popUpTo(BottomNavItem.LOGIN.screenRoute) { inclusive = true }
+                        }
+                    }
                 )
             }
 
