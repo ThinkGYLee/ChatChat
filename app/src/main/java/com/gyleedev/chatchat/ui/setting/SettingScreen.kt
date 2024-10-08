@@ -27,7 +27,7 @@ fun SettingScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "로그인 하기")
+
                 }
             )
         },

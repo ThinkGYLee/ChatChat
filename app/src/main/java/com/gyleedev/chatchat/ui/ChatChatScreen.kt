@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.gyleedev.chatchat.ui.chatlist.ChatListScreen
 import com.gyleedev.chatchat.ui.friendlist.FriendListScreen
 import com.gyleedev.chatchat.ui.login.LoginScreen
+import com.gyleedev.chatchat.ui.setting.SettingScreen
 import com.gyleedev.chatchat.ui.signin.SignInScreen
 
 sealed class BottomNavItem(
@@ -52,6 +53,11 @@ sealed class BottomNavItem(
     data object CHATLIST : BottomNavItem(
         Icons.Outlined.Email,
         com.gyleedev.chatchat.ui.CHATLIST
+    )
+
+    data object SETTING : BottomNavItem(
+        Icons.Outlined.Settings,
+        com.gyleedev.chatchat.ui.SETTING
     )
 }
 
@@ -102,6 +108,9 @@ fun ChatChatScreen(
                     }
                 )
             }
+            composable(route = BottomNavItem.SETTING.screenRoute) {
+                SettingScreen(onSignInClicked = {}, modifier = Modifier.fillMaxSize())
+            }
         }
     }
 }
@@ -114,7 +123,7 @@ fun BottomNavigation(
     val items = listOf(
         BottomNavItem.FRIENDLIST,
         BottomNavItem.CHATLIST,
-        BottomNavItem.LOGIN
+        BottomNavItem.SETTING
     )
     NavigationBar(
         modifier = modifier.fillMaxWidth(),
