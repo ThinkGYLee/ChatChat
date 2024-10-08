@@ -59,8 +59,13 @@ class LoginViewModel @Inject constructor(
 
     fun logInButtonClick() {
         viewModelScope.launch {
-            val result = userRepository.logInRequest(id = idQuery.value, password = passwordQuery.value)
-            _logInResult.emit(result)
+            try {
+                val result =
+                    userRepository.logInRequest(id = idQuery.value, password = passwordQuery.value)
+                _logInResult.emit(result)
+            } catch (e: Exception) {
+                _logInResult.emit(LogInResult.Failure(e.message.toString()))
+            }
         }
     }
 }
