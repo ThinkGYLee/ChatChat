@@ -88,7 +88,14 @@ fun ChatChatScreen(
             }
 
             composable(route = BottomNavItem.SIGNIN.screenRoute) {
-                SignInScreen(modifier = Modifier.fillMaxSize())
+                SignInScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    onSignInComplete = {
+                        navController.navigate(BottomNavItem.CHATLIST.screenRoute) {
+                            popUpTo(BottomNavItem.LOGIN.screenRoute) { inclusive = true }
+                        }
+                    }
+                )
             }
         }
     }
