@@ -1,5 +1,6 @@
 package com.gyleedev.chatchat.ui.signin
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,14 +40,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gyleedev.chatchat.R
+import com.gyleedev.chatchat.domain.SignInResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(
+    onSignInComplete: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SignInViewModel = hiltViewModel()
 ) {
@@ -57,6 +62,7 @@ fun SignInScreen(
     val idIsAvailable = viewModel.idIsAvailable.collectAsStateWithLifecycle()
     val passwordIsAvailable = viewModel.passwordIsAvailable.collectAsStateWithLifecycle()
     val passwordIsSame = viewModel.passwordIsSame.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(idQuery.text) {
         viewModel.editId(idQuery.text.toString())
@@ -72,6 +78,25 @@ fun SignInScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.signInProgress.collect {
+            if (it == SignInResult.Success) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.sign_in_success_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+                onSignInComplete()
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.sign_in_failure_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -326,5 +351,5 @@ fun PasswordScreen(
 @Preview
 @Composable
 fun SignInScreenPreview() {
-    SignInScreen()
+    SignInScreen(onSignInComplete = {})
 }
