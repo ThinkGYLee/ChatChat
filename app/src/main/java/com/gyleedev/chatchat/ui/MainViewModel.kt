@@ -14,8 +14,11 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
-    private val _isUserExists = MutableStateFlow<UserState>(UserState.Loading)
+    private val _isUserExists = MutableStateFlow(UserState.Loading)
     val isUserExists: StateFlow<UserState> = _isUserExists
+
+    private val _startDestination = MutableStateFlow("")
+    val startDestination: StateFlow<String> = _startDestination
 
     init {
         fetchUserExists()
@@ -25,8 +28,10 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             if (userRepository.fetchUserExists()) {
                 _isUserExists.emit(UserState.Exists)
+                _startDestination.emit(FRIENDLIST)
             } else {
                 _isUserExists.emit(UserState.NoUser)
+                _startDestination.emit(LOGIN)
             }
         }
     }

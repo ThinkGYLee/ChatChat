@@ -57,6 +57,7 @@ sealed class BottomNavItem(
 
 @Composable
 fun ChatChatScreen(
+    startDestination: String,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
@@ -66,7 +67,7 @@ fun ChatChatScreen(
     ) { paddingValue ->
         NavHost(
             navController = navController,
-            startDestination = BottomNavItem.FRIENDLIST.screenRoute,
+            startDestination = startDestination,
             modifier = Modifier
                 .padding(paddingValue)
                 .consumeWindowInsets(paddingValue)
