@@ -52,7 +52,7 @@ class UserRepositoryImpl @Inject constructor(
         try {
             database.reference.child(
                 "users"
-            ).child(user.uid).setValue(user).also { println("writedbresult: $it") }
+            ).child(user.uid).setValue(user)
             return SignInResult.Success
         } catch (e: Exception) {
             return SignInResult.Failure
@@ -76,7 +76,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun searchUser(email: String) {
         val query =
-            firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/").reference.child(
+            database.reference.child(
                 "users"
             ).orderByChild("email").equalTo(email)
         query.addListenerForSingleValueEvent(object : ValueEventListener {
