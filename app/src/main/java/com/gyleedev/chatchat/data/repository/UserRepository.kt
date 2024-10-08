@@ -11,15 +11,18 @@ import com.google.firebase.ktx.Firebase
 import com.gyleedev.chatchat.data.database.UserDao
 import com.gyleedev.chatchat.data.database.toEntity
 import com.gyleedev.chatchat.data.database.toModel
+import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserData
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 interface UserRepository {
     fun getUsersFromDatabase(): List<UserData>
-    fun signInUser(id: String, password: String)
+    suspend fun signInUser(id: String, password: String): UserData?
     fun logInRequest(id: String, password: String)
     fun searchUser(email: String)
     fun fetchUserExists(): Boolean
+    suspend fun writeUserToRealtimeDatabase(user: UserData): SignInResult
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -34,35 +37,27 @@ class UserRepositoryImpl @Inject constructor(
         return userDao.getUsers().map { it.toModel() }
     }
 
-    override fun signInUser(id: String, password: String) {
-        auth.createUserWithEmailAndPassword(id, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "createUserWithEmail:success")
-                    val user = auth.currentUser
-                    println(user)
-                    val userData =
-                        user?.uid?.let { UserData(email = id, name = "Anonymous User", uid = it) }
-                    if (userData != null) {
-                        writeUserToRealtimeDatabase(userData)
-                    }
+    override suspend fun signInUser(id: String, password: String): UserData? {
+        val request = auth.createUserWithEmailAndPassword(id, password)
 
-                    // updateUI(user)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
-
-                    println("Authentication failed. :${task.exception?.message}")
-                    // updateUI(null)
-                }
+        return with(request.await()) {
+            if (user != null) {
+                UserData(email = id, name = "Anonymous User", uid = user!!.uid)
+            } else {
+                null
             }
+        }
     }
 
-    private fun writeUserToRealtimeDatabase(user: UserData) {
-        database.reference.child(
-            "users"
-        ).child(user.uid).setValue(user)
+    override suspend fun writeUserToRealtimeDatabase(user: UserData): SignInResult {
+        try {
+            database.reference.child(
+                "users"
+            ).child(user.uid).setValue(user).also { println("writedbresult: $it") }
+            return SignInResult.Success
+        } catch (e: Exception) {
+            return SignInResult.Failure
+        }
     }
 
     private fun writeUserToRoomDatabase(user: UserData) {
