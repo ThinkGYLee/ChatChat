@@ -2,16 +2,19 @@ package com.gyleedev.chatchat.ui.signin
 
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
-import com.gyleedev.chatchat.data.repository.UserRepository
+import com.gyleedev.chatchat.domain.SignInResult
+import com.gyleedev.chatchat.domain.usecase.SignInUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val useCase: SignInUseCase
 ) : BaseViewModel() {
 
     private val _idQuery = MutableStateFlow("")
@@ -28,6 +31,9 @@ class SignInViewModel @Inject constructor(
 
     private val _signInIsAvailable = MutableStateFlow(false)
     val signInIsAvailable: StateFlow<Boolean> = _signInIsAvailable
+
+    private val _signInProgress = MutableSharedFlow<SignInResult>()
+    val signInProgress: SharedFlow<SignInResult> = _signInProgress
 
     fun editId(id: String) {
         viewModelScope.launch {
@@ -62,6 +68,9 @@ class SignInViewModel @Inject constructor(
     }
 
     fun signInRequest() {
-        userRepository.signInUser(id = _idQuery.value, password = _passwordQuery.value)
+        viewModelScope.launch {
+            val process = useCase(id = _idQuery.value, password = _passwordQuery.value)
+            _signInProgress.emit(process)
+        }
     }
 }
