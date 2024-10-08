@@ -1,7 +1,5 @@
 package com.gyleedev.chatchat.data.repository
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -11,6 +9,7 @@ import com.google.firebase.ktx.Firebase
 import com.gyleedev.chatchat.data.database.UserDao
 import com.gyleedev.chatchat.data.database.toEntity
 import com.gyleedev.chatchat.data.database.toModel
+import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserData
 import kotlinx.coroutines.tasks.await
@@ -19,7 +18,7 @@ import javax.inject.Inject
 interface UserRepository {
     fun getUsersFromDatabase(): List<UserData>
     suspend fun signInUser(id: String, password: String): UserData?
-    fun logInRequest(id: String, password: String)
+    suspend fun logInRequest(id: String, password: String): LogInResult
     fun searchUser(email: String)
     fun fetchUserExists(): Boolean
     suspend fun writeUserToRealtimeDatabase(user: UserData): SignInResult
@@ -64,19 +63,15 @@ class UserRepositoryImpl @Inject constructor(
         userDao.insertUser(user.toEntity())
     }
 
-    override fun logInRequest(id: String, password: String) {
-        auth.signInWithEmailAndPassword(id, password)
-            .addOnCompleteListener() { task ->
-                if (task.isSuccessful) {
-                    Log.d(TAG, "signInWithEmail:success")
-                    println("success")
-                    val user = auth.currentUser
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithEmail:failure", task.exception)
-                    println("fail : ${task.exception}")
-                }
+    override suspend fun logInRequest(id: String, password: String): LogInResult {
+        val request = auth.signInWithEmailAndPassword(id, password)
+        return with(request.await()) {
+            if (user != null) {
+                LogInResult.Success
+            } else {
+                LogInResult.Failure("failure")
             }
+        }
     }
 
     override fun searchUser(email: String) {
