@@ -1,6 +1,7 @@
 package com.gyleedev.chatchat.ui.login
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,11 +54,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.chatchat.R
+import com.gyleedev.chatchat.domain.LogInResult
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
+    onLogInComplete: () -> Unit,
     onSignInClicked: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel()
@@ -69,6 +73,7 @@ fun LoginScreen(
     val idComment = if (idIsAvailable || idQuery.text.isEmpty()) "" else "이메일 형식을 지켜주세요"
     val passwordComment =
         if (passwordIsAvailable || passwordQuery.text.isEmpty()) "" else "8자리 이상을 입력해 주세요"
+    val context = LocalContext.current
 
     LaunchedEffect(idQuery.text) {
         viewModel.editId(idQuery.text.toString())
@@ -80,6 +85,25 @@ fun LoginScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.logInResult.collect {
+            if (it == LogInResult.Success) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.log_in_success_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+                onLogInComplete()
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.log_in_failure_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -325,5 +349,5 @@ fun PasswordTextField(
 @Preview
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(onSignInClicked = {})
+    LoginScreen(onSignInClicked = {}, onLogInComplete = {})
 }
