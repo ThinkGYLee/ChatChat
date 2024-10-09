@@ -67,8 +67,25 @@ fun ChatChatScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
+    var isBottomBarVisible: Boolean
+    navController.currentBackStackEntryAsState().value?.destination?.route.let { route ->
+        isBottomBarVisible = when (route) {
+            LOGIN -> false
+            SIGNIN -> false
+            else -> true
+        }
+        println("$route, $isBottomBarVisible")
+    }
+
     Scaffold(
-        bottomBar = { BottomNavigation(navController = navController, modifier = Modifier) },
+        bottomBar = {
+            if (isBottomBarVisible) {
+                BottomNavigation(
+                    navController = navController,
+                    modifier = Modifier
+                )
+            }
+        },
         modifier = modifier.fillMaxSize()
     ) { paddingValue ->
         NavHost(
