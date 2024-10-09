@@ -12,16 +12,19 @@ import com.gyleedev.chatchat.data.database.toModel
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserData
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 interface UserRepository {
     fun getUsersFromDatabase(): List<UserData>
-    suspend fun signInUser(id: String, password: String): UserData?
+    suspend fun signInUser(id: String, password: String): Flow<UserData?>
     suspend fun logInRequest(id: String, password: String): LogInResult
     fun searchUser(email: String)
     fun fetchUserExists(): Boolean
-    suspend fun writeUserToRealtimeDatabase(user: UserData): SignInResult
+    suspend fun writeUserToRealtimeDatabase(user: UserData): Flow<SignInResult>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -36,28 +39,27 @@ class UserRepositoryImpl @Inject constructor(
         return userDao.getUsers().map { it.toModel() }
     }
 
-    override suspend fun signInUser(id: String, password: String): UserData? {
-        val request = auth.createUserWithEmailAndPassword(id, password)
-
-        return with(request.await()) {
-            if (user != null) {
-                UserData(email = id, name = "Anonymous User", uid = user!!.uid)
-            } else {
-                null
-            }
+    override suspend fun signInUser(id: String, password: String): Flow<UserData?> = callbackFlow {
+        auth.createUserWithEmailAndPassword(id, password).addOnSuccessListener { task ->
+            trySend(UserData(email = id, name = "Anonymous User", uid = task.user!!.uid))
+        }.addOnFailureListener {
+            trySend(null)
         }
+        awaitClose()
     }
 
-    override suspend fun writeUserToRealtimeDatabase(user: UserData): SignInResult {
-        try {
-            database.reference.child(
-                "users"
-            ).child(user.uid).setValue(user)
-            return SignInResult.Success
-        } catch (e: Exception) {
-            return SignInResult.Failure
+    override suspend fun writeUserToRealtimeDatabase(user: UserData): Flow<SignInResult> =
+        callbackFlow {
+            database.reference.child("users").child(user.uid).setValue(user)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(SignInResult.Success)
+                    } else {
+                        trySend(SignInResult.Failure)
+                    }
+                }
+            awaitClose()
         }
-    }
 
     private fun writeUserToRoomDatabase(user: UserData) {
         userDao.insertUser(user.toEntity())
