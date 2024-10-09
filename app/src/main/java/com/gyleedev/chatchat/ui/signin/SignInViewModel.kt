@@ -3,7 +3,9 @@ package com.gyleedev.chatchat.ui.signin
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.SignInResult
-import com.gyleedev.chatchat.domain.usecase.SignInUseCase
+import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.domain.usecase.SignInAuthUseCase
+import com.gyleedev.chatchat.domain.usecase.SignInDatabaseUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val useCase: SignInUseCase
+    private val signInAuthUseCase: SignInAuthUseCase,
+    private val signInDatabaseUseCase: SignInDatabaseUseCase
 ) : BaseViewModel() {
 
     private val _idQuery = MutableStateFlow("")
@@ -69,8 +72,23 @@ class SignInViewModel @Inject constructor(
 
     fun signInRequest() {
         viewModelScope.launch {
-            val process = useCase(id = _idQuery.value, password = _passwordQuery.value)
-            _signInProgress.emit(process)
+            val process = signInAuthUseCase(id = _idQuery.value, password = _passwordQuery.value)
+            process.collect { value ->
+                if (value != null) {
+                    signInDatabase(value)
+                } else {
+                    _signInProgress.emit(SignInResult.Failure)
+                }
+            }
+        }
+    }
+
+    private fun signInDatabase(userData: UserData) {
+        viewModelScope.launch {
+            val process = signInDatabaseUseCase(userData)
+            process.collect { value ->
+                _signInProgress.emit(value)
+            }
         }
     }
 }
