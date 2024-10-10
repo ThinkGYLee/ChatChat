@@ -40,7 +40,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun signInUser(id: String, password: String): Flow<UserData?> = callbackFlow {
         auth.createUserWithEmailAndPassword(id, password).addOnSuccessListener { task ->
-            trySend(UserData(email = id, name = "Anonymous User", uid = task.user!!.uid))
+            trySend(UserData(email = id, name = "Anonymous User", uid = task.user!!.uid, picture = " ", status = " "))
         }.addOnFailureListener {
             trySend(null)
         }

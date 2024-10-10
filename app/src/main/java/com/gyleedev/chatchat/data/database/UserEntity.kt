@@ -17,7 +17,11 @@ data class UserEntity(
     @ColumnInfo(name = "name")
     val name: String,
     @ColumnInfo(name = "uid")
-    val uid: String
+    val uid: String,
+    @ColumnInfo(name = "picture")
+    val picture: String,
+    @ColumnInfo(name = "status")
+    val status: String
 )
 
 fun UserData.toEntity(): UserEntity {
@@ -25,7 +29,9 @@ fun UserData.toEntity(): UserEntity {
         id = 0,
         name = name,
         email = email,
-        uid = uid
+        uid = uid,
+        picture = picture,
+        status = status
     )
 }
 
@@ -33,6 +39,8 @@ fun UserEntity.toModel(): UserData {
     return UserData(
         name = name,
         email = email,
-        uid = uid
+        uid = uid,
+        picture = picture,
+        status = status
     )
 }
