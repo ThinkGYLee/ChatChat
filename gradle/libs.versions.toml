@@ -37,20 +37,21 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
-androidx-core-splash = {group = "androidx.core", name = "core-splashscreen", version.ref = "splash"}
+androidx-core-splash = { group = "androidx.core", name = "core-splashscreen", version.ref = "splash" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-crashlystics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = 'playServicesAuth' }
-firebase-database = { group = "com.google.firebase", name = "firebase-database"}
+firebase-database = { group = "com.google.firebase", name = "firebase-database" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage-ktx" }
 dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 dagger-hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavCompose" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "google-gson" }
-room-runtime = { group = "androidx.room", name="room-runtime", version.ref = "room" }
-room-compiler = { group = "androidx.room", name="room-compiler", version.ref = "room" }
-room-ktx = { group = "androidx.room", name="room-ktx", version.ref = "room" }
-room-paging = { group = "androidx.room", name="room-paging", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 
 
 [plugins]

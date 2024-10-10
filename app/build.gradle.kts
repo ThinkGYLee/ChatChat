@@ -87,6 +87,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.services.auth)
     implementation(libs.firebase.database)
+    implementation(libs.firebase.storage)
     implementation(libs.androidx.lifecycle.compose)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.core.splash)
