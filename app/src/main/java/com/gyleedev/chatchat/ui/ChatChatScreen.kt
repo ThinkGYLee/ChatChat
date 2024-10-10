@@ -74,7 +74,6 @@ fun ChatChatScreen(
             SIGNIN -> false
             else -> true
         }
-        println("$route, $isBottomBarVisible")
     }
 
     Scaffold(
@@ -126,7 +125,7 @@ fun ChatChatScreen(
                 )
             }
             composable(route = BottomNavItem.SETTING.screenRoute) {
-                SettingScreen(onSignInClicked = {}, modifier = Modifier.fillMaxSize())
+                SettingScreen(modifier = Modifier.fillMaxSize())
             }
         }
     }
