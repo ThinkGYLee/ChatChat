@@ -2,8 +2,8 @@ package com.gyleedev.chatchat.ui.login
 
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
-import com.gyleedev.chatchat.data.repository.UserRepository
 import com.gyleedev.chatchat.domain.LogInResult
+import com.gyleedev.chatchat.domain.usecase.LogInUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val useCase: LogInUseCase
 ) : BaseViewModel() {
 
     private val _idQuery = MutableStateFlow("")
@@ -61,8 +61,10 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val result =
-                    userRepository.logInRequest(id = idQuery.value, password = passwordQuery.value)
-                _logInResult.emit(result)
+                    useCase.invoke(_idQuery.value, _passwordQuery.value)
+                result.collect { value ->
+                    _logInResult.emit(value)
+                }
             } catch (e: Exception) {
                 _logInResult.emit(LogInResult.Failure(e.message.toString()))
             }
