@@ -15,13 +15,12 @@ import com.gyleedev.chatchat.domain.UserData
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 interface UserRepository {
     fun getUsersFromDatabase(): List<UserData>
     suspend fun signInUser(id: String, password: String): Flow<UserData?>
-    suspend fun logInRequest(id: String, password: String): LogInResult
+    suspend fun logInRequest(id: String, password: String): Flow<LogInResult>
     fun searchUser(email: String)
     fun fetchUserExists(): Boolean
     suspend fun writeUserToRealtimeDatabase(user: UserData): Flow<SignInResult>
@@ -65,16 +64,16 @@ class UserRepositoryImpl @Inject constructor(
         userDao.insertUser(user.toEntity())
     }
 
-    override suspend fun logInRequest(id: String, password: String): LogInResult {
-        val request = auth.signInWithEmailAndPassword(id, password)
-        return with(request.await()) {
-            if (user != null) {
-                LogInResult.Success
-            } else {
-                LogInResult.Failure("failure")
+    override suspend fun logInRequest(id: String, password: String): Flow<LogInResult> =
+        callbackFlow {
+            auth.signInWithEmailAndPassword(id, password).addOnSuccessListener { task ->
+                trySend(LogInResult.Success)
+            }.addOnFailureListener { task ->
+                val message = if(task.message!= null) task.message else "unknown failure"
+                trySend(LogInResult.Failure(message!!))
             }
+            awaitClose()
         }
-    }
 
     override fun searchUser(email: String) {
         val query =
