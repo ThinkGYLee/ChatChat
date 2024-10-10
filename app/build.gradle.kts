@@ -102,4 +102,7 @@ dependencies {
     implementation(libs.room.paging)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+
+    implementation(libs.landscapist.glide)
+    implementation(libs.landscapist.placeholder)
 }

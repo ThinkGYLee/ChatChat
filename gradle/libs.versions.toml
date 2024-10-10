@@ -19,6 +19,7 @@ hiltNavCompose = "1.2.0"
 google-gson = "2.10.1"
 room = "2.6.1"
 splash = "1.0.1"
+landscapist = "2.3.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -52,6 +53,8 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
+landscapist-glide = { module = "com.github.skydoves:landscapist-glide", version.ref = "landscapist" }
+landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholder", version.ref = "landscapist" }
 
 
 [plugins]
