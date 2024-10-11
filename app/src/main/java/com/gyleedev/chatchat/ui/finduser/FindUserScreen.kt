@@ -81,7 +81,7 @@ fun FindUserScreen(
 
     LaunchedEffect(Unit) {
         viewModel.addProcessComplete.collect { it ->
-            if(it) {
+            if (it) {
                 onFindComplete()
             } else {
                 Toast.makeText(
@@ -138,7 +138,7 @@ fun FindUserScreen(
             })
 
             if (userData.value != null) {
-                FindUserCard(onFindComplete = viewModel::addFriend , userData = userData.value!!)
+                FindUserCard(onFindComplete = viewModel::addFriend, userData = userData.value!!)
             }
         }
     }

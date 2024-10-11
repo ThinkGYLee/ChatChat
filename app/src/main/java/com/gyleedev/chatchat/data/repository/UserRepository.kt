@@ -134,7 +134,7 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override suspend fun addFriend(user: UserData): Flow<Boolean>  = callbackFlow {
+    override suspend fun addFriend(user: UserData): Flow<Boolean> = callbackFlow {
         auth.currentUser?.let {
             database.reference.child("friends").child(it.uid).child(user.uid).setValue(user)
                 .addOnCompleteListener { task ->

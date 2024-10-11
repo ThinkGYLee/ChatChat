@@ -21,7 +21,6 @@ class FindUserViewModel @Inject constructor(
 
     private val _emailQuery = MutableStateFlow("")
 
-
     private val _emailIsAvailable = MutableStateFlow(false)
     val emailIsAvailable: StateFlow<Boolean> = _emailIsAvailable
 
