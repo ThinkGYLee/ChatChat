@@ -22,7 +22,7 @@ interface UserRepository {
     fun getUsersFromDatabase(): List<UserData>
     suspend fun signInUser(id: String, password: String): Flow<UserData?>
     suspend fun logInRequest(id: String, password: String): Flow<LogInResult>
-    fun searchUser(email: String)
+    suspend fun searchUser(email: String): Flow<UserData?>
     fun fetchUserExists(): Boolean
     suspend fun writeUserToRealtimeDatabase(user: UserData): Flow<SignInResult>
     suspend fun getMyUserInformation(): Flow<UserData?>
@@ -86,7 +86,7 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    override fun searchUser(email: String) {
+    override suspend fun searchUser(email: String): Flow<UserData?> = callbackFlow {
         val query =
             database.reference.child(
                 "users"
@@ -95,14 +95,15 @@ class UserRepositoryImpl @Inject constructor(
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (ds in snapshot.getChildren()) {
                     val snap = ds.getValue(UserData::class.java)
-                    println(snap)
+                    trySend(snap)
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                println(error)
+                trySend(null)
             }
         })
+        awaitClose()
     }
 
     override fun fetchUserExists(): Boolean {
