@@ -26,6 +26,7 @@ interface UserRepository {
     fun fetchUserExists(): Boolean
     suspend fun writeUserToRealtimeDatabase(user: UserData): Flow<SignInResult>
     suspend fun getMyUserInformation(): Flow<UserData?>
+    suspend fun addFriend(user: UserData): Flow<Boolean>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -93,7 +94,7 @@ class UserRepositoryImpl @Inject constructor(
             ).orderByChild("email").equalTo(email)
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.value!=null) {
+                if (snapshot.value != null) {
                     for (ds in snapshot.getChildren()) {
                         val snap = ds.getValue(UserData::class.java)
                         trySend(snap)
@@ -130,6 +131,20 @@ class UserRepositoryImpl @Inject constructor(
                 trySend(null)
             }
         })
+        awaitClose()
+    }
+
+    override suspend fun addFriend(user: UserData): Flow<Boolean>  = callbackFlow {
+        auth.currentUser?.let {
+            database.reference.child("friends").child(it.uid).child(user.uid).setValue(user)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(true)
+                    } else {
+                        trySend(false)
+                    }
+                }
+        }
         awaitClose()
     }
 }
