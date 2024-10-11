@@ -25,6 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.gyleedev.chatchat.ui.chatlist.ChatListScreen
+import com.gyleedev.chatchat.ui.finduser.FindUserScreen
 import com.gyleedev.chatchat.ui.friendlist.FriendListScreen
 import com.gyleedev.chatchat.ui.login.LoginScreen
 import com.gyleedev.chatchat.ui.setting.SettingScreen
@@ -59,6 +60,11 @@ sealed class BottomNavItem(
         Icons.Outlined.Settings,
         com.gyleedev.chatchat.ui.SETTING
     )
+
+    data object FINDUSER : BottomNavItem(
+        Icons.Outlined.Settings,
+        com.gyleedev.chatchat.ui.FINDUSER
+    )
 }
 
 @Composable
@@ -72,6 +78,7 @@ fun ChatChatScreen(
         isBottomBarVisible = when (route) {
             LOGIN -> false
             SIGNIN -> false
+            FINDUSER -> false
             else -> true
         }
     }
@@ -95,7 +102,10 @@ fun ChatChatScreen(
                 .consumeWindowInsets(paddingValue)
         ) {
             composable(route = BottomNavItem.FRIENDLIST.screenRoute) {
-                FriendListScreen(modifier = Modifier.fillMaxSize())
+                FriendListScreen(
+                    onFindUserButtonClick = { navController.navigate(BottomNavItem.FINDUSER.screenRoute) },
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             composable(route = BottomNavItem.CHATLIST.screenRoute) {
@@ -126,6 +136,18 @@ fun ChatChatScreen(
             }
             composable(route = BottomNavItem.SETTING.screenRoute) {
                 SettingScreen(modifier = Modifier.fillMaxSize())
+            }
+
+            composable(route = BottomNavItem.FINDUSER.screenRoute) {
+                FindUserScreen(onFindComplete = {
+                    navController.navigate(BottomNavItem.FRIENDLIST.screenRoute) {
+                        popUpTo(
+                            BottomNavItem.FRIENDLIST.screenRoute
+                        ) {
+                            inclusive = true
+                        }
+                    }
+                }, modifier = Modifier.fillMaxSize())
             }
         }
     }
