@@ -93,13 +93,18 @@ class UserRepositoryImpl @Inject constructor(
             ).orderByChild("email").equalTo(email)
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                for (ds in snapshot.getChildren()) {
-                    val snap = ds.getValue(UserData::class.java)
-                    trySend(snap)
+                if(snapshot.value!=null) {
+                    for (ds in snapshot.getChildren()) {
+                        val snap = ds.getValue(UserData::class.java)
+                        trySend(snap)
+                    }
+                } else {
+                    trySend(null)
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
+                println(error)
                 trySend(null)
             }
         })

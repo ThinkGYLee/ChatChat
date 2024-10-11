@@ -5,7 +5,9 @@ import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.usecase.GetUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,6 +25,9 @@ class FindUserViewModel @Inject constructor(
 
     private val _userData = MutableStateFlow<UserData?>(null)
     val userData: StateFlow<UserData?> = _userData
+
+    private val _searchFailure = MutableSharedFlow<Unit>()
+    val searchFailure: SharedFlow<Unit> = _searchFailure
 
     fun editEmail(email: String) {
         viewModelScope.launch {
@@ -42,7 +47,11 @@ class FindUserViewModel @Inject constructor(
         viewModelScope.launch {
             val fetchUserdata = useCase(emailQuery.value)
             fetchUserdata.collect { value ->
-                _userData.emit(value)
+                if (value == null) {
+                    _searchFailure.emit(Unit)
+                } else {
+                    _userData.emit(value)
+                }
             }
         }
     }
