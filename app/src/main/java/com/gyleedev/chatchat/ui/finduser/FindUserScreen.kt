@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.chatchat.R
+import com.gyleedev.chatchat.domain.UserData
 import com.skydoves.landscapist.glide.GlideImage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,6 +76,20 @@ fun FindUserScreen(
                 context.getString(R.string.search_user_failure_message),
                 Toast.LENGTH_SHORT
             ).show()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.addProcessComplete.collect { it ->
+            if(it) {
+                onFindComplete()
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.add_user_failure_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -123,7 +138,7 @@ fun FindUserScreen(
             })
 
             if (userData.value != null) {
-                FindUserCard(onFindComplete = { onFindComplete() })
+                FindUserCard(onFindComplete = viewModel::addFriend , userData = userData.value!!)
             }
         }
     }
@@ -194,7 +209,7 @@ fun FindUserTextField(
 }
 
 @Composable
-fun FindUserCard(onFindComplete: () -> Unit, modifier: Modifier = Modifier) {
+fun FindUserCard(onFindComplete: () -> Unit, userData: UserData, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .padding(20.dp)
@@ -207,9 +222,9 @@ fun FindUserCard(onFindComplete: () -> Unit, modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             GlideImage(
-                imageModel = { R.drawable.icons8__ }
+                imageModel = { userData.picture.ifBlank { R.drawable.icons8__ } }
             )
-            Text(text = "aaaa")
+            Text(text = userData.name)
             TextButton(onClick = { onFindComplete() }) {
                 Text(text = "친구 추가")
             }
