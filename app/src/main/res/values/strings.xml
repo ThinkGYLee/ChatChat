@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Chat Chat</string>
+    <string name="sign_in_failure_message">회원가입에 실패하였습니다</string>
+    <string name="sign_in_success_message">회원가입에 성공하였습니다</string>
+    <string name="log_in_failure_message">로그인에 실패하였습니다</string>
+    <string name="log_in_success_message">로그인에 성공하였습니다</string>
+    <string name="search_user_failure_message">해당 email의 유저 정보가 없습니다.\n다른 email로 검색해주세요</string>
+    <string name="add_user_failure_message">친구 추가에 실패했습니다</string>
 </resources>
