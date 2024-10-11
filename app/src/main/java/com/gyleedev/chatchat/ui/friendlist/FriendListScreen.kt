@@ -33,6 +33,7 @@ import com.skydoves.landscapist.glide.GlideImage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendListScreen(
+    onFindUserButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FriendListViewModel = hiltViewModel()
 ) {
@@ -50,7 +51,7 @@ fun FriendListScreen(
                     Text(text = "친구")
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { onFindUserButtonClick() }) {
                         Icon(imageVector = Icons.Outlined.Add, contentDescription = "add friend")
                     }
                 }
@@ -65,7 +66,6 @@ fun FriendListScreen(
                 .fillMaxSize()
                 .padding(horizontal = 20.dp)
         ) {
-
             if (myUserData.value != null) {
                 MyUserData(onClick = {}, userData = myUserData.value!!)
             }
@@ -99,7 +99,6 @@ fun FriendListScreen(
     }
 }
 
-
 @Composable
 fun MyUserData(onClick: () -> Unit, userData: UserData, modifier: Modifier = Modifier) {
     Row(
@@ -113,10 +112,12 @@ fun MyUserData(onClick: () -> Unit, userData: UserData, modifier: Modifier = Mod
         Spacer(modifier = Modifier.width(20.dp))
         Column(verticalArrangement = Arrangement.Center) {
             Text(text = userData.name)
-            if (userData.status.isNotBlank()) Text(
-                text = userData.status,
-                style = MaterialTheme.typography.labelMedium
-            )
+            if (userData.status.isNotBlank()) {
+                Text(
+                    text = userData.status,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
         }
     }
 }
