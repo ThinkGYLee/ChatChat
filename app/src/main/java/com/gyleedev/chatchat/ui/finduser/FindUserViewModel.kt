@@ -3,6 +3,7 @@ package com.gyleedev.chatchat.ui.finduser
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.domain.usecase.AddFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.GetUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -14,11 +15,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FindUserViewModel @Inject constructor(
-    private val useCase: GetUserDataUseCase
+    private val getUserDataUseCase: GetUserDataUseCase,
+    private val addFriendUseCase: AddFriendUseCase
 ) : BaseViewModel() {
 
     private val _emailQuery = MutableStateFlow("")
-    val emailQuery: StateFlow<String> = _emailQuery
+
 
     private val _emailIsAvailable = MutableStateFlow(false)
     val emailIsAvailable: StateFlow<Boolean> = _emailIsAvailable
@@ -28,6 +30,9 @@ class FindUserViewModel @Inject constructor(
 
     private val _searchFailure = MutableSharedFlow<Unit>()
     val searchFailure: SharedFlow<Unit> = _searchFailure
+
+    private val _addProcessComplete = MutableSharedFlow<Boolean>()
+    val addProcessComplete: SharedFlow<Boolean> = _addProcessComplete
 
     fun editEmail(email: String) {
         viewModelScope.launch {
@@ -45,13 +50,22 @@ class FindUserViewModel @Inject constructor(
 
     fun fetchUserData() {
         viewModelScope.launch {
-            val fetchUserdata = useCase(emailQuery.value)
+            val fetchUserdata = getUserDataUseCase(_emailQuery.value)
             fetchUserdata.collect { value ->
                 if (value == null) {
                     _searchFailure.emit(Unit)
                 } else {
                     _userData.emit(value)
                 }
+            }
+        }
+    }
+
+    fun addFriend() {
+        viewModelScope.launch {
+            val request = userData.value?.let { addFriendUseCase.invoke(it) }
+            request?.collect { value ->
+                _addProcessComplete.emit(value)
             }
         }
     }
