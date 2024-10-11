@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,6 +21,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -30,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -42,11 +45,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gyleedev.chatchat.R
+import com.skydoves.landscapist.glide.GlideImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FindUserScreen(modifier: Modifier = Modifier) {
+fun FindUserScreen(
+    onFindComplete: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: FindUserViewModel = hiltViewModel()
+) {
     val emailQuery = rememberTextFieldState()
+    val emailIsAvailable = viewModel.emailIsAvailable.collectAsStateWithLifecycle()
+    val userData = viewModel.userData.collectAsStateWithLifecycle()
+
+    LaunchedEffect(emailQuery.text) {
+        viewModel.editEmail(emailQuery.text.toString())
+    }
 
     Scaffold(modifier = modifier, topBar = {
         TopAppBar(
@@ -59,7 +76,8 @@ fun FindUserScreen(modifier: Modifier = Modifier) {
             },
             navigationIcon = {
                 IconButton(
-                    onClick = { /*TODO*/ }) {
+                    onClick = { /*TODO*/ }
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = "ArrowBack Button"
@@ -67,12 +85,14 @@ fun FindUserScreen(modifier: Modifier = Modifier) {
                 }
             },
             actions = {
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(
+                    onClick = viewModel::fetchUserData,
+                    enabled = emailIsAvailable.value
+                ) {
                     Text(text = "확인")
                 }
             }
         )
-
     }) { innerPadding ->
         Column(
             modifier = Modifier
@@ -89,6 +109,9 @@ fun FindUserScreen(modifier: Modifier = Modifier) {
                 }
             })
 
+            if (userData.value != null) {
+                FindUserCard(onFindComplete = { onFindComplete() })
+            }
         }
     }
 }
@@ -158,9 +181,33 @@ fun FindUserTextField(
 }
 
 @Composable
+fun FindUserCard(onFindComplete: () -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .padding(20.dp)
+            .fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            GlideImage(
+                imageModel = { R.drawable.icons8__ }
+            )
+            Text(text = "aaaa")
+            TextButton(onClick = { onFindComplete() }) {
+                Text(text = "친구 추가")
+            }
+        }
+    }
+}
+
+@Composable
 @Preview
 fun FindUserScreenPreview() {
     MaterialTheme {
-        FindUserScreen()
+        FindUserScreen(onFindComplete = {})
     }
 }
