@@ -7,12 +7,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class GetMyFriendUseCase @Inject constructor(
+class GetMyFriendFromRemoteUseCase @Inject constructor(
     private val repository: UserRepository
 ) {
-    suspend operator fun invoke(): Flow<List<UserData?>?> {
+    suspend operator fun invoke(): Flow<List<UserData>?> {
         return withContext(Dispatchers.IO) {
-            repository.getMyFriendList()
+            repository.getMyFriendListFromRemote()
         }
     }
 }

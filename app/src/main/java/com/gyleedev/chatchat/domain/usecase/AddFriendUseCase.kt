@@ -12,7 +12,7 @@ class AddFriendUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(userData: UserData): Flow<Boolean> {
         return withContext(Dispatchers.IO) {
-            repository.addFriend(userData)
+            repository.addFriendToRemote(userData)
         }
     }
 }

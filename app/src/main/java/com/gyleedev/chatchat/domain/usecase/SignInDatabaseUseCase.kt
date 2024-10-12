@@ -13,7 +13,7 @@ class SignInDatabaseUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(userData: UserData): Flow<SignInResult> {
         return withContext(Dispatchers.IO) {
-            repository.writeUserToRealtimeDatabase(userData)
+            repository.writeUserToRemote(userData)
         }
     }
 }
