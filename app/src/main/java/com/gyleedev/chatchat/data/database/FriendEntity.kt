@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 import com.gyleedev.chatchat.domain.UserData
 
 @Entity(
-    tableName = "user"
+    tableName = "friend"
 )
-data class UserEntity(
+data class FriendEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Long,
@@ -24,8 +24,8 @@ data class UserEntity(
     val status: String
 )
 
-fun UserData.toEntity(): UserEntity {
-    return UserEntity(
+fun UserData.toEntity(): FriendEntity {
+    return FriendEntity(
         id = 0,
         name = name,
         email = email,
@@ -35,7 +35,7 @@ fun UserData.toEntity(): UserEntity {
     )
 }
 
-fun UserEntity.toModel(): UserData {
+fun FriendEntity.toModel(): UserData {
     return UserData(
         name = name,
         email = email,

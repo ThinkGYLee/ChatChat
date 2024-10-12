@@ -5,12 +5,12 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [
-        UserEntity::class
+        FriendEntity::class
     ],
     version = 1,
     exportSchema = true
 )
 
 abstract class UserDatabase : RoomDatabase() {
-    abstract fun userDao(): UserDao
+    abstract fun userDao(): FriendDao
 }
