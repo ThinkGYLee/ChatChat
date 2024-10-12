@@ -7,7 +7,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.gyleedev.chatchat.data.database.UserDao
+import com.gyleedev.chatchat.data.database.FriendDao
 import com.gyleedev.chatchat.data.database.toEntity
 import com.gyleedev.chatchat.data.database.toModel
 import com.gyleedev.chatchat.domain.LogInResult
@@ -27,10 +27,11 @@ interface UserRepository {
     suspend fun writeUserToRealtimeDatabase(user: UserData): Flow<SignInResult>
     suspend fun getMyUserInformation(): Flow<UserData?>
     suspend fun addFriend(user: UserData): Flow<Boolean>
+    suspend fun getMyFriendList(): Flow<List<UserData?>?>
 }
 
 class UserRepositoryImpl @Inject constructor(
-    private val userDao: UserDao,
+    private val friendDao: FriendDao,
     firebase: Firebase,
     private val auth: FirebaseAuth,
     private val firebaseStorage: FirebaseStorage
@@ -39,7 +40,7 @@ class UserRepositoryImpl @Inject constructor(
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
     override fun getUsersFromDatabase(): List<UserData> {
-        return userDao.getUsers().map { it.toModel() }
+        return friendDao.getUsers().map { it.toModel() }
     }
 
     override suspend fun signInUser(id: String, password: String): Flow<UserData?> = callbackFlow {
@@ -73,7 +74,7 @@ class UserRepositoryImpl @Inject constructor(
         }
 
     private fun writeUserToRoomDatabase(user: UserData) {
-        userDao.insertUser(user.toEntity())
+        friendDao.insertUser(user.toEntity())
     }
 
     override suspend fun logInRequest(id: String, password: String): Flow<LogInResult> =
@@ -144,6 +145,32 @@ class UserRepositoryImpl @Inject constructor(
                         trySend(false)
                     }
                 }
+        }
+        awaitClose()
+    }
+
+    override suspend fun getMyFriendList(): Flow<List<UserData?>?> = callbackFlow {
+        auth.currentUser?.let {
+            database.reference.child("friends").child(it.uid)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val friendList = mutableListOf<UserData?>()
+                        for (ds in snapshot.getChildren()) {
+                            val snap = ds.getValue(UserData::class.java)
+                            if (snap != null) {
+                                friendList.add(snap)
+                            }
+                        }
+                        println(friendList)
+                        trySend(friendList)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        trySend(null)
+                    }
+
+                }
+                )
         }
         awaitClose()
     }
