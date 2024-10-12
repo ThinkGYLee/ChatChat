@@ -3,12 +3,13 @@ package com.gyleedev.chatchat.data.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.UserData
 
 @Entity(
-    tableName = "user"
+    tableName = "friend"
 )
-data class UserEntity(
+data class FriendEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Long,
@@ -24,8 +25,8 @@ data class UserEntity(
     val status: String
 )
 
-fun UserData.toEntity(): UserEntity {
-    return UserEntity(
+fun UserData.toEntity(): FriendEntity {
+    return FriendEntity(
         id = 0,
         name = name,
         email = email,
@@ -35,7 +36,18 @@ fun UserData.toEntity(): UserEntity {
     )
 }
 
-fun UserEntity.toModel(): UserData {
+fun FriendEntity.toFriendData(): FriendData {
+    return FriendData(
+        id = id,
+        name = name,
+        email = email,
+        uid = uid,
+        picture = picture,
+        status = status
+    )
+}
+
+fun FriendEntity.toModel(): UserData {
     return UserData(
         name = name,
         email = email,

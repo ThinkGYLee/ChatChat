@@ -1,5 +1,9 @@
 package com.gyleedev.chatchat.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -7,30 +11,40 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.gyleedev.chatchat.data.database.UserDao
+import com.gyleedev.chatchat.data.database.FriendDao
 import com.gyleedev.chatchat.data.database.toEntity
+import com.gyleedev.chatchat.data.database.toFriendData
 import com.gyleedev.chatchat.data.database.toModel
+import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface UserRepository {
-    fun getUsersFromDatabase(): List<UserData>
+    fun getUsersFromLocal(): List<UserData>
     suspend fun signInUser(id: String, password: String): Flow<UserData?>
     suspend fun logInRequest(id: String, password: String): Flow<LogInResult>
     suspend fun searchUser(email: String): Flow<UserData?>
     fun fetchUserExists(): Boolean
-    suspend fun writeUserToRealtimeDatabase(user: UserData): Flow<SignInResult>
+    suspend fun writeUserToRemote(user: UserData): Flow<SignInResult>
     suspend fun getMyUserInformation(): Flow<UserData?>
-    suspend fun addFriend(user: UserData): Flow<Boolean>
+    suspend fun addFriendToRemote(user: UserData): Flow<Boolean>
+    suspend fun getMyFriendListFromRemote(): Flow<List<UserData>?>
+    suspend fun insertMyFriendListToLocal(list: List<UserData>)
+    suspend fun insertFriendToLocal(user: UserData)
+    fun getFriends(): Flow<PagingData<FriendData>>
+    suspend fun getFriendsCount(): Long
 }
 
 class UserRepositoryImpl @Inject constructor(
-    private val userDao: UserDao,
+    private val friendDao: FriendDao,
     firebase: Firebase,
     private val auth: FirebaseAuth,
     private val firebaseStorage: FirebaseStorage
@@ -38,8 +52,8 @@ class UserRepositoryImpl @Inject constructor(
     val database =
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
-    override fun getUsersFromDatabase(): List<UserData> {
-        return userDao.getUsers().map { it.toModel() }
+    override fun getUsersFromLocal(): List<UserData> {
+        return friendDao.getUsers().map { it.toModel() }
     }
 
     override suspend fun signInUser(id: String, password: String): Flow<UserData?> = callbackFlow {
@@ -59,7 +73,7 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override suspend fun writeUserToRealtimeDatabase(user: UserData): Flow<SignInResult> =
+    override suspend fun writeUserToRemote(user: UserData): Flow<SignInResult> =
         callbackFlow {
             database.reference.child("users").child(user.uid).setValue(user)
                 .addOnCompleteListener { task ->
@@ -72,8 +86,8 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    private fun writeUserToRoomDatabase(user: UserData) {
-        userDao.insertUser(user.toEntity())
+    private fun writeUserToLocal(user: UserData) {
+        friendDao.insertUser(user.toEntity())
     }
 
     override suspend fun logInRequest(id: String, password: String): Flow<LogInResult> =
@@ -134,7 +148,7 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override suspend fun addFriend(user: UserData): Flow<Boolean> = callbackFlow {
+    override suspend fun addFriendToRemote(user: UserData): Flow<Boolean> = callbackFlow {
         auth.currentUser?.let {
             database.reference.child("friends").child(it.uid).child(user.uid).setValue(user)
                 .addOnCompleteListener { task ->
@@ -146,5 +160,55 @@ class UserRepositoryImpl @Inject constructor(
                 }
         }
         awaitClose()
+    }
+
+    override suspend fun getMyFriendListFromRemote(): Flow<List<UserData>?> = callbackFlow {
+        auth.currentUser?.let {
+            database.reference.child("friends").child(it.uid)
+                .addListenerForSingleValueEvent(
+                    object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val friendList = mutableListOf<UserData>()
+                            for (ds in snapshot.getChildren()) {
+                                val snap = ds.getValue(UserData::class.java)
+                                if (snap != null) {
+                                    friendList.add(snap)
+                                }
+                            }
+                            trySend(friendList)
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            trySend(null)
+                        }
+                    }
+                )
+        }
+        awaitClose()
+    }
+
+    override suspend fun insertMyFriendListToLocal(list: List<UserData>) {
+        withContext(Dispatchers.IO) {
+            friendDao.insertUsers(list.map { it.toEntity() })
+        }
+    }
+
+    override suspend fun insertFriendToLocal(user: UserData) {
+        friendDao.insertUser(user.toEntity())
+    }
+
+    override fun getFriends(): Flow<PagingData<FriendData>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                friendDao.getFriends()
+            }
+        ).flow.map { value ->
+            value.map { it.toFriendData() }
+        }
+    }
+
+    override suspend fun getFriendsCount(): Long {
+        return friendDao.getFriendsCount()
     }
 }

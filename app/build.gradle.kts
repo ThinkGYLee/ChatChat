@@ -105,4 +105,7 @@ dependencies {
 
     implementation(libs.landscapist.glide)
     implementation(libs.landscapist.placeholder)
+
+    implementation(libs.paging.compose)
+    implementation(libs.paging.runtime.ktx)
 }
