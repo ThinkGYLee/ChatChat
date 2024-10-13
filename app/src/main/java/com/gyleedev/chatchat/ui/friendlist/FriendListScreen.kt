@@ -49,17 +49,16 @@ fun FriendListScreen(
     val myUserData = viewModel.myUserData.collectAsStateWithLifecycle()
     val items = viewModel.items.collectAsLazyPagingItems()
 
-    items.itemCount
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(text = "친구")
-                },
+                title = { Text(text = "친구") },
                 actions = {
-                    IconButton(onClick = { onFindUserButtonClick() }) {
-                        Icon(imageVector = Icons.Outlined.Add, contentDescription = "add friend")
+                    IconButton(onClick = onFindUserButtonClick) {
+                        Icon(
+                            imageVector = Icons.Outlined.Add,
+                            contentDescription = "add friend"
+                        )
                     }
                 }
             )
@@ -78,18 +77,15 @@ fun FriendListScreen(
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "친구",
                     style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.alignByBaseline()
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = items.itemCount.toString(),
                     style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.alignByBaseline()
                 )
             }
             if (items.itemCount > 0) {
@@ -98,7 +94,11 @@ fun FriendListScreen(
                         .fillMaxSize()
                         .padding(vertical = 12.dp)
                 ) {
-                    items(items.itemCount, key = { items[it]!!.email }, contentType = { 0 }) { index ->
+                    items(
+                        items.itemCount,
+                        key = { items[it]!!.email },
+                        contentType = { 0 }
+                    ) { index ->
                         val friend = items[index] as FriendData
                         FriendData(onClick = { /*TODO*/ }, friendData = friend)
                     }
@@ -109,12 +109,16 @@ fun FriendListScreen(
 }
 
 @Composable
-fun MyUserData(onClick: () -> Unit, userData: UserData, modifier: Modifier = Modifier) {
+fun MyUserData(
+    onClick: () -> Unit,
+    userData: UserData,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onClick() },
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(imageModel = { userData.picture.ifBlank { R.drawable.icons8__ } })
@@ -132,12 +136,16 @@ fun MyUserData(onClick: () -> Unit, userData: UserData, modifier: Modifier = Mod
 }
 
 @Composable
-fun FriendData(onClick: () -> Unit, friendData: FriendData, modifier: Modifier = Modifier) {
+fun FriendData(
+    onClick: () -> Unit,
+    friendData: FriendData,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onClick() },
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(imageModel = { friendData.picture.ifBlank { R.drawable.icons8__ } })
