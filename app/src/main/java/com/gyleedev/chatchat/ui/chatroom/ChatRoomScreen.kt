@@ -32,6 +32,7 @@ import com.gyleedev.chatchat.ui.theme.ChatChatTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatRoomScreen(
+    onBackPressKeyClick: () -> Unit,
     friendData: FriendData,
     modifier: Modifier = Modifier,
     chatRoomViewModel: ChatRoomViewModel = hiltViewModel()
@@ -46,7 +47,7 @@ fun ChatRoomScreen(
                 title = { Text(text = "${friendData.name} 님과의 대화") },
                 navigationIcon = {
                     IconButton(
-                        onClick = { /*TODO*/ }
+                        onClick = onBackPressKeyClick
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -64,7 +65,7 @@ fun ChatRoomScreen(
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
         ) {
-            dummyData.value.messageList.forEach { it ->
+            dummyData.value.messageList.forEach {
                 ChatBubble(me, it)
                 Spacer(modifier = Modifier.height(20.dp))
             }
@@ -110,6 +111,6 @@ fun ChatBubblePreview() {
 @Composable
 fun ChatRoomScreenPreview() {
     ChatChatTheme {
-        ChatRoomScreen(FriendData(uid = "aa", id = 0L, name = "abcd", picture = " ", status = " "))
+        ChatRoomScreen(onBackPressKeyClick = {},FriendData(uid = "aa", id = 0L, name = "abcd", picture = " ", status = " "))
     }
 }
