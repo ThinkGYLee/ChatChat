@@ -15,9 +15,11 @@ import com.gyleedev.chatchat.data.database.FriendDao
 import com.gyleedev.chatchat.data.database.toEntity
 import com.gyleedev.chatchat.data.database.toFriendData
 import com.gyleedev.chatchat.data.database.toModel
+import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.SignInResult
+import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -25,6 +27,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.util.UUID
 import javax.inject.Inject
 
 interface UserRepository {
@@ -41,8 +44,12 @@ interface UserRepository {
     suspend fun insertFriendToLocal(user: UserData)
     fun getFriends(): Flow<PagingData<FriendData>>
     suspend fun getFriendsCount(): Long
+    suspend fun checkChatRoomExists(friendData: FriendData): Flow<Boolean>
+    suspend fun createChatRoomData(): Flow<ChatRoomData?>
+
 }
 
+// "11" + UUID.randomUUID()
 class UserRepositoryImpl @Inject constructor(
     private val friendDao: FriendDao,
     firebase: Firebase,
@@ -211,4 +218,43 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun getFriendsCount(): Long {
         return friendDao.getFriendsCount()
     }
+
+    override suspend fun checkChatRoomExists(friendData: FriendData): Flow<Boolean> = callbackFlow {
+        auth.currentUser?.uid?.let {
+            database.reference.child("userChatRooms").child(it).orderByChild("receiver")
+                .equalTo(friendData.uid)
+        }?.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (ds in snapshot.getChildren()) {
+                    val snap = ds.getValue(UserChatRoomData::class.java)
+                    if (snap != null) {
+                        trySend(true)
+                    } else {
+                        trySend(false)
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                trySend(false)
+            }
+        })
+    }
+
+    override suspend fun createChatRoomData(): Flow<ChatRoomData?> =
+        callbackFlow {
+            val rid = UUID.randomUUID().toString()
+            val chatRoomData = ChatRoomData(rid = rid, lastMessage = "")
+            auth.currentUser?.uid?.let {
+                database.reference.child("chatRooms").child(rid)
+                    .setValue(ChatRoomData(rid = rid)).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            trySend(chatRoomData)
+                        } else {
+                            trySend(null)
+                        }
+                    }
+            }
+        }
+
 }
