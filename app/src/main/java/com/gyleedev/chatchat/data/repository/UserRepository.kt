@@ -46,7 +46,15 @@ interface UserRepository {
     suspend fun getFriendsCount(): Long
     suspend fun checkChatRoomExists(friendData: FriendData): Flow<Boolean>
     suspend fun createChatRoomData(): Flow<ChatRoomData?>
+    suspend fun createMyUserChatRoom(
+        friendData: FriendData,
+        chatRoomData: ChatRoomData
+    ): Flow<UserChatRoomData?>
 
+    suspend fun createFriendUserChatRoom(
+        friendData: FriendData,
+        chatRoomData: ChatRoomData
+    ): Flow<UserChatRoomData?>
 }
 
 // "11" + UUID.randomUUID()
@@ -257,4 +265,38 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun createMyUserChatRoom(
+        friendData: FriendData,
+        chatRoomData: ChatRoomData
+    ): Flow<UserChatRoomData?> = callbackFlow {
+        val userChatRoomData = UserChatRoomData(rid = chatRoomData.rid, receiver = friendData.uid)
+        auth.currentUser?.uid?.let {
+            database.reference.child("userChatRooms").child(it)
+                .setValue(UserChatRoomData(rid = chatRoomData.rid, receiver = friendData.uid))
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(userChatRoomData)
+                    } else {
+                        trySend(null)
+                    }
+                }
+        }
+    }
+
+    override suspend fun createFriendUserChatRoom(
+        friendData: FriendData,
+        chatRoomData: ChatRoomData
+    ): Flow<UserChatRoomData?> = callbackFlow {
+        auth.currentUser?.uid?.let {
+            val userChatRoomData = UserChatRoomData(rid = chatRoomData.rid, receiver = it)
+            database.reference.child("userChatRooms").child(friendData.uid)
+                .setValue(userChatRoomData).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(userChatRoomData)
+                    } else {
+                        trySend(null)
+                    }
+                }
+        }
+    }
 }
