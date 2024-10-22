@@ -11,6 +11,6 @@ import androidx.room.RoomDatabase
     exportSchema = true
 )
 
-abstract class UserDatabase : RoomDatabase() {
+abstract class ChatDataDatabase : RoomDatabase() {
     abstract fun userDao(): FriendDao
 }

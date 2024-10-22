@@ -15,15 +15,15 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun providesUserDatabase(@ApplicationContext context: Context): UserDatabase {
+    fun providesUserDatabase(@ApplicationContext context: Context): ChatDataDatabase {
         return Room.databaseBuilder(
             context,
-            UserDatabase::class.java,
+            ChatDataDatabase::class.java,
             "database"
         ).build()
     }
 
     @Singleton
     @Provides
-    fun providesUserDao(userDatabase: UserDatabase): FriendDao = userDatabase.userDao()
+    fun providesUserDao(chatDataDatabase: ChatDataDatabase): FriendDao = chatDataDatabase.userDao()
 }
