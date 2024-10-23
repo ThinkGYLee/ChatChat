@@ -38,6 +38,7 @@ fun ChatRoomScreen(
     chatRoomViewModel: ChatRoomViewModel = hiltViewModel()
 ) {
     val dummyData = chatRoomViewModel.dummyData.collectAsStateWithLifecycle()
+    val dummyMessageData = chatRoomViewModel.dummyMessageData.collectAsStateWithLifecycle()
     val me = "user1"
 
     Scaffold(
@@ -65,7 +66,7 @@ fun ChatRoomScreen(
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
         ) {
-            dummyData.value.messageList.forEach {
+            dummyMessageData.value.forEach {
                 ChatBubble(me, it)
                 Spacer(modifier = Modifier.height(20.dp))
             }
@@ -89,7 +90,12 @@ fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifi
         alignment = Alignment.Start
     }
 
-    Column(modifier.padding(horizontal = 20.dp).fillMaxWidth(), horizontalAlignment = alignment) {
+    Column(
+        modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth(),
+        horizontalAlignment = alignment
+    ) {
         Surface(
             color = backgroundColor,
             shape = backgroundShape
@@ -103,7 +109,7 @@ fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifi
 @Composable
 fun ChatBubblePreview() {
     ChatChatTheme {
-        ChatBubble("user1", dummyChatRoomData.messageList[1])
+        ChatBubble("user1", dummyMessageDataList[1])
     }
 }
 
@@ -111,6 +117,6 @@ fun ChatBubblePreview() {
 @Composable
 fun ChatRoomScreenPreview() {
     ChatChatTheme {
-        ChatRoomScreen(onBackPressKeyClick = {},FriendData(uid = "aa", id = 0L, name = "abcd", picture = " ", status = " "))
+        ChatRoomScreen(onBackPressKeyClick = {}, FriendData(uid = "aa", id = 0L, name = "abcd", picture = " ", status = " "))
     }
 }
