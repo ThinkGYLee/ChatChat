@@ -26,6 +26,9 @@ interface FriendDao {
     @Query("SELECT * FROM friend LIMIT 1")
     fun getLastFriend(): FriendEntity
 
+    @Query("SELECT * FROM friend WHERE uid = :uid")
+    fun getFriendByUid(uid: String): FriendEntity
+
     @Update
     fun updateUser(user: FriendEntity)
 
