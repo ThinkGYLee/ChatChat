@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.data.database
 
 import android.content.Context
 import androidx.room.Room
+import com.gyleedev.chatchat.data.database.dao.FriendDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

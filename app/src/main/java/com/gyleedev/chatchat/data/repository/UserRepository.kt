@@ -11,10 +11,10 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.gyleedev.chatchat.data.database.FriendDao
-import com.gyleedev.chatchat.data.database.toEntity
-import com.gyleedev.chatchat.data.database.toFriendData
-import com.gyleedev.chatchat.data.database.toModel
+import com.gyleedev.chatchat.data.database.dao.FriendDao
+import com.gyleedev.chatchat.data.database.entity.toEntity
+import com.gyleedev.chatchat.data.database.entity.toFriendData
+import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
