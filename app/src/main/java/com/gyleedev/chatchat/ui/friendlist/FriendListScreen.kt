@@ -80,12 +80,12 @@ fun FriendListScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "친구",
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelMedium
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = items.itemCount.toString(),
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelMedium
                 )
             }
             if (items.itemCount > 0) {
