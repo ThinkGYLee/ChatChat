@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,11 +21,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.gyleedev.chatchat.ui.chatlist.ChatListScreen
+import com.gyleedev.chatchat.ui.chatroom.ChatRoomScreen
 import com.gyleedev.chatchat.ui.finduser.FindUserScreen
 import com.gyleedev.chatchat.ui.friendlist.FriendListScreen
 import com.gyleedev.chatchat.ui.login.LoginScreen
@@ -65,6 +69,11 @@ sealed class BottomNavItem(
         Icons.Outlined.Settings,
         com.gyleedev.chatchat.ui.FINDUSER
     )
+
+    data object CHATROOM : BottomNavItem(
+        Icons.Outlined.Menu,
+        com.gyleedev.chatchat.ui.CHATROOM
+    )
 }
 
 @Composable
@@ -103,6 +112,7 @@ fun ChatChatScreen(
         ) {
             composable(route = BottomNavItem.FRIENDLIST.screenRoute) {
                 FriendListScreen(
+                    onUserClick = { navController.navigate("${BottomNavItem.CHATROOM.screenRoute}/${it}") },
                     onFindUserButtonClick = { navController.navigate(BottomNavItem.FINDUSER.screenRoute) },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -148,6 +158,16 @@ fun ChatChatScreen(
                         }
                     }
                 }, modifier = Modifier.fillMaxSize())
+            }
+
+            composable(
+                route = "${BottomNavItem.CHATROOM.screenRoute}/{friend}",
+                arguments = listOf(navArgument("friend") {
+                    type = NavType.StringType
+                    nullable = false
+                })
+            ) {
+                ChatRoomScreen(onBackPressKeyClick = { /*TODO*/ })
             }
         }
     }
