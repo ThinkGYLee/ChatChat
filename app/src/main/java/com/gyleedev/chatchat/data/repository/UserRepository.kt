@@ -11,7 +11,9 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FriendDao
+import com.gyleedev.chatchat.data.database.dao.MessageDao
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toFriendData
 import com.gyleedev.chatchat.data.database.entity.toModel
@@ -55,6 +57,10 @@ interface UserRepository {
         friendData: FriendData,
         chatRoomData: ChatRoomData
     ): Flow<UserChatRoomData?>
+
+    suspend fun getFriendById(
+        uid: String
+    ): FriendData
 }
 
 // "11" + UUID.randomUUID()
@@ -62,7 +68,9 @@ class UserRepositoryImpl @Inject constructor(
     private val friendDao: FriendDao,
     firebase: Firebase,
     private val auth: FirebaseAuth,
-    private val firebaseStorage: FirebaseStorage
+    private val firebaseStorage: FirebaseStorage,
+    private val chatRoomDao: ChatRoomDao,
+    private val messageDao: MessageDao
 ) : UserRepository {
     val database =
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
@@ -298,5 +306,9 @@ class UserRepositoryImpl @Inject constructor(
                     }
                 }
         }
+    }
+
+    override suspend fun getFriendById(uid: String): FriendData {
+        return friendDao.getFriendByUid(uid).toFriendData()
     }
 }
