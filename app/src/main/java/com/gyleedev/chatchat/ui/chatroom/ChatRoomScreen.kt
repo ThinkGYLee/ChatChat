@@ -83,7 +83,7 @@ fun ChatRoomScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState(), reverseScrolling = true),
+                .verticalScroll(rememberScrollState(), reverseScrolling = true)
         ) {
             dummyMessageData.value.forEach {
                 ChatBubble(me, it)
@@ -129,7 +129,6 @@ fun CommentBottomBar(
     query: TextFieldState,
     modifier: Modifier = Modifier
 ) {
-
     BasicTextField(
         state = query,
         modifier = modifier
@@ -169,7 +168,6 @@ fun CommentBottomBar(
         }
     )
 }
-
 
 @Preview
 @Composable

@@ -112,7 +112,7 @@ fun ChatChatScreen(
         ) {
             composable(route = BottomNavItem.FRIENDLIST.screenRoute) {
                 FriendListScreen(
-                    onUserClick = { navController.navigate("${BottomNavItem.CHATROOM.screenRoute}/${it}") },
+                    onUserClick = { navController.navigate("${BottomNavItem.CHATROOM.screenRoute}/$it") },
                     onFindUserButtonClick = { navController.navigate(BottomNavItem.FINDUSER.screenRoute) },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -162,10 +162,12 @@ fun ChatChatScreen(
 
             composable(
                 route = "${BottomNavItem.CHATROOM.screenRoute}/{friend}",
-                arguments = listOf(navArgument("friend") {
-                    type = NavType.StringType
-                    nullable = false
-                })
+                arguments = listOf(
+                    navArgument("friend") {
+                        type = NavType.StringType
+                        nullable = false
+                    }
+                )
             ) {
                 ChatRoomScreen(onBackPressKeyClick = { /*TODO*/ })
             }
