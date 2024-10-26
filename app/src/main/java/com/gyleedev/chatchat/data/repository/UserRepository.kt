@@ -14,10 +14,12 @@ import com.google.firebase.storage.FirebaseStorage
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FriendDao
 import com.gyleedev.chatchat.data.database.dao.MessageDao
+import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toFriendData
 import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.domain.ChatRoomData
+import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.SignInResult
@@ -61,9 +63,12 @@ interface UserRepository {
     suspend fun getFriendById(
         uid: String
     ): FriendData
+
+    suspend fun makeNewChatRoom(rid: String, receiver: String): Long
+
+    suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData
 }
 
-// "11" + UUID.randomUUID()
 class UserRepositoryImpl @Inject constructor(
     private val friendDao: FriendDao,
     firebase: Firebase,
@@ -278,7 +283,7 @@ class UserRepositoryImpl @Inject constructor(
     ): Flow<UserChatRoomData?> = callbackFlow {
         val userChatRoomData = UserChatRoomData(rid = chatRoomData.rid, receiver = friendData.uid)
         auth.currentUser?.uid?.let {
-            database.reference.child("userChatRooms").child(it)
+            database.reference.child("userChatRooms").child(it).child(chatRoomData.rid)
                 .setValue(UserChatRoomData(rid = chatRoomData.rid, receiver = friendData.uid))
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -297,7 +302,7 @@ class UserRepositoryImpl @Inject constructor(
     ): Flow<UserChatRoomData?> = callbackFlow {
         auth.currentUser?.uid?.let {
             val userChatRoomData = UserChatRoomData(rid = chatRoomData.rid, receiver = it)
-            database.reference.child("userChatRooms").child(friendData.uid)
+            database.reference.child("userChatRooms").child(friendData.uid).child(chatRoomData.rid)
                 .setValue(userChatRoomData).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         trySend(userChatRoomData)
@@ -309,7 +314,15 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
+    override suspend fun makeNewChatRoom(rid: String, receiver: String): Long {
+        return chatRoomDao.insertChatRoom(ChatRoomEntity(0, rid, receiver, ""))
+    }
+
     override suspend fun getFriendById(uid: String): FriendData {
         return friendDao.getFriendByUid(uid).toFriendData()
+    }
+
+    override suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData {
+        return chatRoomDao.getChatRoomByUid(uid).toModel()
     }
 }
