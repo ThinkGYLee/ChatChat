@@ -1,20 +1,41 @@
 package com.gyleedev.chatchat.ui.chatroom
 
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
+import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.UserChatRoomData
+import com.gyleedev.chatchat.domain.usecase.GetFriendDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ChatRoomViewModel @Inject constructor() : BaseViewModel() {
+class ChatRoomViewModel @Inject constructor(
+    private val getFriendDataUseCase: GetFriendDataUseCase,
+    savedStateHandle: SavedStateHandle
+) : BaseViewModel() {
     private val _dummyData = MutableStateFlow(dummyUserChatRoomData)
     val dummyData: StateFlow<UserChatRoomData> = _dummyData
 
     private val _dummyMessageData = MutableStateFlow(dummyMessageDataList)
     val dummyMessageData: StateFlow<List<MessageData>> = _dummyMessageData
+
+    private val _friendData = MutableStateFlow(FriendData())
+    val friendData: StateFlow<FriendData> = _friendData
+
+    init {
+        //repository.checkChatRoomExists()
+        val friend = savedStateHandle.get<String>("friend")
+        viewModelScope.launch {
+            if (friend != null) {
+                _friendData.emit(getFriendDataUseCase(friend))
+            }
+        }
+    }
 }
 
 val dummyUserChatRoomData = UserChatRoomData(
@@ -31,5 +52,10 @@ val dummyMessageDataList = listOf(
     MessageData("AAKKSDKDK", "user2", "공부하신지 얼마나 되셨나요?", 5L),
     MessageData("AAKKSDKDK", "user1", "이제 한달 다 되어갑니다. 잘 부탁드립니다.", 6L),
     MessageData("AAKKSDKDK", "user2", "저야말로 잘 부탁드립니다.", 7L),
-    MessageData("AAKKSDKDK", "user2", "저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다.저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다.", 8L)
+    MessageData(
+        "AAKKSDKDK",
+        "user2",
+        "저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다.저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다. 저야말로 잘 부탁드립니다.",
+        8L
+    )
 )
