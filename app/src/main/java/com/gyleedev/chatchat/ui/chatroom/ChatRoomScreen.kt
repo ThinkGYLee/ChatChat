@@ -1,6 +1,5 @@
 package com.gyleedev.chatchat.ui.chatroom
 
-import android.text.Layout
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,18 +18,17 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,7 +50,11 @@ fun ChatRoomScreen(
     val dummyMessageData = chatRoomViewModel.dummyMessageData.collectAsStateWithLifecycle()
     val me = "user1"
     val friendData = chatRoomViewModel.friendData.collectAsStateWithLifecycle()
-    var query = rememberTextFieldState()
+    val query = rememberTextFieldState()
+
+    LaunchedEffect(query.text) {
+        chatRoomViewModel.editMessageQuery(query.text.toString())
+    }
 
     Scaffold(
         modifier = modifier,
@@ -136,7 +138,7 @@ fun CommentBottomBar(
             Box {
                 if (query.text.isEmpty()) {
                     Text(
-                        text = "aa",
+                        text = "채팅을 입력하세요",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color(0xFF848484),
                         modifier = Modifier
@@ -152,18 +154,13 @@ fun CommentBottomBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     innerTextField()
-                    FilledIconButton(
+                    IconButton(
                         onClick = { },
-                        modifier = Modifier,
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = Color.Blue
-                        ),
                         enabled = query.text.isNotEmpty()
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.KeyboardArrowUp,
+                            imageVector = Icons.AutoMirrored.Outlined.Send,
                             contentDescription = "Reply Icon",
-                            tint = Color.Black,
                             modifier = Modifier.padding(horizontal = 8.dp)
                         )
                     }

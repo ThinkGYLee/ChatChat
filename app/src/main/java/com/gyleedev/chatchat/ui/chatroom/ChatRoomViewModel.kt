@@ -27,6 +27,8 @@ class ChatRoomViewModel @Inject constructor(
     private val _friendData = MutableStateFlow(FriendData())
     val friendData: StateFlow<FriendData> = _friendData
 
+    private val _messageQuery = MutableStateFlow("")
+
     init {
         //repository.checkChatRoomExists()
         val friend = savedStateHandle.get<String>("friend")
@@ -34,6 +36,12 @@ class ChatRoomViewModel @Inject constructor(
             if (friend != null) {
                 _friendData.emit(getFriendDataUseCase(friend))
             }
+        }
+    }
+
+    fun editMessageQuery(query: String) {
+        viewModelScope.launch {
+            _messageQuery.emit(query)
         }
     }
 }
