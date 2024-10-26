@@ -241,13 +241,10 @@ class UserRepositoryImpl @Inject constructor(
                 .equalTo(friendData.uid)
         }?.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                for (ds in snapshot.getChildren()) {
-                    val snap = ds.getValue(UserChatRoomData::class.java)
-                    if (snap != null) {
-                        trySend(true)
-                    } else {
-                        trySend(false)
-                    }
+                if (snapshot.value != null) {
+                    trySend(true)
+                } else {
+                    trySend(false)
                 }
             }
 
@@ -255,6 +252,7 @@ class UserRepositoryImpl @Inject constructor(
                 trySend(false)
             }
         })
+        awaitClose()
     }
 
     override suspend fun createChatRoomData(): Flow<ChatRoomData?> =
@@ -271,6 +269,7 @@ class UserRepositoryImpl @Inject constructor(
                         }
                     }
             }
+            awaitClose()
         }
 
     override suspend fun createMyUserChatRoom(
@@ -289,6 +288,7 @@ class UserRepositoryImpl @Inject constructor(
                     }
                 }
         }
+        awaitClose()
     }
 
     override suspend fun createFriendUserChatRoom(
@@ -306,6 +306,7 @@ class UserRepositoryImpl @Inject constructor(
                     }
                 }
         }
+        awaitClose()
     }
 
     override suspend fun getFriendById(uid: String): FriendData {
