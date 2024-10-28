@@ -22,6 +22,7 @@ data class ChatRoomEntity(
 
 fun ChatRoomEntity.toModel(): ChatRoomLocalData {
     return ChatRoomLocalData(
+        id = id,
         rid = rid,
         receiver = receiver,
         lastMessage = lastMessage
