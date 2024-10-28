@@ -22,6 +22,7 @@ import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
+import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
@@ -67,6 +68,10 @@ interface UserRepository {
     suspend fun makeNewChatRoom(rid: String, receiver: String): Long
 
     suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData
+    suspend fun insertMessageToLocal(message: MessageData, roomId: Long)
+
+    fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
+    fun getMyUidFromLogInData(): String?
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -324,5 +329,31 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData {
         return chatRoomDao.getChatRoomByUid(uid).toModel()
+    }
+    override suspend fun insertMessageToLocal(message: MessageData, roomId: Long) {
+        println(message)
+        if (auth.currentUser?.uid != null) {
+            messageDao.insertChatRoom(
+                message = message.toEntity(
+                    roomId = roomId
+                )
+            )
+        }
+    }
+
+    override fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                messageDao.getUsersWithPaging(rid)
+            }
+        ).flow.map { value ->
+            value.map { it.toModel() }
+        }
+    }
+
+    override fun getMyUidFromLogInData(): String? {
+        println(auth.currentUser)
+        return auth.currentUser?.uid
     }
 }
