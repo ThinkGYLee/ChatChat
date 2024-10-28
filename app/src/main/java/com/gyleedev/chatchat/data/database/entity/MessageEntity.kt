@@ -25,8 +25,6 @@ data class MessageEntity(
     val writer: String,
     @ColumnInfo(name = "comment")
     val comment: String,
-    @ColumnInfo(name = "uid")
-    val uid: String,
     @ColumnInfo(name = "time")
     val time: Long
 )
@@ -37,5 +35,16 @@ fun MessageEntity.toModel(): MessageData {
         writer = writer,
         comment = comment,
         time = time
+    )
+}
+
+fun MessageData.toEntity(roomId: Long): MessageEntity {
+    return MessageEntity(
+        id = 0,
+        rid = chatRoomId,
+        writer = writer,
+        comment = comment,
+        time = time,
+        roomId = roomId
     )
 }
