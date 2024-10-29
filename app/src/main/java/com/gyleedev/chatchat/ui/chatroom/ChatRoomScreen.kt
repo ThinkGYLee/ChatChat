@@ -4,18 +4,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Send
@@ -36,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
 
@@ -51,6 +51,8 @@ fun ChatRoomScreen(
     val me = "user1"
     val friendData = chatRoomViewModel.friendData.collectAsStateWithLifecycle()
     val query = rememberTextFieldState()
+    val messages = chatRoomViewModel.messages.collectAsLazyPagingItems()
+    val myUid = chatRoomViewModel.myUid.collectAsStateWithLifecycle()
 
     LaunchedEffect(query.text) {
         chatRoomViewModel.editMessageQuery(query.text.toString())
@@ -74,20 +76,33 @@ fun ChatRoomScreen(
             )
         },
         bottomBar = {
-            CommentBottomBar(query = query)
+            CommentBottomBar(query = query, onClick = {
+                chatRoomViewModel.sendMessage()
+                query.edit {
+                    delete(
+                        0,
+                        query.text.length
+                    )
+                }
+            })
         }
     ) { innerPadding ->
 
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState(), reverseScrolling = true)
-        ) {
-            dummyMessageData.value.forEach {
-                ChatBubble(me, it)
-                Spacer(modifier = Modifier.height(20.dp))
+        if (myUid.value != null) {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .fillMaxSize(),
+                state = LazyListState(firstVisibleItemIndex = messages.itemCount)
+            ) {
+                items(
+                    count = messages.itemCount,
+                    key = { messages[it]?.time!! },
+                    contentType = { messages[it]?.writer }) {
+                    messages[it]?.let { it1 -> ChatBubble(me = myUid.value!!, messageData = it1) }
+                }
+
             }
         }
     }
@@ -103,6 +118,7 @@ fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifi
         backgroundColor = MaterialTheme.colorScheme.primary
         backgroundShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
         alignment = Alignment.End
+
     } else {
         backgroundColor = MaterialTheme.colorScheme.surfaceVariant
         backgroundShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
@@ -111,7 +127,7 @@ fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifi
 
     Column(
         modifier
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 20.dp, vertical = 8.dp)
             .fillMaxWidth(),
         horizontalAlignment = alignment
     ) {
@@ -126,6 +142,7 @@ fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifi
 
 @Composable
 fun CommentBottomBar(
+    onClick: () -> Unit,
     query: TextFieldState,
     modifier: Modifier = Modifier
 ) {
@@ -154,7 +171,7 @@ fun CommentBottomBar(
                 ) {
                     innerTextField()
                     IconButton(
-                        onClick = { },
+                        onClick = onClick,
                         enabled = query.text.isNotEmpty()
                     ) {
                         Icon(
