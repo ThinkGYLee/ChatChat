@@ -2,20 +2,44 @@ package com.gyleedev.chatchat.ui.chatroom
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.gyleedev.chatchat.core.BaseViewModel
+import com.gyleedev.chatchat.domain.ChatRoomData
+import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.UserChatRoomData
+import com.gyleedev.chatchat.domain.usecase.CheckChatRoomExistsUseCase
+import com.gyleedev.chatchat.domain.usecase.CreateChatRoomUseCase
+import com.gyleedev.chatchat.domain.usecase.CreateFriendChatRoomUseCase
+import com.gyleedev.chatchat.domain.usecase.CreateLocalChatRoomUseCase
+import com.gyleedev.chatchat.domain.usecase.CreateMyChatRoomUseCase
+import com.gyleedev.chatchat.domain.usecase.GetChatRoomLocalDataByUidUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendDataUseCase
+import com.gyleedev.chatchat.domain.usecase.GetMessagesFromLocalUseCase
+import com.gyleedev.chatchat.domain.usecase.GetMyUidFromLogInDataUseCase
+import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatRoomViewModel @Inject constructor(
+    private val getMyUidFromLogInDataUseCase: GetMyUidFromLogInDataUseCase,
     private val getFriendDataUseCase: GetFriendDataUseCase,
+    private val checkChatRoomExistsUseCase: CheckChatRoomExistsUseCase,
+    private val createChatRoomUseCase: CreateChatRoomUseCase,
+    private val createMyChatRoomUseCase: CreateMyChatRoomUseCase,
+    private val createFriendChatRoomUseCase: CreateFriendChatRoomUseCase,
+    private val createLocalChatRoomUseCase: CreateLocalChatRoomUseCase,
+    private val getChatRoomLocalDataByUidUseCase: GetChatRoomLocalDataByUidUseCase,
+    private val sendMessageUseCase: SendMessageUseCase,
+    private val getMessagesFromLocalUseCase: GetMessagesFromLocalUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
     private val _dummyData = MutableStateFlow(dummyUserChatRoomData)
@@ -27,21 +51,124 @@ class ChatRoomViewModel @Inject constructor(
     private val _friendData = MutableStateFlow(FriendData())
     val friendData: StateFlow<FriendData> = _friendData
 
+    private val _myUid = MutableStateFlow<String?>(null)
+    val myUid: StateFlow<String?> = _myUid
+
     private val _messageQuery = MutableStateFlow("")
 
+    private val _chatRoomRemoteData = MutableStateFlow<ChatRoomData?>(null)
+    private val _chatRoomLocalData = MutableStateFlow<ChatRoomLocalData>(ChatRoomLocalData())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val messages = _chatRoomLocalData.flatMapLatest {
+        getMessagesFromLocalUseCase(it.rid).cachedIn(viewModelScope)
+    }
+
+
     init {
-        //repository.checkChatRoomExists()
         val friend = savedStateHandle.get<String>("friend")
         viewModelScope.launch {
+            val uid = getMyUidFromLogInDataUseCase.invoke()
+            _myUid.emit(uid)
             if (friend != null) {
-                _friendData.emit(getFriendDataUseCase(friend))
+                getFriendData(friend)
             }
         }
+    }
+
+    private suspend fun getFriendData(friend: String) {
+        val friendData = getFriendDataUseCase(friend)
+        _friendData.emit(friendData)
+        checkChatRoomData()
+    }
+
+    private suspend fun checkChatRoomData() {
+        val chatRoomStatus = checkChatRoomExistsUseCase(_friendData.value)
+        chatRoomStatus.collect {
+            if (it) {
+                try {
+                    getChatRoomFromLocal()
+                } catch (e: Exception) {
+                    //TODO
+                }
+            } else {
+                createChatRoom()
+            }
+        }
+    }
+
+    private suspend fun createChatRoom() {
+        val response = createChatRoomUseCase()
+        response.collect {
+            if (it != null) {
+                _chatRoomRemoteData.emit(it)
+                createLocalChatRoom()
+                createMyChatRoom()
+            } else {
+                createChatRoom()
+            }
+        }
+    }
+
+    private suspend fun createMyChatRoom() {
+        val response = _chatRoomRemoteData.value?.let {
+            createMyChatRoomUseCase(_friendData.value, it)
+        }
+        response?.collect {
+            if (it == null) {
+                createMyChatRoom()
+            }
+            createFriendChatRoom()
+        }
+    }
+
+    private suspend fun createFriendChatRoom() {
+        val response =
+            _chatRoomRemoteData.value?.let { createFriendChatRoomUseCase(_friendData.value, it) }
+        response?.collect {
+            if (it == null) {
+                createFriendChatRoom()
+            } else {
+                getChatRoomFromLocal()
+            }
+        }
+    }
+
+    private suspend fun createLocalChatRoom() {
+        if (_chatRoomRemoteData.value != null) {
+            createLocalChatRoomUseCase(
+                _chatRoomRemoteData.value!!.rid,
+                friendData.value.uid
+            ).also { println(it) }
+        }
+    }
+
+    private suspend fun getChatRoomFromLocal() {
+        val data = getChatRoomLocalDataByUidUseCase(_friendData.value.uid).also { println(it) }
+        _chatRoomLocalData.emit(data)
+
     }
 
     fun editMessageQuery(query: String) {
         viewModelScope.launch {
             _messageQuery.emit(query)
+        }
+    }
+
+    fun sendMessage() {
+        viewModelScope.launch {
+            val message = myUid.value?.let {
+                MessageData(
+                    chatRoomId = _chatRoomLocalData.value.rid,
+                    writer = it,
+                    comment = _messageQuery.value,
+                    time = Instant.now().toEpochMilli(),
+                )
+            }
+            val rid = _chatRoomLocalData.value.id
+            if (message != null) {
+                sendMessageUseCase(message, rid)
+            }
         }
     }
 }
