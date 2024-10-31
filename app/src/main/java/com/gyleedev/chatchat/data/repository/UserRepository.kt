@@ -72,6 +72,8 @@ interface UserRepository {
 
     fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
     fun getMyUidFromLogInData(): String?
+
+    suspend fun insertMessageToRemote(message: MessageData): Flow<Boolean>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -355,5 +357,19 @@ class UserRepositoryImpl @Inject constructor(
     override fun getMyUidFromLogInData(): String? {
         println(auth.currentUser)
         return auth.currentUser?.uid
+    }
+
+    override suspend fun insertMessageToRemote(message: MessageData) = callbackFlow<Boolean> {
+        auth.currentUser?.let {
+            database.reference.child("messages").child(it.uid).setValue(message)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(true)
+                    } else {
+                        trySend(false)
+                    }
+                }
+        }
+        awaitClose()
     }
 }
