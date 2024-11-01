@@ -7,5 +7,6 @@ data class MessageData(
     @SerializedName("chatRoomId") val chatRoomId: String = "",
     @SerializedName("writer") val writer: String = "",
     @SerializedName("comment") val comment: String = "",
-    @SerializedName("time") val time: Long = 0L
+    @SerializedName("time") val time: Long = 0L,
+    @SerializedName("messageSendState") val messageSendState: MessageSendState = MessageSendState.COMPLETE
 )
