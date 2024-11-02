@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.gyleedev.chatchat.domain.MessageData
+import com.gyleedev.chatchat.domain.MessageSendState
 
 @Entity(
     tableName = "message"
@@ -26,7 +27,9 @@ data class MessageEntity(
     @ColumnInfo(name = "comment")
     val comment: String,
     @ColumnInfo(name = "time")
-    val time: Long
+    val time: Long,
+    @ColumnInfo(name = "messageSendState")
+    val messageSendState: MessageSendState
 )
 
 fun MessageEntity.toModel(): MessageData {
@@ -34,7 +37,8 @@ fun MessageEntity.toModel(): MessageData {
         chatRoomId = rid,
         writer = writer,
         comment = comment,
-        time = time
+        time = time,
+        messageSendState = messageSendState
     )
 }
 
@@ -45,6 +49,19 @@ fun MessageData.toEntity(roomId: Long): MessageEntity {
         writer = writer,
         comment = comment,
         time = time,
-        roomId = roomId
+        roomId = roomId,
+        messageSendState = messageSendState
+    )
+}
+
+fun MessageData.toUpdateEntity(messageId: Long, roomId: Long): MessageEntity {
+    return MessageEntity(
+        id = messageId,
+        rid = chatRoomId,
+        writer = writer,
+        comment = comment,
+        time = time,
+        roomId = roomId,
+        messageSendState = messageSendState
     )
 }
