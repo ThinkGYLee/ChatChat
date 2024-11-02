@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.domain.MessageData
+import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,10 +101,20 @@ fun ChatRoomScreen(
                 items(
                     count = messages.itemCount,
                     key = { messages[it]?.time!! },
-                    contentType = { messages[it]?.writer }) {
-                    messages[it]?.let { it1 -> ChatBubble(me = myUid.value!!, messageData = it1) }
+                    contentType = { messages[it]?.writer }
+                ) {
+                    Row {
+                        if (messages[it]?.messageSendState == MessageSendState.LOADING) {
+                            CircularProgressIndicator()
+                        }
+                        messages[it]?.let { it1 ->
+                            ChatBubble(
+                                me = myUid.value!!,
+                                messageData = it1
+                            )
+                        }
+                    }
                 }
-
             }
         }
     }
@@ -118,7 +130,6 @@ fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifi
         backgroundColor = MaterialTheme.colorScheme.primary
         backgroundShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
         alignment = Alignment.End
-
     } else {
         backgroundColor = MaterialTheme.colorScheme.surfaceVariant
         backgroundShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
@@ -189,8 +200,14 @@ fun CommentBottomBar(
 @Preview
 @Composable
 fun ChatBubblePreview() {
+    val messageData = dummyMessageDataList[1].copy(messageSendState = MessageSendState.LOADING)
     ChatChatTheme {
-        ChatBubble("user1", dummyMessageDataList[1])
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            if (messageData.messageSendState == MessageSendState.LOADING) {
+                CircularProgressIndicator()
+            }
+            ChatBubble("user1", messageData)
+        }
     }
 }
 
