@@ -8,6 +8,7 @@ import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.MessageData
+import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.usecase.CheckChatRoomExistsUseCase
 import com.gyleedev.chatchat.domain.usecase.CreateChatRoomUseCase
@@ -64,7 +65,6 @@ class ChatRoomViewModel @Inject constructor(
         getMessagesFromLocalUseCase(it.rid).cachedIn(viewModelScope)
     }
 
-
     init {
         val friend = savedStateHandle.get<String>("friend")
         viewModelScope.launch {
@@ -89,7 +89,7 @@ class ChatRoomViewModel @Inject constructor(
                 try {
                     getChatRoomFromLocal()
                 } catch (e: Exception) {
-                    //TODO
+                    // TODO
                 }
             } else {
                 createChatRoom()
@@ -146,7 +146,6 @@ class ChatRoomViewModel @Inject constructor(
     private suspend fun getChatRoomFromLocal() {
         val data = getChatRoomLocalDataByUidUseCase(_friendData.value.uid).also { println(it) }
         _chatRoomLocalData.emit(data)
-
     }
 
     fun editMessageQuery(query: String) {
@@ -163,6 +162,7 @@ class ChatRoomViewModel @Inject constructor(
                     writer = it,
                     comment = _messageQuery.value,
                     time = Instant.now().toEpochMilli(),
+                    messageSendState = MessageSendState.LOADING
                 )
             }
             val rid = _chatRoomLocalData.value.id
