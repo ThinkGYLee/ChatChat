@@ -332,6 +332,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData {
         return chatRoomDao.getChatRoomByUid(uid).toModel()
     }
+
     override suspend fun insertMessageToLocal(message: MessageData, roomId: Long) {
         println(message)
         if (auth.currentUser?.uid != null) {
@@ -359,17 +360,15 @@ class UserRepositoryImpl @Inject constructor(
         return auth.currentUser?.uid
     }
 
-    override suspend fun insertMessageToRemote(message: MessageData) = callbackFlow<Boolean> {
-        auth.currentUser?.let {
-            database.reference.child("messages").child(it.uid).setValue(message)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        trySend(true)
-                    } else {
-                        trySend(false)
-                    }
+    override suspend fun insertMessageToRemote(message: MessageData) = callbackFlow {
+        database.reference.child("messages").child(message.chatRoomId).setValue(message)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    trySend(true)
+                } else {
+                    trySend(false)
                 }
-        }
+            }
         awaitClose()
     }
 }
