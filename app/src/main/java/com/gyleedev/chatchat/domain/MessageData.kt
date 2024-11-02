@@ -1,6 +1,7 @@
 package com.gyleedev.chatchat.domain
 
 import com.google.gson.annotations.SerializedName
+import com.gyleedev.chatchat.data.model.MessageRemoteData
 
 // 기본값 설정 안해주면 crash남
 data class MessageData(
@@ -10,3 +11,12 @@ data class MessageData(
     @SerializedName("time") val time: Long = 0L,
     @SerializedName("messageSendState") val messageSendState: MessageSendState = MessageSendState.COMPLETE
 )
+
+fun MessageData.toRemoteModel(): MessageRemoteData {
+    return MessageRemoteData(
+        chatRoomId = chatRoomId,
+        writer = writer,
+        comment = comment,
+        time = time
+    )
+}
