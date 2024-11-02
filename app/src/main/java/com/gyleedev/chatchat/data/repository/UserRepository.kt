@@ -18,14 +18,17 @@ import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toFriendData
 import com.gyleedev.chatchat.data.database.entity.toModel
+import com.gyleedev.chatchat.data.database.entity.toUpdateEntity
 import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.MessageData
+import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.domain.toRemoteModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -68,12 +71,13 @@ interface UserRepository {
     suspend fun makeNewChatRoom(rid: String, receiver: String): Long
 
     suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData
-    suspend fun insertMessageToLocal(message: MessageData, roomId: Long)
+    suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long?
 
     fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
     fun getMyUidFromLogInData(): String?
 
-    suspend fun insertMessageToRemote(message: MessageData): Flow<Boolean>
+    suspend fun insertMessageToRemote(message: MessageData): Flow<MessageSendState>
+    suspend fun updateMessageState(messageId: Long, roomId: Long, message: MessageData)
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -333,14 +337,16 @@ class UserRepositoryImpl @Inject constructor(
         return chatRoomDao.getChatRoomByUid(uid).toModel()
     }
 
-    override suspend fun insertMessageToLocal(message: MessageData, roomId: Long) {
+    override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long? {
         println(message)
-        if (auth.currentUser?.uid != null) {
+        return if (auth.currentUser?.uid != null) {
             messageDao.insertChatRoom(
                 message = message.toEntity(
                     roomId = roomId
                 )
             )
+        } else {
+            null
         }
     }
 
@@ -360,15 +366,27 @@ class UserRepositoryImpl @Inject constructor(
         return auth.currentUser?.uid
     }
 
-    override suspend fun insertMessageToRemote(message: MessageData) = callbackFlow {
-        database.reference.child("messages").child(message.chatRoomId).setValue(message)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    trySend(true)
-                } else {
-                    trySend(false)
+    override suspend fun insertMessageToRemote(message: MessageData): Flow<MessageSendState> =
+        callbackFlow {
+            database.reference.child("messages").child(message.chatRoomId)
+                .child(message.time.toString())
+                .setValue(message.toRemoteModel())
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(MessageSendState.COMPLETE)
+                    } else {
+                        trySend(MessageSendState.FAIL)
+                    }
                 }
-            }
-        awaitClose()
+            awaitClose()
+        }
+
+    override suspend fun updateMessageState(messageId: Long, roomId: Long, message: MessageData) {
+        messageDao.updateMessageState(
+            message = message.toUpdateEntity(
+                messageId = messageId,
+                roomId = roomId
+            )
+        )
     }
 }
