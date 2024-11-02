@@ -11,7 +11,17 @@ class SendMessageUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(messageData: MessageData, rid: Long) {
         return withContext(Dispatchers.IO) {
-            repository.insertMessageToLocal(messageData, rid)
+            val messageId = repository.insertMessageToLocal(messageData, rid)
+            if (messageId != null) {
+                val request = repository.insertMessageToRemote(messageData)
+                request.collect { it ->
+                    it.also {
+                        val message = messageData.copy(messageSendState = it)
+
+                        repository.updateMessageState(messageId, rid, message)
+                    }
+                }
+            }
         }
     }
 }
