@@ -1,5 +1,6 @@
 package com.gyleedev.chatchat.ui.chatroom
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -106,6 +107,8 @@ fun ChatRoomScreen(
                     Row {
                         if (messages[it]?.messageSendState == MessageSendState.LOADING) {
                             CircularProgressIndicator()
+                        } else if (messages[it]?.messageSendState == MessageSendState.FAIL) {
+                            ResendButton(onClick = { /*TODO*/ })
                         }
                         messages[it]?.let { it1 ->
                             ChatBubble(
@@ -195,6 +198,33 @@ fun CommentBottomBar(
             }
         }
     )
+}
+
+@Composable
+fun ResendButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
+    ) {
+        Surface(
+            color = Color.Red,
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Text(text = "재전송", modifier = Modifier.padding(4.dp))
+        }
+    }
+}
+
+@Preview
+@Composable
+fun ResendButtonPreview() {
+    ChatChatTheme {
+        ResendButton(onClick = {})
+    }
 }
 
 @Preview
