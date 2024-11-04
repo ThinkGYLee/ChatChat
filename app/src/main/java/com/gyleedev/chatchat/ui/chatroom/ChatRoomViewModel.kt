@@ -171,6 +171,24 @@ class ChatRoomViewModel @Inject constructor(
             }
         }
     }
+
+    fun resendMessage() {
+        viewModelScope.launch {
+            val message = myUid.value?.let {
+                MessageData(
+                    chatRoomId = _chatRoomLocalData.value.rid,
+                    writer = it,
+                    comment = _messageQuery.value,
+                    time = Instant.now().toEpochMilli(),
+                    messageSendState = MessageSendState.LOADING
+                )
+            }
+            val rid = _chatRoomLocalData.value.id
+            if (message != null) {
+                sendMessageUseCase(message, rid)
+            }
+        }
+    }
 }
 
 val dummyUserChatRoomData = UserChatRoomData(
