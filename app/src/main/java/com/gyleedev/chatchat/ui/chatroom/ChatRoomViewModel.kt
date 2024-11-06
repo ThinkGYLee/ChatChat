@@ -19,6 +19,7 @@ import com.gyleedev.chatchat.domain.usecase.GetChatRoomLocalDataByUidUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMessagesFromLocalUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyUidFromLogInDataUseCase
+import com.gyleedev.chatchat.domain.usecase.ResendMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +42,7 @@ class ChatRoomViewModel @Inject constructor(
     private val getChatRoomLocalDataByUidUseCase: GetChatRoomLocalDataByUidUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val getMessagesFromLocalUseCase: GetMessagesFromLocalUseCase,
+    private val resendMessageUseCase: ResendMessageUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
     private val _dummyData = MutableStateFlow(dummyUserChatRoomData)
