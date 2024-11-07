@@ -52,7 +52,7 @@ interface UserRepository {
     suspend fun insertFriendToLocal(user: UserData)
     fun getFriends(): Flow<PagingData<FriendData>>
     suspend fun getFriendsCount(): Long
-    suspend fun checkChatRoomExists(friendData: FriendData): Flow<Boolean>
+    suspend fun checkChatRoomExistsInRemote(friendData: FriendData): Flow<Boolean>
     suspend fun createChatRoomData(): Flow<ChatRoomData?>
     suspend fun createMyUserChatRoom(
         friendData: FriendData,
@@ -78,6 +78,7 @@ interface UserRepository {
 
     suspend fun insertMessageToRemote(message: MessageData): Flow<MessageSendState>
     suspend fun updateMessageState(messageId: Long, roomId: Long, message: MessageData)
+    suspend fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -251,25 +252,26 @@ class UserRepositoryImpl @Inject constructor(
         return friendDao.getFriendsCount()
     }
 
-    override suspend fun checkChatRoomExists(friendData: FriendData): Flow<Boolean> = callbackFlow {
-        auth.currentUser?.uid?.let {
-            database.reference.child("userChatRooms").child(it).orderByChild("receiver")
-                .equalTo(friendData.uid)
-        }?.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.value != null) {
-                    trySend(true)
-                } else {
+    override suspend fun checkChatRoomExistsInRemote(friendData: FriendData): Flow<Boolean> =
+        callbackFlow {
+            auth.currentUser?.uid?.let {
+                database.reference.child("userChatRooms").child(it).orderByChild("receiver")
+                    .equalTo(friendData.uid)
+            }?.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.value != null) {
+                        trySend(true)
+                    } else {
+                        trySend(false)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
                     trySend(false)
                 }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                trySend(false)
-            }
-        })
-        awaitClose()
-    }
+            })
+            awaitClose()
+        }
 
     override suspend fun createChatRoomData(): Flow<ChatRoomData?> =
         callbackFlow {
@@ -389,4 +391,28 @@ class UserRepositoryImpl @Inject constructor(
             )
         )
     }
+
+    override suspend fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?> =
+        callbackFlow {
+            auth.currentUser?.uid?.let {
+                database.reference.child("userChatRooms").child(it).orderByChild("receiver")
+                    .equalTo(friendData.uid)
+            }?.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (ds in snapshot.getChildren()) {
+                        val snap = ds.getValue(ChatRoomData::class.java)
+                        if (snap != null) {
+                            trySend(snap.rid)
+                        } else {
+                            trySend(null)
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(null)
+                }
+            })
+            awaitClose()
+        }
 }
