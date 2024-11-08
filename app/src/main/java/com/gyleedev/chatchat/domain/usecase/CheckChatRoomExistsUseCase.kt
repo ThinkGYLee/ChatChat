@@ -12,7 +12,7 @@ class CheckChatRoomExistsUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(friend: FriendData): Flow<Boolean> {
         return withContext(Dispatchers.IO) {
-            repository.checkChatRoomExists(friend)
+            repository.checkChatRoomExistsInRemote(friend)
         }
     }
 }
