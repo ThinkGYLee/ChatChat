@@ -78,6 +78,10 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
+    private suspend fun getChetRoomFromLocalByUid() {
+        getChatRoomFromLocal()
+    }
+
     private suspend fun getFriendData(friend: String) {
         val friendData = getFriendDataUseCase(friend)
         _friendData.emit(friendData)
