@@ -79,6 +79,8 @@ interface UserRepository {
     suspend fun insertMessageToRemote(message: MessageData): Flow<MessageSendState>
     suspend fun updateMessageState(messageId: Long, roomId: Long, message: MessageData)
     suspend fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?>
+    suspend fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?>
+    suspend fun insertChatRoomToLocal(friendData: FriendData, chatRoomData: ChatRoomData): Long
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -415,4 +417,42 @@ class UserRepositoryImpl @Inject constructor(
             })
             awaitClose()
         }
+
+    override suspend fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?> =
+        callbackFlow {
+            auth.currentUser?.uid?.let {
+                database.reference.child("userChatRooms").child(it).orderByChild("receiver")
+                    .equalTo(friendData.uid)
+            }?.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (ds in snapshot.getChildren()) {
+                        val snap = ds.getValue(ChatRoomData::class.java)
+                        if (snap != null) {
+                            trySend(snap)
+                        } else {
+                            trySend(null)
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(null)
+                }
+            })
+            awaitClose()
+        }
+
+    override suspend fun insertChatRoomToLocal(
+        friendData: FriendData,
+        chatRoomData: ChatRoomData
+    ): Long {
+        return chatRoomDao.insertChatRoom(
+            ChatRoomEntity(
+                id = 0L,
+                receiver = friendData.uid,
+                lastMessage = "",
+                rid = chatRoomData.rid
+            )
+        )
+    }
 }
