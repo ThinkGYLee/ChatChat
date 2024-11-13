@@ -1,5 +1,7 @@
 package com.gyleedev.chatchat.ui.chatroom
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
@@ -160,6 +162,7 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun sendMessage() {
         viewModelScope.launch {
             val message = myUid.value?.let {
@@ -178,6 +181,7 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun resendMessage() {
         viewModelScope.launch {
             val message = myUid.value?.let {
