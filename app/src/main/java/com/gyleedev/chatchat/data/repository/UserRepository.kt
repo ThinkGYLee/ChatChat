@@ -358,7 +358,7 @@ class UserRepositoryImpl @Inject constructor(
         return Pager(
             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
             pagingSourceFactory = {
-                messageDao.getUsersWithPaging(rid)
+                messageDao.getMessagesWithPaging(rid)
             }
         ).flow.map { value ->
             value.map { it.toModel() }

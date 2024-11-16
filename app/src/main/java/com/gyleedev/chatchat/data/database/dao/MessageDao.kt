@@ -12,8 +12,8 @@ interface MessageDao {
     @Insert
     fun insertChatRoom(message: MessageEntity): Long
 
-    @Query("SELECT * FROM message WHERE rid = :id")
-    fun getUsersWithPaging(id: String): PagingSource<Int, MessageEntity>
+    @Query("SELECT * FROM message WHERE rid = :id ORDER BY time ASC")
+    fun getMessagesWithPaging(id: String): PagingSource<Int, MessageEntity>
 
     @Update
     fun updateMessageState(message: MessageEntity)
