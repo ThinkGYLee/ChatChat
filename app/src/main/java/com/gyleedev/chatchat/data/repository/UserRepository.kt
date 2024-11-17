@@ -57,12 +57,12 @@ interface UserRepository {
     suspend fun createMyUserChatRoom(
         friendData: FriendData,
         chatRoomData: ChatRoomData
-    ): Flow<UserChatRoomData?>
+    )
 
     suspend fun createFriendUserChatRoom(
         friendData: FriendData,
         chatRoomData: ChatRoomData
-    ): Flow<UserChatRoomData?>
+    )
 
     suspend fun getFriendById(
         uid: String
@@ -295,38 +295,24 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun createMyUserChatRoom(
         friendData: FriendData,
         chatRoomData: ChatRoomData
-    ): Flow<UserChatRoomData?> = callbackFlow {
-        val userChatRoomData = UserChatRoomData(rid = chatRoomData.rid, receiver = friendData.uid)
+    ) {
+        UserChatRoomData(rid = chatRoomData.rid, receiver = friendData.uid)
         auth.currentUser?.uid?.let {
             database.reference.child("userChatRooms").child(it).child(chatRoomData.rid)
                 .setValue(UserChatRoomData(rid = chatRoomData.rid, receiver = friendData.uid))
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        trySend(userChatRoomData)
-                    } else {
-                        trySend(null)
-                    }
-                }
         }
-        awaitClose()
     }
 
     override suspend fun createFriendUserChatRoom(
         friendData: FriendData,
         chatRoomData: ChatRoomData
-    ): Flow<UserChatRoomData?> = callbackFlow {
+    ) {
         auth.currentUser?.uid?.let {
             val userChatRoomData = UserChatRoomData(rid = chatRoomData.rid, receiver = it)
-            database.reference.child("userChatRooms").child(friendData.uid).child(chatRoomData.rid)
-                .setValue(userChatRoomData).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        trySend(userChatRoomData)
-                    } else {
-                        trySend(null)
-                    }
-                }
+            database.reference.child("userChatRooms").child(friendData.uid)
+                .child(chatRoomData.rid)
+                .setValue(userChatRoomData)
         }
-        awaitClose()
     }
 
     override suspend fun makeNewChatRoom(rid: String, receiver: String): Long {
@@ -385,7 +371,11 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    override suspend fun updateMessageState(messageId: Long, roomId: Long, message: MessageData) {
+    override suspend fun updateMessageState(
+        messageId: Long,
+        roomId: Long,
+        message: MessageData
+    ) {
         messageDao.updateMessageState(
             message = message.toUpdateEntity(
                 messageId = messageId,
