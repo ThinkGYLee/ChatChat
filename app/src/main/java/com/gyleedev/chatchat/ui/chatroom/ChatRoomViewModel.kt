@@ -6,17 +6,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.gyleedev.chatchat.core.BaseViewModel
-import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.UserChatRoomData
-import com.gyleedev.chatchat.domain.usecase.CheckChatRoomExistsUseCase
-import com.gyleedev.chatchat.domain.usecase.CreateChatRoomUseCase
-import com.gyleedev.chatchat.domain.usecase.CreateFriendChatRoomUseCase
-import com.gyleedev.chatchat.domain.usecase.CreateLocalChatRoomUseCase
-import com.gyleedev.chatchat.domain.usecase.CreateMyChatRoomUseCase
+import com.gyleedev.chatchat.domain.usecase.GetChatRoomDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomLocalDataByUidUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMessagesFromLocalUseCase
@@ -36,15 +31,11 @@ import javax.inject.Inject
 class ChatRoomViewModel @Inject constructor(
     private val getMyUidFromLogInDataUseCase: GetMyUidFromLogInDataUseCase,
     private val getFriendDataUseCase: GetFriendDataUseCase,
-    private val checkChatRoomExistsUseCase: CheckChatRoomExistsUseCase,
-    private val createChatRoomUseCase: CreateChatRoomUseCase,
-    private val createMyChatRoomUseCase: CreateMyChatRoomUseCase,
-    private val createFriendChatRoomUseCase: CreateFriendChatRoomUseCase,
-    private val createLocalChatRoomUseCase: CreateLocalChatRoomUseCase,
     private val getChatRoomLocalDataByUidUseCase: GetChatRoomLocalDataByUidUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val getMessagesFromLocalUseCase: GetMessagesFromLocalUseCase,
     private val resendMessageUseCase: ResendMessageUseCase,
+    private val getChatRoomDataUseCase: GetChatRoomDataUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
     private val _dummyData = MutableStateFlow(dummyUserChatRoomData)
@@ -60,8 +51,6 @@ class ChatRoomViewModel @Inject constructor(
     val myUid: StateFlow<String?> = _myUid
 
     private val _messageQuery = MutableStateFlow("")
-
-    private val _chatRoomRemoteData = MutableStateFlow<ChatRoomData?>(null)
     private val _chatRoomLocalData = MutableStateFlow<ChatRoomLocalData>(ChatRoomLocalData())
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -80,79 +69,17 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getChetRoomFromLocalByUid() {
-        getChatRoomFromLocal()
-    }
-
     private suspend fun getFriendData(friend: String) {
-        val friendData = getFriendDataUseCase(friend)
-        _friendData.emit(friendData)
-        checkChatRoomData()
-    }
-
-    private suspend fun checkChatRoomData() {
-        val chatRoomStatus = checkChatRoomExistsUseCase(_friendData.value)
-        chatRoomStatus.collect {
-            if (it) {
-                try {
-                    getChatRoomFromLocal()
-                } catch (e: Exception) {
-                    // TODO
-                }
-            } else {
-                createChatRoom()
-            }
-        }
-    }
-
-    private suspend fun createChatRoom() {
-        val response = createChatRoomUseCase()
-        response.collect {
-            if (it != null) {
-                _chatRoomRemoteData.emit(it)
-                createLocalChatRoom()
-                createMyChatRoom()
-            } else {
-                createChatRoom()
-            }
-        }
-    }
-
-    private suspend fun createMyChatRoom() {
-        val response = _chatRoomRemoteData.value?.let {
-            createMyChatRoomUseCase(_friendData.value, it)
-        }
-        response?.collect {
-            if (it == null) {
-                createMyChatRoom()
-            }
-            createFriendChatRoom()
-        }
-    }
-
-    private suspend fun createFriendChatRoom() {
-        val response =
-            _chatRoomRemoteData.value?.let { createFriendChatRoomUseCase(_friendData.value, it) }
-        response?.collect {
-            if (it == null) {
-                createFriendChatRoom()
-            } else {
-                getChatRoomFromLocal()
-            }
-        }
-    }
-
-    private suspend fun createLocalChatRoom() {
-        if (_chatRoomRemoteData.value != null) {
-            createLocalChatRoomUseCase(
-                _chatRoomRemoteData.value!!.rid,
-                friendData.value.uid
-            ).also { println(it) }
+        viewModelScope.launch {
+            val friendData = getFriendDataUseCase(friend)
+            _friendData.emit(friendData)
+            getChatRoomDataUseCase(friendData)
+            getChatRoomFromLocal()
         }
     }
 
     private suspend fun getChatRoomFromLocal() {
-        val data = getChatRoomLocalDataByUidUseCase(_friendData.value.uid).also { println(it) }
+        val data = getChatRoomLocalDataByUidUseCase(_friendData.value.uid)
         _chatRoomLocalData.emit(data)
     }
 
