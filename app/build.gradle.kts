@@ -91,6 +91,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.compose)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.core.splash)
+    implementation(libs.firebase.messaging)
 
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.hilt.compiler)
