@@ -169,7 +169,7 @@ fun ChatChatScreen(
                     }
                 )
             ) {
-                ChatRoomScreen(onBackPressKeyClick = { /*TODO*/ })
+                ChatRoomScreen(onBackPressKeyClick = { navController.navigateUp() })
             }
         }
     }
