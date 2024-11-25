@@ -1,5 +1,7 @@
 package com.gyleedev.chatchat.ui.chatroom
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +44,7 @@ import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatRoomScreen(
@@ -49,9 +52,7 @@ fun ChatRoomScreen(
     modifier: Modifier = Modifier,
     chatRoomViewModel: ChatRoomViewModel = hiltViewModel()
 ) {
-    val dummyData = chatRoomViewModel.dummyData.collectAsStateWithLifecycle()
-    val dummyMessageData = chatRoomViewModel.dummyMessageData.collectAsStateWithLifecycle()
-    val me = "user1"
+
     val friendData = chatRoomViewModel.friendData.collectAsStateWithLifecycle()
     val query = rememberTextFieldState()
     val messages = chatRoomViewModel.messages.collectAsLazyPagingItems()
@@ -241,6 +242,7 @@ fun ChatBubblePreview() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun ChatRoomScreenPreview() {
