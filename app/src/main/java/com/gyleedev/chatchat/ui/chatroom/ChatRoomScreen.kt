@@ -228,19 +228,6 @@ fun ResendButtonPreview() {
     }
 }
 
-@Preview
-@Composable
-fun ChatBubblePreview() {
-    val messageData = dummyMessageDataList[1].copy(messageSendState = MessageSendState.LOADING)
-    ChatChatTheme {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            if (messageData.messageSendState == MessageSendState.LOADING) {
-                CircularProgressIndicator()
-            }
-            ChatBubble("user1", messageData)
-        }
-    }
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview
