@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.util
+package com.gyleedev.chatchat.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase

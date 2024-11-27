@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.data.database
+package com.gyleedev.chatchat.data.database.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.gyleedev.chatchat.data.database.entity.FriendEntity
 
 @Dao
 interface FriendDao {
@@ -24,6 +25,9 @@ interface FriendDao {
 
     @Query("SELECT * FROM friend LIMIT 1")
     fun getLastFriend(): FriendEntity
+
+    @Query("SELECT * FROM friend WHERE uid = :uid")
+    fun getFriendByUid(uid: String): FriendEntity
 
     @Update
     fun updateUser(user: FriendEntity)

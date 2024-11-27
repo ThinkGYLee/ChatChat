@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -60,11 +61,7 @@ class LoginViewModel @Inject constructor(
     fun logInButtonClick() {
         viewModelScope.launch {
             try {
-                val result =
-                    useCase.invoke(_idQuery.value, _passwordQuery.value)
-                result.collect { value ->
-                    _logInResult.emit(value)
-                }
+                _logInResult.emit(useCase(_idQuery.value, _passwordQuery.value).first())
             } catch (e: Exception) {
                 _logInResult.emit(LogInResult.Failure(e.message.toString()))
             }

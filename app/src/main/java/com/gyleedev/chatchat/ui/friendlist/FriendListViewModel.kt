@@ -23,6 +23,7 @@ class FriendListViewModel @Inject constructor(
     private val addFriendsUseCase: AddFriendsUseCase,
     private val getFriendsCountUseCase: GetFriendsCountUseCase
 ) : BaseViewModel() {
+
     private val _myUserData = MutableStateFlow<UserData?>(null)
     val myUserData: StateFlow<UserData?> = _myUserData
 
@@ -52,7 +53,7 @@ class FriendListViewModel @Inject constructor(
 
     private fun getMyFriendsFromRemote() {
         viewModelScope.launch {
-            val request = getMyFriendFromRemoteUseCase.invoke()
+            val request = getMyFriendFromRemoteUseCase()
             request.collect { value ->
                 if (value != null) {
                     addMyFriendsToLocal(value)
