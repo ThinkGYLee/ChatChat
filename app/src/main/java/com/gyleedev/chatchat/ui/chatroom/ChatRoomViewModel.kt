@@ -15,6 +15,7 @@ import com.gyleedev.chatchat.domain.usecase.GetChatRoomDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomLocalDataByUidUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMessagesFromLocalUseCase
+import com.gyleedev.chatchat.domain.usecase.GetMessagesFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyUidFromLogInDataUseCase
 import com.gyleedev.chatchat.domain.usecase.ResendMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
@@ -36,6 +37,7 @@ class ChatRoomViewModel @Inject constructor(
     private val getMessagesFromLocalUseCase: GetMessagesFromLocalUseCase,
     private val resendMessageUseCase: ResendMessageUseCase,
     private val getChatRoomDataUseCase: GetChatRoomDataUseCase,
+    private val getMessagesFromRemoteUseCase: GetMessagesFromRemoteUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
     private val _dummyData = MutableStateFlow(dummyUserChatRoomData)
@@ -51,7 +53,7 @@ class ChatRoomViewModel @Inject constructor(
     val myUid: StateFlow<String?> = _myUid
 
     private val _messageQuery = MutableStateFlow("")
-    private val _chatRoomLocalData = MutableStateFlow<ChatRoomLocalData>(ChatRoomLocalData())
+    private val _chatRoomLocalData = MutableStateFlow(ChatRoomLocalData())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val messages = _chatRoomLocalData.flatMapLatest {
@@ -61,7 +63,7 @@ class ChatRoomViewModel @Inject constructor(
     init {
         val friend = savedStateHandle.get<String>("friend")
         viewModelScope.launch {
-            val uid = getMyUidFromLogInDataUseCase.invoke()
+            val uid = getMyUidFromLogInDataUseCase()
             _myUid.emit(uid)
             if (friend != null) {
                 getFriendData(friend)
@@ -75,6 +77,7 @@ class ChatRoomViewModel @Inject constructor(
             _friendData.emit(friendData)
             getChatRoomDataUseCase(friendData)
             getChatRoomFromLocal()
+            getMessagesFromRemoteUseCase(_chatRoomLocalData.value)
         }
     }
 
