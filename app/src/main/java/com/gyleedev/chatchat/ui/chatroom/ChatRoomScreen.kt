@@ -52,7 +52,6 @@ fun ChatRoomScreen(
     modifier: Modifier = Modifier,
     chatRoomViewModel: ChatRoomViewModel = hiltViewModel()
 ) {
-
     val friendData = chatRoomViewModel.friendData.collectAsStateWithLifecycle()
     val query = rememberTextFieldState()
     val messages = chatRoomViewModel.messages.collectAsLazyPagingItems()
@@ -227,7 +226,6 @@ fun ResendButtonPreview() {
         ResendButton(onClick = {})
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview
