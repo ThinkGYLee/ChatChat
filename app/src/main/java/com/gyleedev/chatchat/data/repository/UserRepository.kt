@@ -5,6 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -15,6 +16,7 @@ import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FriendDao
 import com.gyleedev.chatchat.data.database.dao.MessageDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
+import com.gyleedev.chatchat.data.database.entity.MessageEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toFriendData
 import com.gyleedev.chatchat.data.database.entity.toModel
@@ -29,11 +31,13 @@ import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.toRemoteModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
@@ -81,6 +85,8 @@ interface UserRepository {
     suspend fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?>
     suspend fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?>
     suspend fun insertChatRoomToLocal(friendData: FriendData, chatRoomData: ChatRoomData): Long
+    suspend fun getMessageListener(chatRoom: ChatRoomLocalData)
+    suspend fun getLastMessage(chatRoomId: String): MessageEntity?
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -330,7 +336,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long? {
         println(message)
         return if (auth.currentUser?.uid != null) {
-            messageDao.insertChatRoom(
+            messageDao.insertMessage(
                 message = message.toEntity(
                     roomId = roomId
                 )
@@ -376,11 +382,14 @@ class UserRepositoryImpl @Inject constructor(
         roomId: Long,
         message: MessageData
     ) {
+        println(message)
         messageDao.updateMessageState(
             message = message.toUpdateEntity(
                 messageId = messageId,
                 roomId = roomId
-            )
+            ).also {
+                println(it)
+            }
         )
     }
 
@@ -444,5 +453,70 @@ class UserRepositoryImpl @Inject constructor(
                 rid = chatRoomData.rid
             )
         )
+    }
+
+    override suspend fun getMessageListener(chatRoom: ChatRoomLocalData) {
+        database.reference.child("messages").child(chatRoom.rid)
+            .addChildEventListener(
+                object : ChildEventListener {
+
+                    override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                        val snap = snapshot.getValue(MessageData::class.java)
+                        if (snap != null) {
+                            insertMessage(snap, chatRoom.id)
+                        }
+                    }
+
+                    override fun onChildChanged(
+                        snapshot: DataSnapshot,
+                        previousChildName: String?
+                    ) {
+                        println(snapshot)
+                        for (ds in snapshot.getChildren()) {
+                            val snap = ds.getValue(MessageData::class.java)
+                            if (snap != null) {
+                                insertMessage(snap, chatRoom.id)
+                            }
+                        }
+                    }
+
+                    override fun onChildRemoved(snapshot: DataSnapshot) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
+                }
+            )
+    }
+
+    private fun insertMessage(message: MessageData, id: Long) {
+        CoroutineScope(Dispatchers.IO).launch {
+            auth.currentUser?.uid?.let {
+                val lastMessage = getLastMessage(message.chatRoomId)
+                if (lastMessage == null) {
+                    messageDao.insertMessage(message.toEntity(id))
+                } else {
+                    if (message.writer != it) {
+                        if (message.time > lastMessage.time) {
+                            messageDao.insertMessage(message.toEntity(id))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    override suspend fun getLastMessage(chatRoomId: String): MessageEntity? {
+        return try {
+            messageDao.getLastMessage(chatRoomId)
+        } catch (e: Exception) {
+            null
+        }
     }
 }
