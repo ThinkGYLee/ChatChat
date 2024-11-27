@@ -17,4 +17,7 @@ interface MessageDao {
 
     @Update
     fun updateMessageState(message: MessageEntity)
+
+    @Query("SELECT * FROM message WHERE rid = :id ORDER BY time DESC LIMIT 1")
+    fun getLastMessage(id: String): MessageEntity
 }
