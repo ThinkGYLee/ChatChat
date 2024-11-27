@@ -10,7 +10,7 @@ import com.gyleedev.chatchat.data.database.entity.MessageEntity
 @Dao
 interface MessageDao {
     @Insert
-    fun insertChatRoom(message: MessageEntity): Long
+    fun insertMessage(message: MessageEntity): Long
 
     @Query("SELECT * FROM message WHERE rid = :id ORDER BY time ASC")
     fun getMessagesWithPaging(id: String): PagingSource<Int, MessageEntity>
