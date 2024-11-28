@@ -10,8 +10,8 @@ activityCompose = "1.9.2"
 composeBom = "2024.09.01"
 spotless = "6.11.0"
 firebase = "4.4.2"
-firebaseBom = "33.3.0"
-firebaseAuth = "23.0.0"
+firebaseBom = "33.6.0"
+firebaseAuth = "23.1.0"
 playServicesAuth = "21.2.0"
 ksp = "2.0.0-1.0.24"
 hilt = "2.51.1"
@@ -21,6 +21,7 @@ room = "2.6.1"
 splash = "1.0.1"
 landscapist = "2.3.3"
 paging = "3.3.2"
+crashlytics = "3.0.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,7 +42,8 @@ androidx-lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-r
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-core-splash = { group = "androidx.core", name = "core-splashscreen", version.ref = "splash" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-crashlystics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-analystics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = 'playServicesAuth' }
 firebase-database = { group = "com.google.firebase", name = "firebase-database" }
@@ -69,3 +71,4 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 firebase = { id = "com.google.gms.google-services", version.ref = "firebase" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
