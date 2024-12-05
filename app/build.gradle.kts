@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.firebase)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.crashlytics)
 }
 
 android {
@@ -83,7 +84,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.crashlystics)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analystics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.services.auth)
     implementation(libs.firebase.database)
