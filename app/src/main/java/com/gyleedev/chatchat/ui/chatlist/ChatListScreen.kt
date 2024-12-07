@@ -34,7 +34,7 @@ fun ChatListScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "채팅")
+                    Text(text = "채팅방")
                 },
                 actions = {
                     IconButton(onClick = { /*TODO*/ }) {
@@ -52,9 +52,7 @@ fun ChatListScreen(
                 .fillMaxSize()
                 .padding(horizontal = 20.dp)
         ) {
-            Row {
-                Text(text = "채팅")
-            }
+
         }
     }
 }
