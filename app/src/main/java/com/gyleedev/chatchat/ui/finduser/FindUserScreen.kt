@@ -48,7 +48,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.UserData
 import com.skydoves.landscapist.glide.GlideImage
@@ -68,15 +70,19 @@ fun FindUserScreen(
     LaunchedEffect(emailQuery.text) {
         viewModel.editEmail(emailQuery.text.toString())
     }
-
+    val lifecycle = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
-        viewModel.searchFailure.collect {
-            Toast.makeText(
-                context,
-                context.getString(R.string.search_user_failure_message),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        // lifecycle
+
+        viewModel.searchFailure
+            .flowWithLifecycle(lifecycle.lifecycle)
+            .collect {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.search_user_failure_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
     }
 
     LaunchedEffect(Unit) {
