@@ -39,6 +39,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _idQuery.emit(id)
             checkSignInAvailable()
+            //
         }
     }
 
@@ -49,13 +50,11 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun checkSignInAvailable() {
-        viewModelScope.launch {
-            val pattern = android.util.Patterns.EMAIL_ADDRESS
-            _idIsAvailable.emit(pattern.matcher(_idQuery.value).matches())
-            _passwordIsAvailable.emit(_passwordQuery.value.length >= 8)
-            _logInIsAvailable.emit(_idIsAvailable.value && _passwordIsAvailable.value)
-        }
+    private suspend fun checkSignInAvailable() {
+        val pattern = android.util.Patterns.EMAIL_ADDRESS
+        _idIsAvailable.emit(pattern.matcher(_idQuery.value).matches())
+        _passwordIsAvailable.emit(_passwordQuery.value.length >= 8)
+        _logInIsAvailable.emit(_idIsAvailable.value && _passwordIsAvailable.value)
     }
 
     fun logInButtonClick() {
