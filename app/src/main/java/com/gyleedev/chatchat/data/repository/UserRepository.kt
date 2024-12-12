@@ -36,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,7 +57,7 @@ interface UserRepository {
     suspend fun insertFriendToLocal(user: UserData)
     fun getFriends(): Flow<PagingData<FriendData>>
     suspend fun getFriendsCount(): Long
-    suspend fun checkChatRoomExistsInRemote(friendData: FriendData): Flow<Boolean>
+    fun checkChatRoomExistsInRemote(friendData: FriendData): Flow<Boolean>
     suspend fun createChatRoomData(): Flow<ChatRoomData?>
     suspend fun createMyUserChatRoom(
         friendData: FriendData,
@@ -260,7 +261,7 @@ class UserRepositoryImpl @Inject constructor(
         return friendDao.getFriendsCount()
     }
 
-    override suspend fun checkChatRoomExistsInRemote(friendData: FriendData): Flow<Boolean> =
+    override fun checkChatRoomExistsInRemote(friendData: FriendData): Flow<Boolean> =
         callbackFlow {
             auth.currentUser?.uid?.let {
                 database.reference.child("userChatRooms").child(it).orderByChild("receiver")
@@ -279,7 +280,7 @@ class UserRepositoryImpl @Inject constructor(
                 }
             })
             awaitClose()
-        }
+        }.flowOn(Dispatchers.IO)
 
     override suspend fun createChatRoomData(): Flow<ChatRoomData?> =
         callbackFlow {
@@ -481,15 +482,15 @@ class UserRepositoryImpl @Inject constructor(
                     }
 
                     override fun onChildRemoved(snapshot: DataSnapshot) {
-                        TODO("Not yet implemented")
+
                     }
 
                     override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                        TODO("Not yet implemented")
+
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        TODO("Not yet implemented")
+
                     }
                 }
             )
