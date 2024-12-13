@@ -22,4 +22,7 @@ interface ChatRoomDao {
 
     @Update
     fun updateChatRoom(chatRoom: ChatRoomEntity)
+
+    @Query("SELECT * FROM chatroom")
+    fun getChatRoomsWithPaging(id: String): PagingSource<Int, ChatRoomEntity>
 }
