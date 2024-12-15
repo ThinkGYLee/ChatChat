@@ -88,6 +88,7 @@ interface UserRepository {
     suspend fun insertChatRoomToLocal(friendData: FriendData, chatRoomData: ChatRoomData): Long
     suspend fun getMessageListener(chatRoom: ChatRoomLocalData)
     suspend fun getLastMessage(chatRoomId: String): MessageEntity?
+    fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomLocalData>>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -518,6 +519,17 @@ class UserRepositoryImpl @Inject constructor(
             messageDao.getLastMessage(chatRoomId)
         } catch (e: Exception) {
             null
+        }
+    }
+
+    override fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomLocalData>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                chatRoomDao.getChatRoomsWithPaging()
+            }
+        ).flow.map { value ->
+            value.map { it.toModel() }
         }
     }
 }
