@@ -97,7 +97,8 @@ fun ChatRoomScreen(
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
-                state = LazyListState(firstVisibleItemIndex = messages.itemCount)
+                //리컴퍼지션 될때마다 스크롤 다시되는거 해결하기
+                state = LazyListState(firstVisibleItemIndex = messages.itemCount).also { println(it) }
             ) {
                 items(
                     count = messages.itemCount,
