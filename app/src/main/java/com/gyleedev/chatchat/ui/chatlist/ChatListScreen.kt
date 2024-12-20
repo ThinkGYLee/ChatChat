@@ -1,7 +1,6 @@
 package com.gyleedev.chatchat.ui.chatlist
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,6 +25,7 @@ fun ChatListScreen(
     modifier: Modifier = Modifier,
     viewModel: ChatListViewModel = hiltViewModel()
 ) {
+    val chatRoomList = viewModel.list.collectAsLazyPagingItems()
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
         }
@@ -37,7 +38,7 @@ fun ChatListScreen(
                     Text(text = "채팅방")
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { }) {
                         Icon(imageVector = Icons.Outlined.Add, contentDescription = "add friend")
                     }
                 }
