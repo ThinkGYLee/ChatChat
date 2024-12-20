@@ -149,15 +149,19 @@ fun ChatChatScreen(
             }
 
             composable(route = BottomNavItem.FINDUSER.screenRoute) {
-                FindUserScreen(onFindComplete = {
-                    navController.navigate(BottomNavItem.FRIENDLIST.screenRoute) {
-                        popUpTo(
-                            BottomNavItem.FRIENDLIST.screenRoute
-                        ) {
-                            inclusive = true
+                FindUserScreen(
+                    onFindComplete = {
+                        navController.navigate(BottomNavItem.FRIENDLIST.screenRoute) {
+                            popUpTo(
+                                BottomNavItem.FRIENDLIST.screenRoute
+                            ) {
+                                inclusive = true
+                            }
                         }
-                    }
-                }, modifier = Modifier.fillMaxSize())
+                    },
+                    onBackPressKeyClick = { navController.navigateUp() },
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             composable(
