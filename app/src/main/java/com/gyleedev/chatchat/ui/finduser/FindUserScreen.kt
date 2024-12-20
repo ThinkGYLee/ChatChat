@@ -58,6 +58,7 @@ import com.skydoves.landscapist.glide.GlideImage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FindUserScreen(
+    onBackPressKeyClick: () -> Unit,
     onFindComplete: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FindUserViewModel = hiltViewModel()
@@ -110,7 +111,7 @@ fun FindUserScreen(
             },
             navigationIcon = {
                 IconButton(
-                    onClick = { /*TODO*/ }
+                    onClick = onBackPressKeyClick
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
@@ -242,6 +243,6 @@ fun FindUserCard(onFindComplete: () -> Unit, userData: UserData, modifier: Modif
 @Preview
 fun FindUserScreenPreview() {
     MaterialTheme {
-        FindUserScreen(onFindComplete = {})
+        FindUserScreen(onFindComplete = {}, onBackPressKeyClick = {})
     }
 }
