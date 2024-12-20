@@ -31,14 +31,12 @@ import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.toRemoteModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
@@ -458,57 +456,76 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getMessageListener(chatRoom: ChatRoomLocalData) {
-        database.reference.child("messages").child(chatRoom.rid)
-            .addChildEventListener(
-                object : ChildEventListener {
-
-                    override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                        val snap = snapshot.getValue(MessageData::class.java)
-                        if (snap != null) {
-                            insertMessage(snap, chatRoom.id)
-                        }
-                    }
-
-                    override fun onChildChanged(
-                        snapshot: DataSnapshot,
-                        previousChildName: String?
-                    ) {
-                        println(snapshot)
-                        for (ds in snapshot.getChildren()) {
-                            val snap = ds.getValue(MessageData::class.java)
-                            if (snap != null) {
-                                insertMessage(snap, chatRoom.id)
-                            }
-                        }
-                    }
-
-                    override fun onChildRemoved(snapshot: DataSnapshot) {
-
-                    }
-
-                    override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-
-                    }
-                }
-            )
+        messageListener(chatRoom).collect {
+            if (it != null) {
+                insertMessage(it, chatRoom.id)
+            }
+        }
     }
 
-    private fun insertMessage(message: MessageData, id: Long) {
-        CoroutineScope(Dispatchers.IO).launch {
-            auth.currentUser?.uid?.let {
-                val lastMessage = getLastMessage(message.chatRoomId)
-                if (lastMessage == null) {
-                    messageDao.insertMessage(message.toEntity(id))
-                } else {
-                    if (message.writer != it) {
-                        if (message.time > lastMessage.time) {
-                            messageDao.insertMessage(message.toEntity(id))
+    private suspend fun messageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?> =
+        callbackFlow<MessageData?> {
+            database.reference.child("messages").child(chatRoom.rid)
+                .addChildEventListener(
+                    object : ChildEventListener {
+                        override fun onChildAdded(
+                            snapshot: DataSnapshot,
+                            previousChildName: String?
+                        ) {
+                            println("onChildAdded")
+                            val snap = snapshot.getValue(MessageData::class.java)
+                            println(snap)
+                            if (snap != null) {
+                                println("insert sequence")
+                                trySend(snap)
+                                //insertMessage(snap, chatRoom.id)
+                            }
+                        }
+
+                        override fun onChildChanged(
+                            snapshot: DataSnapshot,
+                            previousChildName: String?
+                        ) {
+                            println("onChildChanged")
+                            println(snapshot)
+                            trySend(null)
+                            /*for (ds in snapshot.getChildren()) {
+                                val snap = ds.getValue(MessageData::class.java)
+                                if (snap != null) {
+                                    insertMessage(snap, chatRoom.id)
+                                }
+                            }*/
+                        }
+
+                        override fun onChildRemoved(snapshot: DataSnapshot) {
+                            trySend(null)
+                        }
+
+                        override fun onChildMoved(
+                            snapshot: DataSnapshot,
+                            previousChildName: String?
+                        ) {
+                            trySend(null)
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            trySend(null)
                         }
                     }
+                )
+            awaitClose()
+        }
+
+    private suspend fun insertMessage(message: MessageData, id: Long) {
+        auth.currentUser?.uid?.let {
+            val lastMessage = getLastMessage(message.chatRoomId)
+            if (lastMessage == null) {
+                messageDao.insertMessage(message.toEntity(id))
+            } else {
+                if (message.time > lastMessage.time) {
+                    messageDao.insertMessage(message.toEntity(id))
+                } else {
+
                 }
             }
         }
