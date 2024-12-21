@@ -22,6 +22,7 @@ import com.gyleedev.chatchat.data.database.entity.toFriendData
 import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.data.database.entity.toUpdateEntity
 import com.gyleedev.chatchat.domain.ChatRoomData
+import com.gyleedev.chatchat.domain.ChatRoomDataWithFriend
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
@@ -86,7 +87,7 @@ interface UserRepository {
     suspend fun insertChatRoomToLocal(friendData: FriendData, chatRoomData: ChatRoomData): Long
     suspend fun getMessageListener(chatRoom: ChatRoomLocalData)
     suspend fun getLastMessage(chatRoomId: String): MessageEntity?
-    fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomLocalData>>
+    suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithFriend>>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -249,7 +250,7 @@ class UserRepositoryImpl @Inject constructor(
         return Pager(
             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
             pagingSourceFactory = {
-                friendDao.getFriends()
+                friendDao.getFriendsPaging()
             }
         ).flow.map { value ->
             value.map { it.toFriendData() }
@@ -382,14 +383,12 @@ class UserRepositoryImpl @Inject constructor(
         roomId: Long,
         message: MessageData
     ) {
-        println(message)
+
         messageDao.updateMessageState(
             message = message.toUpdateEntity(
                 messageId = messageId,
                 roomId = roomId
-            ).also {
-                println(it)
-            }
+            )
         )
     }
 
@@ -472,11 +471,8 @@ class UserRepositoryImpl @Inject constructor(
                             snapshot: DataSnapshot,
                             previousChildName: String?
                         ) {
-                            println("onChildAdded")
                             val snap = snapshot.getValue(MessageData::class.java)
-                            println(snap)
                             if (snap != null) {
-                                println("insert sequence")
                                 trySend(snap)
                                 //insertMessage(snap, chatRoom.id)
                             }
@@ -486,8 +482,6 @@ class UserRepositoryImpl @Inject constructor(
                             snapshot: DataSnapshot,
                             previousChildName: String?
                         ) {
-                            println("onChildChanged")
-                            println(snapshot)
                             trySend(null)
                             /*for (ds in snapshot.getChildren()) {
                                 val snap = ds.getValue(MessageData::class.java)
@@ -532,21 +526,36 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getLastMessage(chatRoomId: String): MessageEntity? {
-        return try {
-            messageDao.getLastMessage(chatRoomId)
-        } catch (e: Exception) {
-            null
+        return withContext(Dispatchers.IO) {
+            try {
+                messageDao.getLastMessage(chatRoomId)
+            } catch (e: Exception) {
+                println(e)
+                null
+            }
         }
     }
 
-    override fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomLocalData>> {
-        return Pager(
-            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-            pagingSourceFactory = {
-                chatRoomDao.getChatRoomsWithPaging()
+    override suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithFriend>> {
+        return withContext(Dispatchers.IO) {
+            val friends = getFriendsForChatRoomList()
+            Pager(
+                config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+                pagingSourceFactory = {
+                    chatRoomDao.getChatRoomsWithPaging()
+                }
+            ).flow.map { value ->
+                value.map { chatRoom ->
+                    ChatRoomDataWithFriend(
+                        chatRoomLocalData = chatRoom.toModel(),
+                        friendData = friends.find { chatRoom.receiver == it.uid }!!
+                    )
+                }
             }
-        ).flow.map { value ->
-            value.map { it.toModel() }
         }
+    }
+
+    private fun getFriendsForChatRoomList(): List<FriendData> {
+        return friendDao.getFriends().map { it.toFriendData() }
     }
 }
