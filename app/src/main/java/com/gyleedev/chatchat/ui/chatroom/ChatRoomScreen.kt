@@ -3,6 +3,7 @@ package com.gyleedev.chatchat.ui.chatroom
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -172,6 +174,7 @@ fun CommentBottomBar(
     query: TextFieldState,
     modifier: Modifier = Modifier
 ) {
+    val color = if(isSystemInDarkTheme()) Color.White else Color.Black
     BasicTextField(
         state = query,
         modifier = modifier
@@ -208,7 +211,8 @@ fun CommentBottomBar(
                     }
                 }
             }
-        }
+        },
+        textStyle = TextStyle.Default.copy(color = color)
     )
 }
 
