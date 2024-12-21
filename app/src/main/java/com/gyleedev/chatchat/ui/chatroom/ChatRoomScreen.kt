@@ -32,6 +32,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,8 +59,16 @@ fun ChatRoomScreen(
     val messages = chatRoomViewModel.messages.collectAsLazyPagingItems()
     val myUid = chatRoomViewModel.myUid.collectAsStateWithLifecycle()
 
+    val lazyListState = remember {
+        mutableStateOf(LazyListState(firstVisibleItemScrollOffset = messages.itemCount))
+    }
+
     LaunchedEffect(query.text) {
         chatRoomViewModel.editMessageQuery(query.text.toString())
+    }
+
+    LaunchedEffect(messages.itemCount) {
+        lazyListState.value.animateScrollToItem(0)
     }
 
     Scaffold(
@@ -72,22 +82,23 @@ fun ChatRoomScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "arrowback button"
+                            contentDescription = "arrow back button"
                         )
                     }
                 }
             )
         },
         bottomBar = {
-            CommentBottomBar(query = query, onClick = {
-                chatRoomViewModel.sendMessage()
-                query.edit {
-                    delete(
-                        0,
-                        query.text.length
-                    )
-                }
-            })
+            CommentBottomBar(query = query,
+                onClick = {
+                    chatRoomViewModel.sendMessage()
+                    query.edit {
+                        delete(
+                            0,
+                            query.text.length
+                        )
+                    }
+                })
         }
     ) { innerPadding ->
 
@@ -97,8 +108,8 @@ fun ChatRoomScreen(
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize(),
-                //리컴퍼지션 될때마다 스크롤 다시되는거 해결하기
-                state = LazyListState(firstVisibleItemIndex = messages.itemCount).also { println(it) }
+                state = lazyListState.value,
+                reverseLayout = true
             ) {
                 items(
                     count = messages.itemCount,
