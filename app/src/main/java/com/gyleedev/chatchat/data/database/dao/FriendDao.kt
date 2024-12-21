@@ -36,8 +36,11 @@ interface FriendDao {
     fun resetUser()
 
     @Query("SELECT * FROM friend")
-    fun getFriends(): PagingSource<Int, FriendEntity>
+    fun getFriendsPaging(): PagingSource<Int, FriendEntity>
 
     @Query("SELECT COUNT(*) FROM friend")
     fun getFriendsCount(): Long
+
+    @Query("SELECT * FROM friend")
+    fun getFriends(): List<FriendEntity>
 }
