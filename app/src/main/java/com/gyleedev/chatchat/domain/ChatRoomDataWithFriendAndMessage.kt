@@ -5,4 +5,4 @@ data class ChatRoomDataWithFriendAndMessage(
     val friendData: FriendData,
     val lastMessageData: MessageData
 )
-//view에서 lastMessage 매핑하는 용
+// view에서 lastMessage 매핑하는 용

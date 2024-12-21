@@ -91,7 +91,8 @@ fun ChatRoomScreen(
             )
         },
         bottomBar = {
-            CommentBottomBar(query = query,
+            CommentBottomBar(
+                query = query,
                 onClick = {
                     chatRoomViewModel.sendMessage()
                     query.edit {
@@ -100,7 +101,8 @@ fun ChatRoomScreen(
                             query.text.length
                         )
                     }
-                })
+                }
+            )
         }
     ) { innerPadding ->
 
@@ -174,7 +176,7 @@ fun CommentBottomBar(
     query: TextFieldState,
     modifier: Modifier = Modifier
 ) {
-    val color = if(isSystemInDarkTheme()) Color.White else Color.Black
+    val color = if (isSystemInDarkTheme()) Color.White else Color.Black
     BasicTextField(
         state = query,
         modifier = modifier

@@ -383,7 +383,6 @@ class UserRepositoryImpl @Inject constructor(
         roomId: Long,
         message: MessageData
     ) {
-
         messageDao.updateMessageState(
             message = message.toUpdateEntity(
                 messageId = messageId,
@@ -474,7 +473,7 @@ class UserRepositoryImpl @Inject constructor(
                             val snap = snapshot.getValue(MessageData::class.java)
                             if (snap != null) {
                                 trySend(snap)
-                                //insertMessage(snap, chatRoom.id)
+                                // insertMessage(snap, chatRoom.id)
                             }
                         }
 
@@ -519,7 +518,6 @@ class UserRepositoryImpl @Inject constructor(
                 if (message.time > lastMessage.time) {
                     messageDao.insertMessage(message.toEntity(id))
                 } else {
-
                 }
             }
         }
