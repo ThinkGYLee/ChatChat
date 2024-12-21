@@ -119,7 +119,10 @@ fun ChatChatScreen(
             }
 
             composable(route = BottomNavItem.CHATLIST.screenRoute) {
-                ChatListScreen(modifier = Modifier.fillMaxSize())
+                ChatListScreen(
+                    onClick = { navController.navigate("${BottomNavItem.CHATROOM.screenRoute}/$it") },
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             composable(route = BottomNavItem.LOGIN.screenRoute) {
