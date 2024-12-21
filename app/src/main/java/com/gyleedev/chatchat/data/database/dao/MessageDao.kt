@@ -12,7 +12,7 @@ interface MessageDao {
     @Insert
     fun insertMessage(message: MessageEntity): Long
 
-    @Query("SELECT * FROM message WHERE rid = :id ORDER BY time ASC")
+    @Query("SELECT * FROM message WHERE rid = :id ORDER BY time DESC")
     fun getMessagesWithPaging(id: String): PagingSource<Int, MessageEntity>
 
     @Update
