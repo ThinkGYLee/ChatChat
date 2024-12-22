@@ -20,9 +20,12 @@ import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
@@ -39,11 +42,11 @@ class ChatRoomViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
-    private val _friendData = MutableStateFlow(FriendData())
-    val friendData: StateFlow<FriendData> = _friendData
+    private val friendData = MutableStateFlow(FriendData())
 
-    private val _myUid = MutableStateFlow<String?>(null)
-    val myUid: StateFlow<String?> = _myUid
+    private var uid: String? = null
+    private val myUid = getMyUidFromLogInDataUseCase()
+        .onEach { uid = it }
 
     private val _messageQuery = MutableStateFlow("")
     private val _chatRoomLocalData = MutableStateFlow(ChatRoomLocalData())
@@ -53,11 +56,24 @@ class ChatRoomViewModel @Inject constructor(
         getMessagesFromLocalUseCase(it.rid).cachedIn(viewModelScope)
     }
 
+    val uiState = combine(friendData, myUid) { friendData, uid ->
+        if (uid != null) {
+            ChatRoomUiState.Success(
+                userName = friendData.name,
+                uid = uid
+            )
+        } else {
+            ChatRoomUiState.Loading
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        ChatRoomUiState.Loading
+    )
+
     init {
         val friend = savedStateHandle.get<String>("friend")
         viewModelScope.launch {
-            val uid = getMyUidFromLogInDataUseCase()
-            _myUid.emit(uid)
             if (friend != null) {
                 getFriendData(friend)
             }
@@ -66,14 +82,14 @@ class ChatRoomViewModel @Inject constructor(
 
     private suspend fun getFriendData(friend: String) {
         val friendData = getFriendDataUseCase(friend)
-        _friendData.emit(friendData)
+        this.friendData.emit(friendData)
         getChatRoomDataUseCase(friendData)
         getChatRoomFromLocal()
         getMessagesFromRemoteUseCase(_chatRoomLocalData.value).collectLatest { }
     }
 
     private suspend fun getChatRoomFromLocal() {
-        val data = getChatRoomLocalDataByUidUseCase(_friendData.value.uid)
+        val data = getChatRoomLocalDataByUidUseCase(friendData.value.uid)
         _chatRoomLocalData.emit(data)
     }
 
@@ -86,7 +102,7 @@ class ChatRoomViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun sendMessage() {
         viewModelScope.launch {
-            val message = myUid.value?.let {
+            val message = uid?.let {
                 MessageData(
                     chatRoomId = _chatRoomLocalData.value.rid,
                     writer = it,

@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -56,19 +57,20 @@ fun ChatRoomScreen(
     modifier: Modifier = Modifier,
     chatRoomViewModel: ChatRoomViewModel = hiltViewModel()
 ) {
-    val friendData = chatRoomViewModel.friendData.collectAsStateWithLifecycle()
     val query = rememberTextFieldState()
     val messages = chatRoomViewModel.messages.collectAsLazyPagingItems()
-    val myUid = chatRoomViewModel.myUid.collectAsStateWithLifecycle()
 
     val lazyListState = remember {
         mutableStateOf(LazyListState(firstVisibleItemScrollOffset = messages.itemCount))
     }
 
+    val uiState by chatRoomViewModel.uiState.collectAsStateWithLifecycle()
+
     LaunchedEffect(query.text) {
         chatRoomViewModel.editMessageQuery(query.text.toString())
     }
-// 보냈을때 내려간다던지로 변경
+
+    // 보냈을때 내려간다던지로 변경
     LaunchedEffect(messages.itemCount) {
         lazyListState.value.animateScrollToItem(0)
     }
@@ -76,19 +78,21 @@ fun ChatRoomScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { Text(text = "${friendData.value.name} 님과의 대화") },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onBackPressKeyClick
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "arrow back button"
-                        )
+            if (uiState is ChatRoomUiState.Success) {
+                TopAppBar(
+                    title = { Text(text = "${(uiState as ChatRoomUiState.Success).userName} 님과의 대화") },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = onBackPressKeyClick
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "arrow back button"
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         },
         bottomBar = {
             CommentBottomBar(
@@ -105,8 +109,7 @@ fun ChatRoomScreen(
             )
         }
     ) { innerPadding ->
-
-        if (myUid.value != null) {
+        if (uiState is ChatRoomUiState.Success) {
             LazyColumn(
                 modifier = Modifier
                     .padding(innerPadding)
@@ -128,7 +131,7 @@ fun ChatRoomScreen(
                         }
                         messages[it]?.let { it1 ->
                             ChatBubble(
-                                me = myUid.value!!,
+                                me = (uiState as ChatRoomUiState.Success).uid,
                                 messageData = it1
                             )
                         }

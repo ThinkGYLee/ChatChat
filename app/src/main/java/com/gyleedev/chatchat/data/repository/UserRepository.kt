@@ -323,7 +323,6 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun getMyUidFromLogInData(): String? {
-        println(auth.currentUser)
         return auth.currentUser?.uid
     }
 
