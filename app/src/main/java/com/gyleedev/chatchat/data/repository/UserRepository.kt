@@ -5,7 +5,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -16,7 +15,6 @@ import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FriendDao
 import com.gyleedev.chatchat.data.database.dao.MessageDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
-import com.gyleedev.chatchat.data.database.entity.MessageEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toFriendData
 import com.gyleedev.chatchat.data.database.entity.toModel
@@ -25,7 +23,6 @@ import com.gyleedev.chatchat.domain.ChatRoomDataWithFriend
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
-import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
@@ -35,7 +32,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
@@ -74,14 +70,11 @@ interface UserRepository {
 
     suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData
 
-    fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
     fun getMyUidFromLogInData(): String?
 
     fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?>
     fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?>
     suspend fun insertChatRoomToLocal(friendData: FriendData, chatRoomData: ChatRoomData): Long
-    fun getMessageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?>
-    suspend fun getLastMessage(chatRoomId: String): MessageEntity?
     suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithFriend>>
 }
 
@@ -329,17 +322,6 @@ class UserRepositoryImpl @Inject constructor(
         return chatRoomDao.getChatRoomByUid(uid).toModel()
     }
 
-    override fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>> {
-        return Pager(
-            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-            pagingSourceFactory = {
-                messageDao.getMessagesWithPaging(rid)
-            }
-        ).flow.map { value ->
-            value.map { it.toModel() }
-        }
-    }
-
     override fun getMyUidFromLogInData(): String? {
         println(auth.currentUser)
         return auth.currentUser?.uid
@@ -405,86 +387,6 @@ class UserRepositoryImpl @Inject constructor(
                 rid = chatRoomData.rid
             )
         )
-    }
-
-    override fun getMessageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?> {
-        return messageListener(chatRoom)
-            .onEach { messageData ->
-                if (messageData != null) {
-                    println("onEach ${messageData.comment}")
-                    insertMessage(messageData, chatRoom.id)
-                }
-            }.flowOn(Dispatchers.IO)
-    }
-
-    private fun messageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?> =
-        callbackFlow {
-            database.reference.child("messages").child(chatRoom.rid)
-                .addChildEventListener(
-                    object : ChildEventListener {
-                        override fun onChildAdded(
-                            snapshot: DataSnapshot,
-                            previousChildName: String?
-                        ) {
-                            val snap = snapshot.getValue(MessageData::class.java)
-                            if (snap != null) {
-                                trySend(snap)
-                                // insertMessage(snap, chatRoom.id)
-                            }
-                        }
-
-                        override fun onChildChanged(
-                            snapshot: DataSnapshot,
-                            previousChildName: String?
-                        ) {
-                            trySend(null)
-                            /*for (ds in snapshot.getChildren()) {
-                                val snap = ds.getValue(MessageData::class.java)
-                                if (snap != null) {
-                                    insertMessage(snap, chatRoom.id)
-                                }
-                            }*/
-                        }
-
-                        override fun onChildRemoved(snapshot: DataSnapshot) {
-                            trySend(null)
-                        }
-
-                        override fun onChildMoved(
-                            snapshot: DataSnapshot,
-                            previousChildName: String?
-                        ) {
-                            trySend(null)
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            trySend(null)
-                        }
-                    }
-                )
-            awaitClose()
-        }
-
-    private suspend fun insertMessage(message: MessageData, id: Long) {
-        val lastMessage = getLastMessage(message.chatRoomId)
-        if (lastMessage == null) {
-            messageDao.insertMessage(message.toEntity(id))
-        } else {
-            if (message.time > lastMessage.time) {
-                messageDao.insertMessage(message.toEntity(id))
-            }
-        }
-    }
-
-    override suspend fun getLastMessage(chatRoomId: String): MessageEntity? {
-        return withContext(Dispatchers.IO) {
-            try {
-                messageDao.getLastMessage(chatRoomId)
-            } catch (e: Exception) {
-                println(e)
-                null
-            }
-        }
     }
 
     override suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithFriend>> {

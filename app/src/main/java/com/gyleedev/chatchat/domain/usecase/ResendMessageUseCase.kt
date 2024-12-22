@@ -1,17 +1,14 @@
 package com.gyleedev.chatchat.domain.usecase
 
-import com.gyleedev.chatchat.data.repository.UserRepository
+import com.gyleedev.chatchat.data.repository.MessageRepository
 import com.gyleedev.chatchat.domain.MessageData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class ResendMessageUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: MessageRepository
 ) {
     suspend operator fun invoke(messageData: MessageData, rid: Long) {
-        return withContext(Dispatchers.IO) {
-            val request = repository.insertMessageToRemote(messageData)
-        }
+        repository.insertMessageToRemote(messageData).first()
     }
 }
