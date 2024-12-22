@@ -68,7 +68,7 @@ fun ChatRoomScreen(
     LaunchedEffect(query.text) {
         chatRoomViewModel.editMessageQuery(query.text.toString())
     }
-
+// 보냈을때 내려간다던지로 변경
     LaunchedEffect(messages.itemCount) {
         lazyListState.value.animateScrollToItem(0)
     }

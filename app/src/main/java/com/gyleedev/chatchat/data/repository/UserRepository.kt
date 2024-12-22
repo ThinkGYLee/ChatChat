@@ -20,24 +20,22 @@ import com.gyleedev.chatchat.data.database.entity.MessageEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toFriendData
 import com.gyleedev.chatchat.data.database.entity.toModel
-import com.gyleedev.chatchat.data.database.entity.toUpdateEntity
 import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.ChatRoomDataWithFriend
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.MessageData
-import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
-import com.gyleedev.chatchat.domain.toRemoteModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
@@ -75,17 +73,14 @@ interface UserRepository {
     suspend fun makeNewChatRoom(rid: String, receiver: String): Long
 
     suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData
-    suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long?
 
     fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
     fun getMyUidFromLogInData(): String?
 
-    suspend fun insertMessageToRemote(message: MessageData): Flow<MessageSendState>
-    suspend fun updateMessageState(messageId: Long, roomId: Long, message: MessageData)
-    suspend fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?>
-    suspend fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?>
+    fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?>
+    fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?>
     suspend fun insertChatRoomToLocal(friendData: FriendData, chatRoomData: ChatRoomData): Long
-    suspend fun getMessageListener(chatRoom: ChatRoomLocalData)
+    fun getMessageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?>
     suspend fun getLastMessage(chatRoomId: String): MessageEntity?
     suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithFriend>>
 }
@@ -334,19 +329,6 @@ class UserRepositoryImpl @Inject constructor(
         return chatRoomDao.getChatRoomByUid(uid).toModel()
     }
 
-    override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long? {
-        println(message)
-        return if (auth.currentUser?.uid != null) {
-            messageDao.insertMessage(
-                message = message.toEntity(
-                    roomId = roomId
-                )
-            )
-        } else {
-            null
-        }
-    }
-
     override fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>> {
         return Pager(
             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
@@ -363,35 +345,7 @@ class UserRepositoryImpl @Inject constructor(
         return auth.currentUser?.uid
     }
 
-    override suspend fun insertMessageToRemote(message: MessageData): Flow<MessageSendState> =
-        callbackFlow {
-            database.reference.child("messages").child(message.chatRoomId)
-                .child(message.time.toString())
-                .setValue(message.toRemoteModel())
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        trySend(MessageSendState.COMPLETE)
-                    } else {
-                        trySend(MessageSendState.FAIL)
-                    }
-                }
-            awaitClose()
-        }
-
-    override suspend fun updateMessageState(
-        messageId: Long,
-        roomId: Long,
-        message: MessageData
-    ) {
-        messageDao.updateMessageState(
-            message = message.toUpdateEntity(
-                messageId = messageId,
-                roomId = roomId
-            )
-        )
-    }
-
-    override suspend fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?> =
+    override fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?> =
         callbackFlow {
             auth.currentUser?.uid?.let {
                 database.reference.child("userChatRooms").child(it).orderByChild("receiver")
@@ -415,7 +369,7 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    override suspend fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?> =
+    override fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?> =
         callbackFlow {
             auth.currentUser?.uid?.let {
                 database.reference.child("userChatRooms").child(it).orderByChild("receiver")
@@ -453,16 +407,18 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getMessageListener(chatRoom: ChatRoomLocalData) {
-        messageListener(chatRoom).collect {
-            if (it != null) {
-                insertMessage(it, chatRoom.id)
-            }
-        }
+    override fun getMessageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?> {
+        return messageListener(chatRoom)
+            .onEach { messageData ->
+                if (messageData != null) {
+                    println("onEach ${messageData.comment}")
+                    insertMessage(messageData, chatRoom.id)
+                }
+            }.flowOn(Dispatchers.IO)
     }
 
-    private suspend fun messageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?> =
-        callbackFlow<MessageData?> {
+    private fun messageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?> =
+        callbackFlow {
             database.reference.child("messages").child(chatRoom.rid)
                 .addChildEventListener(
                     object : ChildEventListener {
@@ -510,15 +466,12 @@ class UserRepositoryImpl @Inject constructor(
         }
 
     private suspend fun insertMessage(message: MessageData, id: Long) {
-        auth.currentUser?.uid?.let {
-            val lastMessage = getLastMessage(message.chatRoomId)
-            if (lastMessage == null) {
+        val lastMessage = getLastMessage(message.chatRoomId)
+        if (lastMessage == null) {
+            messageDao.insertMessage(message.toEntity(id))
+        } else {
+            if (message.time > lastMessage.time) {
                 messageDao.insertMessage(message.toEntity(id))
-            } else {
-                if (message.time > lastMessage.time) {
-                    messageDao.insertMessage(message.toEntity(id))
-                } else {
-                }
             }
         }
     }
