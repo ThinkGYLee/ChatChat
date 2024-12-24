@@ -62,9 +62,7 @@ interface UserRepository {
         chatRoomData: ChatRoomData
     )
 
-    suspend fun getFriendById(
-        uid: String
-    ): FriendData
+     fun getFriendById(uid: String): Flow<FriendData>
 
     suspend fun makeNewChatRoom(rid: String, receiver: String): Long
 
@@ -314,8 +312,8 @@ class UserRepositoryImpl @Inject constructor(
         return chatRoomDao.insertChatRoom(ChatRoomEntity(0, rid, receiver, ""))
     }
 
-    override suspend fun getFriendById(uid: String): FriendData {
-        return friendDao.getFriendByUid(uid).toFriendData()
+    override  fun getFriendById(uid: String): Flow<FriendData> {
+        return friendDao.getFriendByUid(uid).map { it.toFriendData() }.flowOn(Dispatchers.IO)
     }
 
     override suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData {
