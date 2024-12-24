@@ -19,10 +19,12 @@ import com.gyleedev.chatchat.domain.usecase.GetMyUidFromLogInDataUseCase
 import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -71,21 +73,36 @@ class ChatRoomViewModel @Inject constructor(
         ChatRoomUiState.Loading
     )
 
+    private var job: Job? = null
+
     init {
-        val friend = savedStateHandle.get<String>("friend")
+        val friendUid = savedStateHandle.get<String>("friend")
+        if (friendUid == null) {
+            // TODO 화면 종료 처리
+            throw Exception("예외 처리 에러 말고 단거로")
+        }
         viewModelScope.launch {
-            if (friend != null) {
-                getFriendData(friend)
-            }
+            val friend = getFriendDataUseCase(friendUid).first()
+            friendData.emit(friend)
+            getChatRoomDataUseCase(friend)
+            getChatRoomFromLocal()
+
+            getMessagesFromRemoteUseCase(_chatRoomLocalData.value).collectLatest { }
+            //connectRemote()
         }
     }
 
-    private suspend fun getFriendData(friend: String) {
-        val friendData = getFriendDataUseCase(friend)
-        this.friendData.emit(friendData)
-        getChatRoomDataUseCase(friendData)
-        getChatRoomFromLocal()
-        getMessagesFromRemoteUseCase(_chatRoomLocalData.value).collectLatest { }
+    fun connectRemote() {
+        if (_chatRoomLocalData.value.rid.isEmpty()) {
+            return
+        }
+        job = viewModelScope.launch {
+            getMessagesFromRemoteUseCase(_chatRoomLocalData.value).collectLatest { }
+        }
+    }
+
+    fun disconnectRemote() {
+        job?.cancel()
     }
 
     private suspend fun getChatRoomFromLocal() {
