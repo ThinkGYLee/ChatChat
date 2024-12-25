@@ -75,6 +75,13 @@ fun ChatRoomScreen(
         lazyListState.value.animateScrollToItem(0)
     }
 
+//    LifecycleStartEffect(Unit) {
+//        chatRoomViewModel.connectRemote()
+//        onStopOrDispose {
+//            chatRoomViewModel.disconnectRemote()
+//        }
+//    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -124,11 +131,11 @@ fun ChatRoomScreen(
                     contentType = { messages[it]?.writer }
                 ) {
                     Row {
-                        if (messages[it]?.messageSendState == MessageSendState.LOADING) {
+                        /*if (messages[it]?.messageSendState == MessageSendState.LOADING) {
                             CircularProgressIndicator()
                         } else if (messages[it]?.messageSendState == MessageSendState.FAIL) {
-                            ResendButton(onClick = { /*TODO*/ })
-                        }
+                            ResendButton(onClick = { *//*TODO*//* })
+                        }*/
                         messages[it]?.let { it1 ->
                             ChatBubble(
                                 me = (uiState as ChatRoomUiState.Success).uid,
@@ -146,29 +153,39 @@ fun ChatRoomScreen(
 fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifier) {
     val backgroundColor: Color
     val backgroundShape: RoundedCornerShape
-    val alignment: Alignment.Horizontal
+    val arrangement: Arrangement.Horizontal
 
     if (messageData.writer == me) {
         backgroundColor = MaterialTheme.colorScheme.primary
         backgroundShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
-        alignment = Alignment.End
+        arrangement = Arrangement.End
     } else {
         backgroundColor = MaterialTheme.colorScheme.surfaceVariant
         backgroundShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
-        alignment = Alignment.Start
+        arrangement = Arrangement.Start
     }
-
-    Column(
+    Row(
         modifier
             .padding(horizontal = 20.dp, vertical = 8.dp)
             .fillMaxWidth(),
-        horizontalAlignment = alignment
+        horizontalArrangement = arrangement,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Surface(
-            color = backgroundColor,
-            shape = backgroundShape
+        if (messageData.messageSendState == MessageSendState.LOADING) {
+            CircularProgressIndicator()
+        } else if (messageData.messageSendState == MessageSendState.FAIL) {
+            ResendButton(onClick = { })
+        }
+        Column(
+            Modifier
+                .padding(horizontal = 20.dp, vertical = 8.dp)
         ) {
-            Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
+            Surface(
+                color = backgroundColor,
+                shape = backgroundShape
+            ) {
+                Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
+            }
         }
     }
 }
