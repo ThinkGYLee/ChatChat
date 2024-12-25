@@ -88,7 +88,7 @@ class ChatRoomViewModel @Inject constructor(
             getChatRoomFromLocal()
 
             getMessagesFromRemoteUseCase(_chatRoomLocalData.value).collectLatest { }
-            //connectRemote()
+            // connectRemote()
         }
     }
 
