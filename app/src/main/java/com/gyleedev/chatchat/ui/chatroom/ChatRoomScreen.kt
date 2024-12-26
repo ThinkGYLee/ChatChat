@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -131,11 +132,7 @@ fun ChatRoomScreen(
                     contentType = { messages[it]?.writer }
                 ) {
                     Row {
-                        /*if (messages[it]?.messageSendState == MessageSendState.LOADING) {
-                            CircularProgressIndicator()
-                        } else if (messages[it]?.messageSendState == MessageSendState.FAIL) {
-                            ResendButton(onClick = { *//*TODO*//* })
-                        }*/
+
                         messages[it]?.let { it1 ->
                             ChatBubble(
                                 me = (uiState as ChatRoomUiState.Success).uid,
@@ -172,7 +169,7 @@ fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifi
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (messageData.messageSendState == MessageSendState.LOADING) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(modifier = Modifier.size(20.dp))
         } else if (messageData.messageSendState == MessageSendState.FAIL) {
             ResendButton(onClick = { })
         }
