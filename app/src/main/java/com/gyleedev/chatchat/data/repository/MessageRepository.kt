@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface MessageRepository {
-    suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long?
+    suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long
     fun insertMessageToRemote(message: MessageData): Flow<MessageSendState>
     suspend fun updateMessageState(messageId: Long, roomId: Long, message: MessageData)
 
@@ -47,7 +47,7 @@ class MessageRepositoryImpl @Inject constructor(
     val database =
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
-    override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long? {
+    override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long {
         return messageDao.insertMessage(
             message = message.toEntity(
                 roomId = roomId
