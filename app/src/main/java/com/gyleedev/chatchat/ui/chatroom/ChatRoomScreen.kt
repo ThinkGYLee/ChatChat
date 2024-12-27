@@ -1,6 +1,7 @@
 package com.gyleedev.chatchat.ui.chatroom
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -40,15 +41,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,6 +72,9 @@ fun ChatRoomScreen(
 
     val uiState by chatRoomViewModel.uiState.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
+    val lifecycle = LocalLifecycleOwner.current
+
     LaunchedEffect(query.text) {
         chatRoomViewModel.editMessageQuery(query.text.toString())
     }
@@ -74,6 +82,12 @@ fun ChatRoomScreen(
     // 보냈을때 내려간다던지로 변경
     LaunchedEffect(messages.itemCount) {
         lazyListState.value.animateScrollToItem(0)
+    }
+
+    LaunchedEffect(Unit) {
+        chatRoomViewModel.networkState.flowWithLifecycle(lifecycle.lifecycle).collectLatest {
+            Toast.makeText(context, "네트워크 연결을 확인해주세요", Toast.LENGTH_SHORT).show()
+        }
     }
 
 //    LifecycleStartEffect(Unit) {
@@ -173,8 +187,7 @@ fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifi
             ResendButton(onClick = { })
         }
         Column(
-            Modifier
-                .padding(horizontal = 20.dp, vertical = 8.dp)
+            Modifier.padding(horizontal = 8.dp)
         ) {
             Surface(
                 color = backgroundColor,
@@ -239,7 +252,6 @@ fun ResendButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier
             .padding(horizontal = 20.dp, vertical = 8.dp)
-            .fillMaxWidth()
             .clickable {
                 onClick()
             }
@@ -248,7 +260,11 @@ fun ResendButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
             color = Color.Red,
             shape = RoundedCornerShape(8.dp)
         ) {
-            Text(text = "재전송", modifier = Modifier.padding(4.dp))
+            Text(
+                text = "재전송",
+                modifier = Modifier.padding(4.dp),
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }
