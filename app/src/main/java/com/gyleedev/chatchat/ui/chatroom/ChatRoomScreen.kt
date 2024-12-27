@@ -24,6 +24,8 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -184,10 +186,10 @@ fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifi
         if (messageData.messageSendState == MessageSendState.LOADING) {
             CircularProgressIndicator(modifier = Modifier.size(20.dp))
         } else if (messageData.messageSendState == MessageSendState.FAIL) {
-            ResendButton(onClick = { })
+            ResendButton(onResendClick = { }, onCancelClick = {})
         }
         Column(
-            Modifier.padding(horizontal = 8.dp)
+            Modifier.padding(horizontal = 16.dp)
         ) {
             Surface(
                 color = backgroundColor,
@@ -248,32 +250,50 @@ fun CommentBottomBar(
 }
 
 @Composable
-fun ResendButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier
-            .padding(horizontal = 20.dp, vertical = 8.dp)
-            .clickable {
-                onClick()
-            }
-    ) {
+fun ResendButton(
+    onResendClick: () -> Unit,
+    onCancelClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier) {
         Surface(
             color = Color.Red,
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
+            modifier = Modifier
+                .clickable {
+                    onResendClick()
+                }
         ) {
-            Text(
-                text = "재전송",
-                modifier = Modifier.padding(4.dp),
-                style = MaterialTheme.typography.labelSmall
+            Icon(
+                imageVector = Icons.Outlined.Refresh,
+                contentDescription = "resend button",
+                modifier = Modifier.padding(2.dp)
             )
         }
+        Surface(
+            color = Color.Red,
+            shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
+            modifier = Modifier
+                .clickable {
+                    onCancelClick()
+                }
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Close,
+                contentDescription = "cancel button",
+                modifier = Modifier.padding(2.dp)
+            )
+        }
+
     }
 }
+
 
 @Preview
 @Composable
 fun ResendButtonPreview() {
     ChatChatTheme {
-        ResendButton(onClick = {})
+        ResendButton(onResendClick = {}, onCancelClick = {})
     }
 }
 
