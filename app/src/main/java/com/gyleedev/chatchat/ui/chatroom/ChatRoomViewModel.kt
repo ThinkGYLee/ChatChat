@@ -17,10 +17,13 @@ import com.gyleedev.chatchat.domain.usecase.GetMessagesFromLocalUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMessagesFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyUidFromLogInDataUseCase
 import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
+import com.gyleedev.chatchat.util.NetworkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -41,6 +44,7 @@ class ChatRoomViewModel @Inject constructor(
     private val getMessagesFromLocalUseCase: GetMessagesFromLocalUseCase,
     private val getChatRoomDataUseCase: GetChatRoomDataUseCase,
     private val getMessagesFromRemoteUseCase: GetMessagesFromRemoteUseCase,
+    private val getNetworkState: NetworkManager,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -52,6 +56,9 @@ class ChatRoomViewModel @Inject constructor(
 
     private val _messageQuery = MutableStateFlow("")
     private val _chatRoomLocalData = MutableStateFlow(ChatRoomLocalData())
+
+    private val _networkState = MutableSharedFlow<Boolean>()
+    val networkState: SharedFlow<Boolean> = _networkState
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val messages = _chatRoomLocalData.flatMapLatest {
@@ -119,6 +126,8 @@ class ChatRoomViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun sendMessage() {
         viewModelScope.launch {
+            val networkState = getNetworkState()
+            _networkState.emit(networkState)
             val message = uid?.let {
                 MessageData(
                     chatRoomId = _chatRoomLocalData.value.rid,
@@ -130,8 +139,12 @@ class ChatRoomViewModel @Inject constructor(
             }
             val rid = _chatRoomLocalData.value.id
             if (message != null) {
-                sendMessageUseCase(message, rid)
+                sendMessageUseCase(message, rid, networkState)
             }
         }
+    }
+
+    private fun getNetworkState(): Boolean {
+        return getNetworkState.checkNetworkState()
     }
 }
