@@ -132,7 +132,6 @@ fun ChatRoomScreen(
                     contentType = { messages[it]?.writer }
                 ) {
                     Row {
-
                         messages[it]?.let { it1 ->
                             ChatBubble(
                                 me = (uiState as ChatRoomUiState.Success).uid,
