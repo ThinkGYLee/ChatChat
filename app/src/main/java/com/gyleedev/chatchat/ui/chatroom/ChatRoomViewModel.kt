@@ -16,6 +16,7 @@ import com.gyleedev.chatchat.domain.usecase.GetFriendDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMessagesFromLocalUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMessagesFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyUidFromLogInDataUseCase
+import com.gyleedev.chatchat.domain.usecase.ResendMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
 import com.gyleedev.chatchat.util.NetworkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,6 +46,7 @@ class ChatRoomViewModel @Inject constructor(
     private val getChatRoomDataUseCase: GetChatRoomDataUseCase,
     private val getMessagesFromRemoteUseCase: GetMessagesFromRemoteUseCase,
     private val getNetworkState: NetworkManager,
+    private val resendMessageUseCase: ResendMessageUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -148,11 +150,19 @@ class ChatRoomViewModel @Inject constructor(
         return getNetworkState.checkNetworkState()
     }
 
-    fun resendMessage() {
-
+    fun resendMessage(messageData: MessageData) {
+        viewModelScope.launch {
+            val networkState = getNetworkState()
+            _networkState.emit(networkState)
+            val rid = _chatRoomLocalData.value.id
+            resendMessageUseCase(
+                messageData,
+                rid,
+                networkState
+            )
+        }
     }
 
     fun cancelMessage() {
-
     }
 }
