@@ -148,11 +148,12 @@ fun ChatRoomScreen(
                     contentType = { messages[it]?.writer }
                 ) {
                     Row {
-                        messages[it]?.let { it1 ->
+                        messages[it]?.let { messageData ->
                             ChatBubble(
                                 me = (uiState as ChatRoomUiState.Success).uid,
-                                messageData = it1,
-                                resend = { chatRoomViewModel.resendMessage(it1) }
+                                messageData = messageData,
+                                resend = { chatRoomViewModel.resendMessage(messageData) },
+                                cancel = { chatRoomViewModel.cancelMessage(messageData) }
                             )
                         }
                     }
@@ -165,6 +166,7 @@ fun ChatRoomScreen(
 @Composable
 fun ChatBubble(
     resend: () -> Unit,
+    cancel: () -> Unit,
     me: String,
     messageData: MessageData,
     modifier: Modifier = Modifier
@@ -192,7 +194,7 @@ fun ChatBubble(
         if (messageData.messageSendState == MessageSendState.LOADING) {
             CircularProgressIndicator(modifier = Modifier.size(20.dp))
         } else if (messageData.messageSendState == MessageSendState.FAIL) {
-            ResendButton(onResendClick = resend, onCancelClick = {})
+            ResendButton(onResendClick = resend, onCancelClick = cancel)
         }
         Column(
             Modifier.padding(horizontal = 16.dp)
