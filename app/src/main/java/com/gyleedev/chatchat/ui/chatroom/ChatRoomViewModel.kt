@@ -10,6 +10,7 @@ import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
+import com.gyleedev.chatchat.domain.usecase.CancelMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomLocalDataByUidUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendDataUseCase
@@ -47,6 +48,7 @@ class ChatRoomViewModel @Inject constructor(
     private val getMessagesFromRemoteUseCase: GetMessagesFromRemoteUseCase,
     private val getNetworkState: NetworkManager,
     private val resendMessageUseCase: ResendMessageUseCase,
+    private val cancelMessageUseCase: CancelMessageUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -163,6 +165,9 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
-    fun cancelMessage() {
+    fun cancelMessage(messageData: MessageData) {
+        viewModelScope.launch {
+            cancelMessageUseCase(messageData)
+        }
     }
 }
