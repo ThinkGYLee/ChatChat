@@ -25,4 +25,7 @@ interface MessageDao {
 
     @Query("SELECT * FROM message WHERE rid = :rid AND time = :time AND writer = :writer")
     fun getMessage(rid: String, time: Long, writer: String): Flow<MessageEntity>
+
+    @Query("Delete From message WHERE id = :messageId")
+    fun deleteMessage(messageId: Long)
 }
