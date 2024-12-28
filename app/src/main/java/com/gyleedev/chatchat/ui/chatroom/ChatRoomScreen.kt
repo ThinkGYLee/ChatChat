@@ -88,7 +88,7 @@ fun ChatRoomScreen(
 
     LaunchedEffect(Unit) {
         chatRoomViewModel.networkState.flowWithLifecycle(lifecycle.lifecycle).collectLatest {
-            Toast.makeText(context, "네트워크 연결을 확인해주세요", Toast.LENGTH_SHORT).show()
+            if (!it) Toast.makeText(context, "네트워크 연결을 확인해주세요", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -151,7 +151,8 @@ fun ChatRoomScreen(
                         messages[it]?.let { it1 ->
                             ChatBubble(
                                 me = (uiState as ChatRoomUiState.Success).uid,
-                                messageData = it1
+                                messageData = it1,
+                                resend = { chatRoomViewModel.resendMessage(it1) }
                             )
                         }
                     }
@@ -162,7 +163,12 @@ fun ChatRoomScreen(
 }
 
 @Composable
-fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifier) {
+fun ChatBubble(
+    resend: () -> Unit,
+    me: String,
+    messageData: MessageData,
+    modifier: Modifier = Modifier
+) {
     val backgroundColor: Color
     val backgroundShape: RoundedCornerShape
     val arrangement: Arrangement.Horizontal
@@ -186,7 +192,7 @@ fun ChatBubble(me: String, messageData: MessageData, modifier: Modifier = Modifi
         if (messageData.messageSendState == MessageSendState.LOADING) {
             CircularProgressIndicator(modifier = Modifier.size(20.dp))
         } else if (messageData.messageSendState == MessageSendState.FAIL) {
-            ResendButton(onResendClick = { }, onCancelClick = {})
+            ResendButton(onResendClick = resend, onCancelClick = {})
         }
         Column(
             Modifier.padding(horizontal = 16.dp)
@@ -284,10 +290,8 @@ fun ResendButton(
                 modifier = Modifier.padding(2.dp)
             )
         }
-
     }
 }
-
 
 @Preview
 @Composable
