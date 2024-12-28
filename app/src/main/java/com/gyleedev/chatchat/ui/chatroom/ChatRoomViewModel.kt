@@ -147,4 +147,12 @@ class ChatRoomViewModel @Inject constructor(
     private fun getNetworkState(): Boolean {
         return getNetworkState.checkNetworkState()
     }
+
+    fun resendMessage() {
+
+    }
+
+    fun cancelMessage() {
+
+    }
 }
