@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.gyleedev.chatchat.data.database.entity.MessageEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MessageDao {
@@ -21,4 +22,7 @@ interface MessageDao {
 
     @Query("SELECT * FROM message WHERE rid = :id ORDER BY time DESC LIMIT 1")
     fun getLastMessage(id: String): MessageEntity
+
+    @Query("SELECT * FROM message WHERE rid = :rid AND time = :time AND writer = :writer")
+    fun getMessage(rid: String, time: Long, writer: String): Flow<MessageEntity>
 }
