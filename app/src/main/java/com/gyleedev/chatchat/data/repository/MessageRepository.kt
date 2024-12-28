@@ -39,6 +39,8 @@ interface MessageRepository {
     fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
 
     fun getMessage(message: MessageData): Flow<MessageEntity>
+
+    suspend fun deleteMessage(messageId: Long)
 }
 
 class MessageRepositoryImpl @Inject constructor(
@@ -181,5 +183,9 @@ class MessageRepositoryImpl @Inject constructor(
             writer = message.writer,
             time = message.time
         ).flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun deleteMessage(messageId: Long) {
+        return messageDao.deleteMessage(messageId)
     }
 }
