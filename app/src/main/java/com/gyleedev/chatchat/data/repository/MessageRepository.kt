@@ -37,6 +37,8 @@ interface MessageRepository {
     suspend fun getLastMessage(chatRoomId: String): MessageEntity?
 
     fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
+
+    fun getMessage(message: MessageData): Flow<MessageEntity>
 }
 
 class MessageRepositoryImpl @Inject constructor(
@@ -171,5 +173,13 @@ class MessageRepositoryImpl @Inject constructor(
         ).flow.map { value ->
             value.map { it.toModel() }
         }.flowOn(Dispatchers.IO)
+    }
+
+    override fun getMessage(message: MessageData): Flow<MessageEntity> {
+        return messageDao.getMessage(
+            rid = message.chatRoomId,
+            writer = message.writer,
+            time = message.time
+        ).flowOn(Dispatchers.IO)
     }
 }
