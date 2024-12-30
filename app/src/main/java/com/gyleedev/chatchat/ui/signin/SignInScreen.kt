@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,16 +57,22 @@ fun SignInScreen(
     viewModel: SignInViewModel = hiltViewModel()
 ) {
     val idQuery = rememberTextFieldState()
+    val nicknameQuery = rememberTextFieldState()
     val passwordQuery = rememberTextFieldState()
     val passwordCheckQuery = rememberTextFieldState()
     val signInIsAvailable = viewModel.signInIsAvailable.collectAsStateWithLifecycle()
     val idIsAvailable = viewModel.idIsAvailable.collectAsStateWithLifecycle()
+    val nicknameIsAvailable = viewModel.nicknameIsAvailable.collectAsStateWithLifecycle()
     val passwordIsAvailable = viewModel.passwordIsAvailable.collectAsStateWithLifecycle()
     val passwordIsSame = viewModel.passwordIsSame.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(idQuery.text) {
         viewModel.editId(idQuery.text.toString())
+    }
+
+    LaunchedEffect(nicknameQuery.text) {
+        viewModel.editNickname(nicknameQuery.text.toString())
     }
 
     LaunchedEffect(passwordQuery.text) {
@@ -127,6 +134,20 @@ fun SignInScreen(
             })
             Spacer(modifier = Modifier.height(20.dp))
 
+            NicknameScreen(
+                nicknameQuery = nicknameQuery,
+                nickNameIsAvailable = nicknameIsAvailable.value,
+                onReset = {
+                    nicknameQuery.edit {
+                        delete(
+                            0,
+                            nicknameQuery.text.length
+                        )
+                    }
+                })
+
+            Spacer(modifier = Modifier.height(20.dp))
+
             PasswordScreen(
                 passwordQuery = passwordQuery,
                 passwordCheckQuery = passwordCheckQuery,
@@ -181,7 +202,7 @@ fun IdTextField(
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(
-        modifier = modifier.border(0.1.dp, Color.Black),
+        modifier = modifier.border(0.1.dp, MaterialTheme.colorScheme.onSurface),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicTextField(
@@ -226,7 +247,68 @@ fun IdTextField(
                         )
                     }
                 }
-            }
+            },
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+        )
+    }
+}
+
+@Composable
+fun NicknameTextField(
+    nicknameQuery: TextFieldState,
+    onReset: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var alpha by remember { mutableFloatStateOf(1f) }
+
+    Row(
+        modifier = modifier.border(0.1.dp, MaterialTheme.colorScheme.onSurface),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        BasicTextField(
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .onFocusChanged {
+                    alpha = if (it.isFocused) 0.6f else 1f
+                }
+                .padding(horizontal = 16.dp),
+            state = nicknameQuery,
+            lineLimits = TextFieldLineLimits.SingleLine,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+            decorator = { innerTextField ->
+                Row(
+                    modifier = Modifier
+                        .padding(vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(modifier = Modifier.weight(10f)) {
+                        if (nicknameQuery.text.isEmpty()) {
+                            Text(
+                                text = "닉네임",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color(0xFF848484),
+                                modifier = Modifier
+                                    .padding(start = 4.dp)
+                                    .align(Alignment.CenterStart)
+                            )
+                        }
+                        Row(modifier = Modifier.align(Alignment.CenterStart)) {
+                            innerTextField()
+                        }
+                    }
+                    if (nicknameQuery.text.isNotEmpty()) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = null,
+                            modifier = Modifier.clickable { onReset() }
+                        )
+                    }
+                }
+            },
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
@@ -241,7 +323,7 @@ fun PasswordTextField(
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(
-        modifier = modifier.border(0.1.dp, Color.Black),
+        modifier = modifier.border(0.1.dp, MaterialTheme.colorScheme.onSurface),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicSecureTextField(
@@ -285,7 +367,8 @@ fun PasswordTextField(
                         )
                     }
                 }
-            }
+            },
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
@@ -309,6 +392,29 @@ fun IdScreen(
 }
 
 @Composable
+fun NicknameScreen(
+    nicknameQuery: TextFieldState,
+    nickNameIsAvailable: Boolean,
+    onReset: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val nicknameComment =
+        if (nickNameIsAvailable || nicknameQuery.text.isEmpty()) "" else "닉네임을 2글자 이상 입력해 주세요"
+    Column(modifier = modifier) {
+        Text(text = "닉네임을 입력해 주세요")
+        Spacer(modifier = Modifier.height(16.dp))
+        NicknameTextField(nicknameQuery = nicknameQuery, onReset = {
+            onReset()
+        })
+        Text(
+            text = nicknameComment,
+            style = MaterialTheme.typography.labelMedium,
+            color = Color.Red
+        )
+    }
+}
+
+@Composable
 fun PasswordScreen(
     passwordQuery: TextFieldState,
     passwordCheckQuery: TextFieldState,
@@ -323,7 +429,7 @@ fun PasswordScreen(
     val passwordCheckComment =
         if (passwordIsSame || passwordCheckQuery.text.isEmpty()) "" else "비밀번호가 일치하지 않습니다"
     Column(modifier = modifier) {
-        Text(text = "비밀번호를 입력해주세요")
+        Text(text = "비밀번호를 입력해 주세요")
         Spacer(modifier = Modifier.height(16.dp))
         PasswordTextField(hint = "비밀번호", passwordQuery = passwordQuery, onReset = {
             onPasswordReset()
