@@ -11,6 +11,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.gyleedev.chatchat.data.database.dao.ChatListWithMessageAndFriendDao
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FriendDao
 import com.gyleedev.chatchat.data.database.dao.MessageDao
@@ -82,7 +83,7 @@ class UserRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firebaseStorage: FirebaseStorage,
     private val chatRoomDao: ChatRoomDao,
-    private val messageDao: MessageDao
+    //private val chatListWithMessageAndFriendDao: ChatListWithMessageAndFriendDao
 ) : UserRepository {
     val database =
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
@@ -407,5 +408,9 @@ class UserRepositoryImpl @Inject constructor(
 
     private fun getFriendsForChatRoomList(): List<FriendData> {
         return friendDao.getFriends().map { it.toFriendData() }
+    }
+
+    private fun getChatListWithMessageAndFriend() {
+        /*return chatListWithMessageAndFriendDao.getChatListFeed("a")*/
     }
 }

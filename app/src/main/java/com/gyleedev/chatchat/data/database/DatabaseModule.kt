@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.data.database
 
 import android.content.Context
 import androidx.room.Room
+import com.gyleedev.chatchat.data.database.dao.ChatListWithMessageAndFriendDao
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FriendDao
 import com.gyleedev.chatchat.data.database.dao.MessageDao
@@ -28,13 +29,21 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun providesFriendDao(chatDataDatabase: ChatDataDatabase): FriendDao = chatDataDatabase.friendDao()
+    fun providesFriendDao(chatDataDatabase: ChatDataDatabase): FriendDao =
+        chatDataDatabase.friendDao()
 
     @Singleton
     @Provides
-    fun providesChatRoomDao(chatDataDatabase: ChatDataDatabase): ChatRoomDao = chatDataDatabase.chatRoomDao()
+    fun providesChatRoomDao(chatDataDatabase: ChatDataDatabase): ChatRoomDao =
+        chatDataDatabase.chatRoomDao()
 
     @Singleton
     @Provides
-    fun providesMessageDao(chatDataDatabase: ChatDataDatabase): MessageDao = chatDataDatabase.messageDao()
+    fun providesMessageDao(chatDataDatabase: ChatDataDatabase): MessageDao =
+        chatDataDatabase.messageDao()
+
+    @Singleton
+    @Provides
+    fun providesChatListWithMessageAndFriendDao(chatDataDatabase: ChatDataDatabase): ChatListWithMessageAndFriendDao =
+        chatDataDatabase.chatListWithMessageAndFriendDao()
 }
