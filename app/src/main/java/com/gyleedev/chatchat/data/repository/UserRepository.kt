@@ -11,10 +11,8 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.gyleedev.chatchat.data.database.dao.ChatListWithMessageAndFriendDao
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FriendDao
-import com.gyleedev.chatchat.data.database.dao.MessageDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toFriendData
@@ -27,6 +25,7 @@ import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +38,7 @@ import javax.inject.Inject
 
 interface UserRepository {
     fun getUsersFromLocal(): List<UserData>
-    suspend fun signInUser(id: String, password: String): Flow<UserData?>
+    suspend fun signInUser(id: String, password: String, nickname: String): Flow<UserData?>
     suspend fun logInRequest(id: String, password: String): Flow<LogInResult>
     suspend fun searchUser(email: String): Flow<UserData?>
     fun fetchUserExists(): Boolean
@@ -83,7 +82,8 @@ class UserRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firebaseStorage: FirebaseStorage,
     private val chatRoomDao: ChatRoomDao,
-    //private val chatListWithMessageAndFriendDao: ChatListWithMessageAndFriendDao
+    private val preferenceUtil: PreferenceUtil
+    // private val chatListWithMessageAndFriendDao: ChatListWithMessageAndFriendDao
 ) : UserRepository {
     val database =
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
@@ -92,17 +92,17 @@ class UserRepositoryImpl @Inject constructor(
         return friendDao.getUsers().map { it.toModel() }
     }
 
-    override suspend fun signInUser(id: String, password: String): Flow<UserData?> = callbackFlow {
+    override suspend fun signInUser(id: String, password: String, nickname: String): Flow<UserData?> = callbackFlow {
         auth.createUserWithEmailAndPassword(id, password).addOnSuccessListener { task ->
-            trySend(
-                UserData(
-                    email = id,
-                    name = "Anonymous User",
-                    uid = task.user!!.uid,
-                    picture = " ",
-                    status = " "
-                )
+            val myData = UserData(
+                email = id,
+                name = nickname,
+                uid = task.user!!.uid,
+                picture = " ",
+                status = " "
             )
+            preferenceUtil.setMyData(myData)
+            trySend(myData)
         }.addOnFailureListener {
             trySend(null)
         }
@@ -128,7 +128,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun logInRequest(id: String, password: String): Flow<LogInResult> =
         callbackFlow {
-            auth.signInWithEmailAndPassword(id, password).addOnSuccessListener { task ->
+            auth.signInWithEmailAndPassword(id, password).addOnSuccessListener {
                 trySend(LogInResult.Success)
             }.addOnFailureListener { task ->
                 val message = if (task.message != null) task.message else "unknown failure"
@@ -145,7 +145,7 @@ class UserRepositoryImpl @Inject constructor(
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.value != null) {
-                    for (ds in snapshot.getChildren()) {
+                    for (ds in snapshot.children) {
                         val snap = ds.getValue(UserData::class.java)
                         trySend(snap)
                     }
@@ -167,20 +167,31 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getMyUserInformation(): Flow<UserData?> = callbackFlow {
-        val query =
-            database.reference.child("users").orderByChild("email").equalTo(auth.currentUser?.email)
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (ds in snapshot.getChildren()) {
-                    val snap = ds.getValue(UserData::class.java)
-                    trySend(snap)
+        val myData = preferenceUtil.getMyData()
+        if (myData.uid != "default uid" && auth.currentUser != null) {
+            trySend(myData)
+        } else {
+            val query =
+                database.reference.child("users").orderByChild("email")
+                    .equalTo(auth.currentUser?.email)
+            query.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (ds in snapshot.children) {
+                        val snap = ds.getValue(UserData::class.java)
+                        if (snap != null) {
+                            preferenceUtil.setMyData(snap)
+                            trySend(snap)
+                        } else {
+                            trySend(null)
+                        }
+                    }
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                trySend(null)
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(null)
+                }
+            })
+        }
         awaitClose()
     }
 
@@ -205,7 +216,7 @@ class UserRepositoryImpl @Inject constructor(
                     object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val friendList = mutableListOf<UserData>()
-                            for (ds in snapshot.getChildren()) {
+                            for (ds in snapshot.children) {
                                 val snap = ds.getValue(UserData::class.java)
                                 if (snap != null) {
                                     friendList.add(snap)
@@ -332,7 +343,7 @@ class UserRepositoryImpl @Inject constructor(
                     .equalTo(friendData.uid)
             }?.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    for (ds in snapshot.getChildren()) {
+                    for (ds in snapshot.children) {
                         val snap = ds.getValue(ChatRoomData::class.java)
                         if (snap != null) {
                             trySend(snap.rid)
@@ -356,7 +367,7 @@ class UserRepositoryImpl @Inject constructor(
                     .equalTo(friendData.uid)
             }?.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    for (ds in snapshot.getChildren()) {
+                    for (ds in snapshot.children) {
                         val snap = ds.getValue(ChatRoomData::class.java)
                         if (snap != null) {
                             trySend(snap)
