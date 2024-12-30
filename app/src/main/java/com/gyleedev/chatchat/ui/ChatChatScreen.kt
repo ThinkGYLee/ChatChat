@@ -97,7 +97,6 @@ fun ChatChatScreen(
     Scaffold(
         bottomBar = {
             if (isBottomBarVisible) {
-                println(isBottomBarVisible)
                 BottomNavigation(
                     navController = navController,
                     modifier = Modifier
