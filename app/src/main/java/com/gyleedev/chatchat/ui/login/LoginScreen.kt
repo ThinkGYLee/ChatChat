@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -237,7 +238,7 @@ fun IdTextField(
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(
-        modifier = modifier.border(0.1.dp, Color.Black),
+        modifier = modifier.border(0.1.dp, MaterialTheme.colorScheme.onSurface),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicTextField(
@@ -282,7 +283,8 @@ fun IdTextField(
                         )
                     }
                 }
-            }
+            },
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
@@ -296,7 +298,7 @@ fun PasswordTextField(
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(
-        modifier = modifier.border(0.1.dp, Color.Black),
+        modifier = modifier.border(0.1.dp, MaterialTheme.colorScheme.onSurface),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicSecureTextField(
@@ -340,7 +342,8 @@ fun PasswordTextField(
                         )
                     }
                 }
-            }
+            },
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
