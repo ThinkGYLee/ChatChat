@@ -12,6 +12,7 @@ import com.gyleedev.chatchat.domain.usecase.GetMyUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,10 +41,8 @@ class FriendListViewModel @Inject constructor(
 
     private fun fetchMyUserData() {
         viewModelScope.launch {
-            val fetchUserdata = getMyUserDataUseCase()
-            fetchUserdata.collect { value ->
-                _myUserData.emit(value)
-            }
+            val fetchUserdata = getMyUserDataUseCase().first()
+            _myUserData.emit(fetchUserdata)
         }
     }
 
@@ -53,11 +52,9 @@ class FriendListViewModel @Inject constructor(
 
     private fun getMyFriendsFromRemote() {
         viewModelScope.launch {
-            val request = getMyFriendFromRemoteUseCase()
-            request.collect { value ->
-                if (value != null) {
-                    addMyFriendsToLocal(value)
-                }
+            val request = getMyFriendFromRemoteUseCase().first()
+            if (request != null) {
+                addMyFriendsToLocal(request)
             }
         }
     }
