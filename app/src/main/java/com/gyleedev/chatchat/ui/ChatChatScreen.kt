@@ -83,11 +83,13 @@ fun ChatChatScreen(
     navController: NavHostController = rememberNavController()
 ) {
     var isBottomBarVisible: Boolean
+
     navController.currentBackStackEntryAsState().value?.destination?.route.let { route ->
         isBottomBarVisible = when (route) {
             LOGIN -> false
             SIGNIN -> false
             FINDUSER -> false
+            "CHATROOM/{friend}" -> false
             else -> true
         }
     }
@@ -95,6 +97,7 @@ fun ChatChatScreen(
     Scaffold(
         bottomBar = {
             if (isBottomBarVisible) {
+                println(isBottomBarVisible)
                 BottomNavigation(
                     navController = navController,
                     modifier = Modifier
