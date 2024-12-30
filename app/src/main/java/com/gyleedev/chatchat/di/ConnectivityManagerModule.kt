@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.util
+package com.gyleedev.chatchat.di
 
 import android.content.Context
 import android.net.ConnectivityManager
