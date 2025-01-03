@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -30,6 +31,7 @@ import androidx.navigation.navArgument
 import com.gyleedev.chatchat.ui.chatlist.ChatListScreen
 import com.gyleedev.chatchat.ui.chatroom.ChatRoomScreen
 import com.gyleedev.chatchat.ui.finduser.FindUserScreen
+
 import com.gyleedev.chatchat.ui.friendlist.FriendListScreen
 import com.gyleedev.chatchat.ui.login.LoginScreen
 import com.gyleedev.chatchat.ui.setting.SettingScreen
@@ -73,6 +75,10 @@ sealed class BottomNavItem(
     data object CHATROOM : BottomNavItem(
         Icons.Outlined.Menu,
         com.gyleedev.chatchat.ui.CHATROOM
+    )
+    data object USERINFO : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        com.gyleedev.chatchat.ui.USERINFO
     )
 }
 
@@ -132,7 +138,7 @@ fun ChatChatScreen(
                     modifier = Modifier.fillMaxSize(),
                     onSignInClicked = { navController.navigate(BottomNavItem.SIGNIN.screenRoute) },
                     onLogInComplete = {
-                        navController.navigate(BottomNavItem.CHATLIST.screenRoute) {
+                        navController.navigate(BottomNavItem.FRIENDLIST.screenRoute) {
                             popUpTo(BottomNavItem.LOGIN.screenRoute) { inclusive = true }
                         }
                     }
