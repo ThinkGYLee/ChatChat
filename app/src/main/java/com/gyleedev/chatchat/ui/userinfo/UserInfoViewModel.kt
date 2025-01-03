@@ -22,6 +22,9 @@ class UserInfoViewModel @Inject constructor(
     private val _userData = MutableStateFlow(UserData())
     val userData: StateFlow<UserData?> = _userData
 
+    private val _isUserDataMe = MutableStateFlow<Boolean?>(null)
+    val isUserDataMe: StateFlow<Boolean?> = _isUserDataMe
+
     init {
         viewModelScope.launch {
             val userUid = savedStateHandle.get<String>("user")
@@ -29,6 +32,7 @@ class UserInfoViewModel @Inject constructor(
             if (myUserData != null && userUid != null) {
                 if (userUid == myUserData.uid) {
                     _userData.emit(myUserData)
+                    _isUserDataMe.emit(true)
                 } else {
                     val friendData = getFriendDataUseCase(userUid).first()
                     _userData.emit(
@@ -40,6 +44,7 @@ class UserInfoViewModel @Inject constructor(
                             name = friendData.name
                         )
                     )
+                    _isUserDataMe.emit(false)
                 }
             }
         }
