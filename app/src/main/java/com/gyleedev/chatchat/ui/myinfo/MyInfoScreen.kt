@@ -1,9 +1,9 @@
-package com.gyleedev.chatchat.ui.userinfo
+package com.gyleedev.chatchat.ui.myinfo
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,23 +11,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,21 +40,21 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserInfoScreen(
-    onBackPressKeyClick: () -> Unit,
+fun MyInfoScreen(
+    onCloseKeyPressed: () -> Unit,
     onChatRoomClick: (String) -> Unit,
+    onProfileEditClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: UserInfoViewModel = hiltViewModel()
+    viewModel: MyInfoViewModel = hiltViewModel()
 ) {
-    val userData = viewModel.userData.collectAsStateWithLifecycle()
-
+    val userData by viewModel.userData.collectAsStateWithLifecycle()
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { },
                 navigationIcon = {
-                    IconButton(onClick = onBackPressKeyClick) {
+                    IconButton(onClick = onCloseKeyPressed) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
                             contentDescription = "close button"
@@ -63,14 +64,6 @@ fun UserInfoScreen(
             )
         }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .fillMaxWidth()
-        ) {
-            GlideImage(imageModel = { /*TODO*/ })
-        }
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -80,11 +73,14 @@ fun UserInfoScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             GlideImage(
-                imageModel = { userData.value?.picture?.ifBlank { R.drawable.icons8__ } },
+                imageModel = {
+                    userData?.picture?.ifBlank { R.drawable.icons8__ }
+                },
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
-                    .clip(CircleShape),
+                    .sizeIn(
+                        80.dp
+                    )
+                    .clip(RoundedCornerShape(20.dp)),
                 component = rememberImageComponent {
                     +ShimmerPlugin(
                         Shimmer.Flash(
@@ -92,31 +88,37 @@ fun UserInfoScreen(
                             highlightColor = Color.LightGray
                         )
                     )
-                }
+                },
+                previewPlaceholder = painterResource(id = R.drawable.icons8__)
             )
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(text = userData?.name ?: "anonymous")
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = userData?.status ?: "")
             Spacer(modifier = Modifier.height(60.dp))
-            Column(
-                modifier = Modifier.clickable { userData.value?.uid?.let { onChatRoomClick(it) } },
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(imageVector = Icons.Outlined.Email, contentDescription = "message button")
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "채팅하기")
+            Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Absolute.SpaceEvenly) {
+                Column(
+                    modifier = Modifier.clickable {
+                        userData?.uid?.let { onChatRoomClick(it) }
+                    },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(imageVector = Icons.Outlined.Email, contentDescription = "message button")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "채팅하기")
+                }
+                Column(
+                    modifier = Modifier.clickable {
+                        onProfileEditClick()
+                    },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = "edit button")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "프로필 편집")
+                }
             }
             Spacer(modifier = Modifier.height(72.dp))
         }
-
-    }
-}
-
-@Preview
-@Composable
-fun UserInfoScreenPreview(modifier: Modifier = Modifier) {
-    MaterialTheme {
-        UserInfoScreen(
-            onBackPressKeyClick = { /*TODO*/ },
-            onChatRoomClick = { /*TODO*/ },
-            modifier = modifier
-        )
     }
 }
