@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.ui.userinfo
+package com.gyleedev.chatchat.ui.myinfo
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserInfoViewModel @Inject constructor(
+class MyInfoViewModel @Inject constructor(
     private val getMyUserDataUseCase: GetMyUserDataUseCase,
     private val getFriendDataUseCase: GetFriendDataUseCase,
     savedStateHandle: SavedStateHandle
