@@ -25,6 +25,9 @@ class UserInfoViewModel @Inject constructor(
     private val _isUserDataMe = MutableStateFlow<Boolean?>(null)
     val isUserDataMe: StateFlow<Boolean?> = _isUserDataMe
 
+    private val _isEditable = MutableStateFlow(false)
+    val isEditable: StateFlow<Boolean> = _isEditable
+
     init {
         viewModelScope.launch {
             val userUid = savedStateHandle.get<String>("user")
@@ -47,6 +50,12 @@ class UserInfoViewModel @Inject constructor(
                     _isUserDataMe.emit(false)
                 }
             }
+        }
+    }
+
+    fun changeEditModeStatus() {
+        viewModelScope.launch {
+            _isEditable.emit(!_isEditable.value)
         }
     }
 }
