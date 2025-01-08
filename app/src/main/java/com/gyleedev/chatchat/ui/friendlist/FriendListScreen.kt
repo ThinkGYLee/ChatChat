@@ -38,6 +38,7 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun FriendListScreen(
     onUserClick: (String) -> Unit,
+    onFriendClick: (String) -> Unit,
     onFindUserButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FriendListViewModel = hiltViewModel()
@@ -101,7 +102,7 @@ fun FriendListScreen(
                         contentType = { 0 }
                     ) { index ->
                         val friend = items[index] as FriendData
-                        FriendData(onClick = { onUserClick(friend.uid) }, friendData = friend)
+                        FriendData(onClick = { onFriendClick(friend.uid) }, friendData = friend)
                     }
                 }
             }
