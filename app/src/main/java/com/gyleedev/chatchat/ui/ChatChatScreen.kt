@@ -32,7 +32,6 @@ import com.gyleedev.chatchat.ui.chatlist.ChatListScreen
 import com.gyleedev.chatchat.ui.chatroom.ChatRoomScreen
 import com.gyleedev.chatchat.ui.finduser.FindUserScreen
 import com.gyleedev.chatchat.ui.friendinfo.FriendInfoScreen
-
 import com.gyleedev.chatchat.ui.friendlist.FriendListScreen
 import com.gyleedev.chatchat.ui.login.LoginScreen
 import com.gyleedev.chatchat.ui.myinfo.MyInfoScreen
@@ -212,7 +211,7 @@ fun ChatChatScreen(
             ) {
                 FriendInfoScreen(
                     onCloseKeyPressed = { navController.navigateUp() },
-                    onChatRoomClick = { navController.navigate("${BottomNavItem.CHATROOM.screenRoute}/$it") },
+                    onChatRoomClick = { navController.navigate("${BottomNavItem.CHATROOM.screenRoute}/$it") }
                 )
             }
 
@@ -226,9 +225,9 @@ fun ChatChatScreen(
                 )
             ) {
                 MyInfoScreen(
-                    onCloseKeyPressed = {navController.navigateUp()},
+                    onCloseKeyPressed = { navController.navigateUp() },
                     onChatRoomClick = {},
-                    onProfileEditClick = {navController.navigate("${BottomNavItem.MYINFOEDIT.screenRoute}/$it")},
+                    onProfileEditClick = { navController.navigate("${BottomNavItem.MYINFOEDIT.screenRoute}/$it") }
                 )
             }
 
@@ -242,8 +241,8 @@ fun ChatChatScreen(
                 )
             ) {
                 MyInfoEditScreen(
-                    onCloseKeyPressed = {navController.navigateUp()},
-                    onChatRoomClick = {},
+                    onCloseKeyPressed = { navController.navigateUp() },
+                    onChatRoomClick = {}
                 )
             }
         }

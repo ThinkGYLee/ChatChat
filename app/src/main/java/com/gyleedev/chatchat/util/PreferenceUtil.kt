@@ -34,6 +34,5 @@ class PreferenceUtil(@ApplicationContext context: Context) {
     }
 
     fun deleteKey() {
-
     }
 }

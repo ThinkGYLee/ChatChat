@@ -144,7 +144,8 @@ fun SignInScreen(
                             nicknameQuery.text.length
                         )
                     }
-                })
+                }
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
 

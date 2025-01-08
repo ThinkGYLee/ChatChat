@@ -47,7 +47,6 @@ fun FriendInfoScreen(
 ) {
     val userData by viewModel.userData.collectAsStateWithLifecycle()
 
-
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -112,4 +111,3 @@ fun FriendInfoScreen(
         }
     }
 }
-

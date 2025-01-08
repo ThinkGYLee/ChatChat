@@ -48,7 +48,6 @@ fun MyInfoEditScreen(
 ) {
     val userData by viewModel.userData.collectAsStateWithLifecycle()
 
-
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -100,7 +99,6 @@ fun MyInfoEditScreen(
             Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Absolute.SpaceEvenly) {
                 Column(
                     modifier = Modifier.clickable {
-
                     },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -110,7 +108,6 @@ fun MyInfoEditScreen(
                 }
                 Column(
                     modifier = Modifier.clickable {
-
                     },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
