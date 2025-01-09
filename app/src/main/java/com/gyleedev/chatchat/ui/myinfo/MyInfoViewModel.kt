@@ -30,7 +30,7 @@ class MyInfoViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val userUid = savedStateHandle.get<String>("user")
+            val userUid = savedStateHandle.get<String>("myInfo")
             val myUserData = getMyUserDataUseCase().first()
             if (myUserData != null && userUid != null) {
                 if (userUid == myUserData.uid) {

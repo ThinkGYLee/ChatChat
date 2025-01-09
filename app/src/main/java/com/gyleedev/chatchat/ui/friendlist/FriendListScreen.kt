@@ -37,7 +37,7 @@ import com.skydoves.landscapist.glide.GlideImage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendListScreen(
-    onUserClick: (String) -> Unit,
+    onMyInfoClick: (String) -> Unit,
     onFriendClick: (String) -> Unit,
     onFindUserButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -75,7 +75,10 @@ fun FriendListScreen(
                 .padding(horizontal = 20.dp)
         ) {
             if (myUserData.value != null) {
-                MyUserData(onClick = {}, userData = myUserData.value!!)
+                MyUserData(
+                    onClick = { if (myUserData.value != null) onMyInfoClick(myUserData.value!!.uid) },
+                    userData = myUserData.value!!
+                )
             }
 
             Spacer(modifier = Modifier.height(20.dp))

@@ -133,7 +133,7 @@ fun ChatChatScreen(
         ) {
             composable(route = BottomNavItem.FRIENDLIST.screenRoute) {
                 FriendListScreen(
-                    onUserClick = { navController.navigate("${BottomNavItem.CHATROOM.screenRoute}/$it") },
+                    onMyInfoClick = { navController.navigate("${BottomNavItem.MYINFO.screenRoute}/$it") },
                     onFriendClick = { navController.navigate("${BottomNavItem.FRIENDINFO.screenRoute}/$it") },
                     onFindUserButtonClick = { navController.navigate(BottomNavItem.FINDUSER.screenRoute) },
                     modifier = Modifier.fillMaxSize()
