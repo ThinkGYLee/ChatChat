@@ -105,11 +105,10 @@ fun ChatChatScreen(
 
     navController.currentBackStackEntryAsState().value?.destination?.route.let { route ->
         isBottomBarVisible = when (route) {
-            LOGIN -> false
-            SIGNIN -> false
-            FINDUSER -> false
-            "CHATROOM/{friend}" -> false
-            else -> true
+            FRIENDLIST -> true
+            CHATLIST -> true
+            SETTING -> true
+            else -> false
         }
     }
 
