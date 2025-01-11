@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,7 +41,7 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyInfoEditScreen(
-    onCloseKeyPressed: () -> Unit,
+    onBackKeyPressed: () -> Unit,
     onChatRoomClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyInfoEditViewModel = hiltViewModel()
@@ -54,10 +54,10 @@ fun MyInfoEditScreen(
             TopAppBar(
                 title = { },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onBackKeyPressed) {
                         Icon(
-                            imageVector = Icons.Outlined.Close,
-                            contentDescription = "close button"
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = "Arrow Back button"
                         )
                     }
                 }
