@@ -43,7 +43,7 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 fun MyInfoScreen(
     onCloseKeyPressed: () -> Unit,
     onChatRoomClick: (String) -> Unit,
-    onProfileEditClick: () -> Unit,
+    onProfileEditClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyInfoViewModel = hiltViewModel()
 ) {
@@ -109,7 +109,7 @@ fun MyInfoScreen(
                 }
                 Column(
                     modifier = Modifier.clickable {
-                        onProfileEditClick()
+                        userData?.uid?.let { onProfileEditClick(it) }
                     },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
