@@ -242,7 +242,6 @@ fun ChatChatScreen(
             ) {
                 MyInfoEditScreen(
                     onBackKeyPressed = { navController.navigateUp() },
-                    onChatRoomClick = {}
                 )
             }
         }
