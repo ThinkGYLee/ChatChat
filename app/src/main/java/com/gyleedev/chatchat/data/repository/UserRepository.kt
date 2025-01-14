@@ -74,6 +74,7 @@ interface UserRepository {
     fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?>
     suspend fun insertChatRoomToLocal(friendData: FriendData, chatRoomData: ChatRoomData): Long
     suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithFriend>>
+    suspend fun updateMyUserInfo(user: UserData): Flow<Boolean>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -92,7 +93,11 @@ class UserRepositoryImpl @Inject constructor(
         return friendDao.getUsers().map { it.toModel() }
     }
 
-    override suspend fun signInUser(id: String, password: String, nickname: String): Flow<UserData?> = callbackFlow {
+    override suspend fun signInUser(
+        id: String,
+        password: String,
+        nickname: String
+    ): Flow<UserData?> = callbackFlow {
         auth.createUserWithEmailAndPassword(id, password).addOnSuccessListener { task ->
             val myData = UserData(
                 email = id,
@@ -423,5 +428,16 @@ class UserRepositoryImpl @Inject constructor(
 
     private fun getChatListWithMessageAndFriend() {
         /*return chatListWithMessageAndFriendDao.getChatListFeed("a")*/
+    }
+
+    override suspend fun updateMyUserInfo(user: UserData): Flow<Boolean> = callbackFlow {
+        database.reference.child("users").child(user.uid).setValue(user)
+            .addOnSuccessListener {
+                preferenceUtil.setMyData(user)
+                trySend(true)
+            }.addOnFailureListener {
+                trySend(false)
+            }
+        awaitClose()
     }
 }
