@@ -31,7 +31,7 @@ interface FriendDao {
     fun getFriendByUid(uid: String): Flow<FriendEntity>
 
     @Update
-    fun updateUser(user: FriendEntity)
+    suspend fun updateUser(user: FriendEntity)
 
     @Query("DELETE FROM friend")
     fun resetUser()
@@ -44,4 +44,7 @@ interface FriendDao {
 
     @Query("SELECT * FROM friend")
     fun getFriends(): List<FriendEntity>
+
+    @Query("SELECT * FROM friend")
+    fun getFriendsAsFlow(): Flow<List<FriendEntity>>
 }
