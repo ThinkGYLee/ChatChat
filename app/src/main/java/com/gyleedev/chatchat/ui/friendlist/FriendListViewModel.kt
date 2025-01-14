@@ -39,7 +39,7 @@ class FriendListViewModel @Inject constructor(
         }
     }
 
-    private fun fetchMyUserData() {
+    fun fetchMyUserData() {
         viewModelScope.launch {
             val fetchUserdata = getMyUserDataUseCase().first()
             _myUserData.emit(fetchUserdata)
