@@ -1,5 +1,6 @@
 package com.gyleedev.chatchat.ui.myinfoedit
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -36,10 +38,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.gyleedev.chatchat.R
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
@@ -56,6 +61,24 @@ fun MyInfoEditScreen(
     val myData by viewModel.myUserData.collectAsStateWithLifecycle()
     val myName by viewModel.myNameQuery.collectAsStateWithLifecycle()
     val myStatus by viewModel.myStatusQuery.collectAsStateWithLifecycle()
+    val lifecycle = LocalLifecycleOwner.current
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.request
+            .flowWithLifecycle(lifecycle.lifecycle)
+            .collect {
+                if (it) {
+                    onBackKeyPressed()
+                } else {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.search_user_failure_message),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -71,7 +94,10 @@ fun MyInfoEditScreen(
                     }
                 },
                 actions = {
-                    TextButton(onClick = {}, enabled = myName.isNotEmpty()) {
+                    TextButton(
+                        onClick = { viewModel.updateMyInfo() },
+                        enabled = myName.isNotEmpty()
+                    ) {
                         Text("완료")
                     }
                 }
@@ -117,7 +143,8 @@ fun MyInfoEditScreen(
                     MyEditTextField(
                         myName,
                         onValueChange = { viewModel.changeNameQuery(it) },
-                        onReset = { viewModel.changeNameQuery("") })
+                        onReset = { viewModel.changeNameQuery("") }
+                    )
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
@@ -129,7 +156,8 @@ fun MyInfoEditScreen(
                     MyEditTextField(
                         myStatus,
                         onValueChange = { viewModel.changeStatusQuery(it) },
-                        onReset = { viewModel.changeStatusQuery("") })
+                        onReset = { viewModel.changeStatusQuery("") }
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(160.dp))
@@ -194,7 +222,8 @@ fun MyEditTextField(
                             )
                         }
                     }
-                })
+                }
+            )
             Spacer(modifier = Modifier.height(4.dp))
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
         }
