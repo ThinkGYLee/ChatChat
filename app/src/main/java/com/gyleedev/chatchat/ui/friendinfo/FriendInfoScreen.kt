@@ -45,7 +45,7 @@ fun FriendInfoScreen(
     modifier: Modifier = Modifier,
     viewModel: FriendInfoViewModel = hiltViewModel()
 ) {
-    val userData by viewModel.userData.collectAsStateWithLifecycle()
+    val friendData by viewModel.friendData.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier,
@@ -73,7 +73,7 @@ fun FriendInfoScreen(
         ) {
             GlideImage(
                 imageModel = {
-                    userData?.picture?.ifBlank { R.drawable.icons8__ }
+                    friendData?.picture?.ifBlank { R.drawable.icons8__ }
                 },
                 modifier = Modifier
                     .sizeIn(
@@ -91,14 +91,14 @@ fun FriendInfoScreen(
                 previewPlaceholder = painterResource(id = R.drawable.icons8__)
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Text(text = userData?.name ?: "anonymous")
+            Text(text = friendData?.name ?: "anonymous")
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = userData?.status ?: "")
+            Text(text = friendData?.status ?: "")
             Spacer(modifier = Modifier.height(60.dp))
             Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 Column(
                     modifier = Modifier.clickable {
-                        userData?.let { onChatRoomClick(it.uid) }
+                        friendData?.let { onChatRoomClick(it.uid) }
                     },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
