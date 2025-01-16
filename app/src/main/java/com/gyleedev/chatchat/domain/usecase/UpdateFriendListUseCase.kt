@@ -10,7 +10,7 @@ class UpdateFriendListUseCase @Inject constructor(
     suspend operator fun invoke() {
         val list = repository.getFriendListFromLocal().first()
         list.forEach {
-            repository.updateFriendInfo(it)
+            repository.updateFriendInfoWithFriendEntity(it)
         }
     }
 }
