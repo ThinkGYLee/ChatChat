@@ -79,7 +79,8 @@ interface UserRepository {
     suspend fun updateMyUserInfo(user: UserData): Flow<Boolean>
     suspend fun getFriendInfoFromRemote(uid: String): Flow<UserData?>
     fun getFriendListFromLocal(): Flow<List<FriendEntity>>
-    suspend fun updateFriendInfo(friendEntity: FriendEntity)
+    suspend fun updateFriendInfoWithFriendEntity(friendEntity: FriendEntity)
+    suspend fun updateFriendInfoByUid(uid: String)
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -474,10 +475,8 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override suspend fun updateFriendInfo(friendEntity: FriendEntity) {
+    override suspend fun updateFriendInfoWithFriendEntity(friendEntity: FriendEntity) {
         val remoteData = getFriendInfoFromRemote(friendEntity.uid).first()
-        println(friendEntity.toFriendData())
-        println(remoteData?.toEntity()?.toFriendData())
         if (remoteData?.toEntity()?.toFriendData() != friendEntity.toFriendData()) {
             println("update ${friendEntity.id}")
             friendDao.updateUser(
@@ -488,5 +487,23 @@ class UserRepositoryImpl @Inject constructor(
                 )
             )
         }
+    }
+
+    override suspend fun updateFriendInfoByUid(uid: String) {
+        val localEntity = getFriendEntityFromLocalByUid(uid)
+        val remoteData = getFriendInfoFromRemote(uid).first()
+        if (localEntity.toFriendData() != remoteData?.toEntity()?.toFriendData()) {
+            friendDao.updateUser(
+                localEntity.copy(
+                    name = remoteData!!.name.ifBlank { localEntity.name },
+                    status = remoteData.status.ifBlank { localEntity.status },
+                    picture = remoteData.picture.ifBlank { localEntity.picture }
+                )
+            )
+        }
+    }
+
+    private suspend fun getFriendEntityFromLocalByUid(uid: String): FriendEntity {
+        return friendDao.getFriendByUid(uid).first()
     }
 }
