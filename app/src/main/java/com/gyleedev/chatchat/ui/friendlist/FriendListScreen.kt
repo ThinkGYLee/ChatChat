@@ -161,12 +161,12 @@ fun FriendData(
     ) {
         GlideImage(imageModel = { friendData.picture.ifBlank { R.drawable.icons8__ } })
         Spacer(modifier = Modifier.width(20.dp))
-        Column(verticalArrangement = Arrangement.Center) {
-            Text(text = friendData.name)
+        Column(horizontalAlignment = Alignment.Start) {
+            Text(text = friendData.name, style = MaterialTheme.typography.bodyMedium)
             if (friendData.status.isNotBlank()) {
                 Text(
                     text = friendData.status,
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelSmall
                 )
             }
         }
