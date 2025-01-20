@@ -1,5 +1,7 @@
 package com.gyleedev.chatchat.ui.chatlist
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -82,6 +84,7 @@ fun ChatListScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun ChatRoomItem(
     onClick: (String) -> Unit,
