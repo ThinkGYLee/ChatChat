@@ -152,6 +152,7 @@ class ChatRoomViewModel @Inject constructor(
         return getNetworkState.checkNetworkState()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun resendMessage(messageData: MessageData) {
         viewModelScope.launch {
             val networkState = getNetworkState()
