@@ -1,5 +1,7 @@
 package com.gyleedev.chatchat.domain.usecase
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +16,7 @@ class ResendMessageUseCase @Inject constructor(
     private val updateMessageStateUseCase: UpdateMessageStateUseCase,
     private val getMessageFromLocalUseCase: GetMessageFromLocalUseCase
 ) {
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend operator fun invoke(messageData: MessageData, rid: Long, networkState: Boolean) {
         withContext(Dispatchers.IO) {
             if (networkState) {
