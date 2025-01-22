@@ -115,12 +115,14 @@ fun MyInfoScreen(
                     Text(text = "채팅하기")
                 }
                 Column(
-                    modifier = Modifier.clickable {
-                        userData?.uid?.let { onProfileEditClick(it) }
-                    },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = "edit button")
+                    IconButton(onClick = { userData?.uid?.let { onProfileEditClick(it) } }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "edit button"
+                        )
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = "프로필 편집")
                 }
