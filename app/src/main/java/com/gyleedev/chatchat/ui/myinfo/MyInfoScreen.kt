@@ -1,6 +1,5 @@
 package com.gyleedev.chatchat.ui.myinfo
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -105,11 +104,14 @@ fun MyInfoScreen(
             Spacer(modifier = Modifier.height(60.dp))
             Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Absolute.SpaceEvenly) {
                 Column(
-                    modifier = Modifier.clickable {
-                        userData?.uid?.let { onChatRoomClick(it) }
-                    },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    IconButton(onClick = { userData?.uid?.let { onChatRoomClick(it) } }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Email,
+                            contentDescription = "message button"
+                        )
+                    }
                     Icon(imageVector = Icons.Outlined.Email, contentDescription = "message button")
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = "채팅하기")
