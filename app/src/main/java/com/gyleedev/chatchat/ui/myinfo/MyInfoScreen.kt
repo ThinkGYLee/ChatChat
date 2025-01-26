@@ -115,7 +115,7 @@ fun MyInfoScreen(
                     }
                     Icon(imageVector = Icons.Outlined.Email, contentDescription = "message button")
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "채팅하기")
+                    Text(text = stringResource(R.string.message_button_message))
                 }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
