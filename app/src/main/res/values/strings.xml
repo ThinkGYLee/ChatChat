@@ -7,4 +7,5 @@
     <string name="search_user_failure_message">해당 email의 유저 정보가 없습니다.\n다른 email로 검색해주세요</string>
     <string name="add_user_failure_message">친구 추가에 실패했습니다</string>
     <string name="message_button_description">message button</string>
+    <string name="message_button_message">채팅하기</string>
 </resources>
