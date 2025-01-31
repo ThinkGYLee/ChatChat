@@ -64,7 +64,7 @@ fun MyInfoScreen(
                     IconButton(onClick = onCloseKeyPressed) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = "close button"
+                            contentDescription = stringResource(R.string.message_button_description)
                         )
                     }
                 }

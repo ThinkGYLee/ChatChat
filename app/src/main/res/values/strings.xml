@@ -8,4 +8,5 @@
     <string name="add_user_failure_message">친구 추가에 실패했습니다</string>
     <string name="message_button_description">message button</string>
     <string name="message_button_message">채팅하기</string>
+    <string name="close_button_description">close button</string>
 </resources>
