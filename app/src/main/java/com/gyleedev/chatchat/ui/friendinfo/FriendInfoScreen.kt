@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,7 +57,7 @@ fun FriendInfoScreen(
                     IconButton(onClick = onCloseKeyPressed) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = "close button"
+                            contentDescription = stringResource(R.string.close_button_description)
                         )
                     }
                 }
@@ -102,9 +103,12 @@ fun FriendInfoScreen(
                     },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(imageVector = Icons.Outlined.Email, contentDescription = "message button")
+                    Icon(
+                        imageVector = Icons.Outlined.Email,
+                        contentDescription = stringResource(R.string.message_button_description)
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "채팅하기")
+                    Text(text = stringResource(R.string.message_button_message))
                 }
             }
             Spacer(modifier = Modifier.height(72.dp))
