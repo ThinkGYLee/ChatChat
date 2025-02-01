@@ -25,6 +25,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,11 +56,11 @@ fun ChatListScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "채팅방")
+                    Text(text = stringResource(R.string.chat_list_screen_title))
                 },
                 actions = {
                     IconButton(onClick = { }) {
-                        Icon(imageVector = Icons.Outlined.Add, contentDescription = "add friend")
+                        Icon(imageVector = Icons.Outlined.Add, contentDescription = stringResource(R.string.add_friend_button_description))
                     }
                 }
             )
