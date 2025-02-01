@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -104,7 +105,7 @@ fun FindUserScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "연락처로 추가",
+                    text = stringResource(R.string.find_user_screen_top_bar_text),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -115,7 +116,7 @@ fun FindUserScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "ArrowBack Button"
+                        contentDescription = stringResource(R.string.find_user_screen_navigation_icon_description)
                     )
                 }
             },
@@ -124,7 +125,7 @@ fun FindUserScreen(
                     onClick = viewModel::fetchUserData,
                     enabled = emailIsAvailable.value
                 ) {
-                    Text(text = "확인")
+                    Text(text = stringResource(R.string.find_user_screen_action_button_text))
                 }
             }
         )
@@ -187,7 +188,7 @@ fun FindUserTextField(
                         Box(modifier = Modifier.weight(10f)) {
                             if (idQuery.text.isEmpty()) {
                                 Text(
-                                    text = "친구 이메일 주소",
+                                    text = stringResource(R.string.find_user_text_field_hint),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = Color(0xFF848484),
                                     modifier = Modifier
@@ -202,7 +203,7 @@ fun FindUserTextField(
                         if (idQuery.text.isNotEmpty()) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
-                                contentDescription = null,
+                                contentDescription = stringResource(R.string.keyboard_reset_button_description),
                                 modifier = Modifier.clickable { onReset() }
                             )
                         }
@@ -233,7 +234,7 @@ fun FindUserCard(onFindComplete: () -> Unit, userData: UserData, modifier: Modif
             )
             Text(text = userData.name)
             TextButton(onClick = { onFindComplete() }) {
-                Text(text = "친구 추가")
+                Text(text = stringResource(R.string.find_user_screen_add_button_text))
             }
         }
     }
