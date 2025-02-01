@@ -113,7 +113,6 @@ fun MyInfoScreen(
                             contentDescription = stringResource(R.string.message_button_description)
                         )
                     }
-                    Icon(imageVector = Icons.Outlined.Email, contentDescription = "message button")
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = stringResource(R.string.message_button_message))
                 }
@@ -123,11 +122,11 @@ fun MyInfoScreen(
                     IconButton(onClick = { userData?.uid?.let { onProfileEditClick(it) } }) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
-                            contentDescription = "edit button"
+                            contentDescription = stringResource(R.string.edit_button_description)
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "프로필 편집")
+                    Text(text = stringResource(R.string.edit_button_message))
                 }
             }
             Spacer(modifier = Modifier.height(72.dp))
