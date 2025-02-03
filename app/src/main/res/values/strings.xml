@@ -14,7 +14,7 @@
     <string name="keyboard_reset_button_description">keyboard reset button</string>
     <string name="find_user_text_field_hint">친구 이메일 주소</string>
     <string name="find_user_screen_top_bar_text">연락처로 추가</string>
-    <string name="find_user_screen_navigation_icon_description">arrow back button</string>
+    <string name="navigation_arrow_back_icon_description">arrow back button</string>
     <string name="find_user_screen_action_button_text">확인</string>
     <string name="find_user_screen_add_button_text">친구 추가</string>
     <string name="add_friend_button_description">add friend</string>

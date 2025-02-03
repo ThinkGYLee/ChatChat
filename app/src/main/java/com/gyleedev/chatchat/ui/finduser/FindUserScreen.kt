@@ -116,7 +116,7 @@ fun FindUserScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = stringResource(R.string.find_user_screen_navigation_icon_description)
+                        contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
                     )
                 }
             },
