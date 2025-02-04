@@ -24,4 +24,8 @@
     <string name="message_resend_icon_description">message_resend icon</string>
     <string name="message_cancel_icon_description">message_cancel icon</string>
     <string name="network_error_message">네트워크 연결을 확인해주세요</string>
+    <string name="action_button_complete_message">완료</string>
+    <string name="edit_name_hint">이름을 입력하세요</string>
+    <string name="edit_status_hint">상태를 입력하세요</string>
+    <string name="edit_query_reset_description">query reset button</string>
 </resources>

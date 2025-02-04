@@ -40,6 +40,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -89,7 +90,7 @@ fun MyInfoEditScreen(
                     IconButton(onClick = onBackKeyPressed) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Arrow Back button"
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
                         )
                     }
                 },
@@ -98,7 +99,7 @@ fun MyInfoEditScreen(
                         onClick = { viewModel.updateMyInfo() },
                         enabled = myName.isNotEmpty()
                     ) {
-                        Text("완료")
+                        Text(stringResource(R.string.action_button_complete_message))
                     }
                 }
             )
@@ -135,7 +136,7 @@ fun MyInfoEditScreen(
             Spacer(modifier = Modifier.height(60.dp))
             Column(horizontalAlignment = Alignment.Start) {
                 Text(
-                    "이름을 입력하세요",
+                    stringResource(R.string.edit_name_hint),
                     modifier = Modifier.padding(horizontal = 16.dp),
                     style = MaterialTheme.typography.labelSmall
                 )
@@ -148,7 +149,7 @@ fun MyInfoEditScreen(
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    "상태를 입력하세요",
+                    stringResource(R.string.edit_status_hint),
                     modifier = Modifier.padding(horizontal = 16.dp),
                     style = MaterialTheme.typography.labelSmall
                 )
@@ -202,7 +203,7 @@ fun MyEditTextField(
                         Box(modifier = Modifier.weight(10f)) {
                             if (query.isEmpty()) {
                                 Text(
-                                    text = "상태를 입력하세요",
+                                    text = stringResource(R.string.edit_status_hint),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = Color(0xFF848484),
                                     modifier = Modifier
@@ -217,7 +218,7 @@ fun MyEditTextField(
                         if (query.isNotEmpty()) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
-                                contentDescription = null,
+                                contentDescription = stringResource(R.string.edit_query_reset_description),
                                 modifier = Modifier.clickable { onReset() }
                             )
                         }
