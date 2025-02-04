@@ -19,4 +19,9 @@
     <string name="find_user_screen_add_button_text">친구 추가</string>
     <string name="add_friend_button_description">add friend</string>
     <string name="chat_list_screen_title">채팅방</string>
+    <string name="chat_room_screen_chat_hint">채팅을 입력하세요</string>
+    <string name="reply_icon_description">reply icon</string>
+    <string name="message_resend_icon_description">message_resend icon</string>
+    <string name="message_cancel_icon_description">message_cancel icon</string>
+    <string name="network_error_message">네트워크 연결을 확인해주세요</string>
 </resources>

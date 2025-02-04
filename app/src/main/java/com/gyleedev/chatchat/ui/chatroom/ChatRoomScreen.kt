@@ -90,7 +90,7 @@ fun ChatRoomScreen(
 
     LaunchedEffect(Unit) {
         chatRoomViewModel.networkState.flowWithLifecycle(lifecycle.lifecycle).collectLatest {
-            if (!it) Toast.makeText(context, "네트워크 연결을 확인해주세요", Toast.LENGTH_SHORT).show()
+            if (!it) Toast.makeText(context, R.string.network_error_message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -226,7 +226,7 @@ fun CommentBottomBar(
             Box {
                 if (query.text.isEmpty()) {
                     Text(
-                        text = "채팅을 입력하세요",
+                        text = stringResource(R.string.chat_room_screen_chat_hint),
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color(0xFF848484),
                         modifier = Modifier
@@ -248,7 +248,7 @@ fun CommentBottomBar(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.Send,
-                            contentDescription = "Reply Icon",
+                            contentDescription = stringResource(R.string.reply_icon_description),
                             modifier = Modifier.padding(horizontal = 8.dp)
                         )
                     }
@@ -276,7 +276,7 @@ fun ResendButton(
         ) {
             Icon(
                 imageVector = Icons.Outlined.Refresh,
-                contentDescription = "resend button",
+                contentDescription = stringResource(R.string.message_resend_icon_description),
                 modifier = Modifier.padding(2.dp)
             )
         }
@@ -290,7 +290,7 @@ fun ResendButton(
         ) {
             Icon(
                 imageVector = Icons.Outlined.Close,
-                contentDescription = "cancel button",
+                contentDescription = stringResource(R.string.message_cancel_icon_description),
                 modifier = Modifier.padding(2.dp)
             )
         }
