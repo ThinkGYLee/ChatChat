@@ -28,4 +28,7 @@
     <string name="edit_name_hint">이름을 입력하세요</string>
     <string name="edit_status_hint">상태를 입력하세요</string>
     <string name="edit_query_reset_description">query reset button</string>
+    <string name="action_button_add_friend_message">add friend button</string>
+    <string name="friend_list_screen_top_bar_title">친구</string>
+    <string name="friend_list_screen_middle_title">친구</string>
 </resources>

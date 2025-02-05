@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -60,12 +61,12 @@ fun FriendListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "친구") },
+                title = { Text(text = stringResource(R.string.friend_list_screen_top_bar_title)) },
                 actions = {
                     IconButton(onClick = onFindUserButtonClick) {
                         Icon(
                             imageVector = Icons.Outlined.Add,
-                            contentDescription = "add friend"
+                            contentDescription = stringResource(R.string.add_friend_button_description)
                         )
                     }
                 }
@@ -90,7 +91,7 @@ fun FriendListScreen(
             Spacer(modifier = Modifier.height(20.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "친구",
+                    text = stringResource(R.string.friend_list_screen_middle_title),
                     style = MaterialTheme.typography.labelMedium
                 )
                 Spacer(modifier = Modifier.width(8.dp))
