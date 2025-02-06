@@ -31,4 +31,5 @@
     <string name="action_button_add_friend_message">add friend button</string>
     <string name="friend_list_screen_top_bar_title">친구</string>
     <string name="friend_list_screen_middle_title">친구</string>
+    <string name="google_icon_description">google icon</string>
 </resources>
