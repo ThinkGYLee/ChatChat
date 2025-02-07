@@ -279,7 +279,7 @@ fun IdTextField(
                     if (searchQuery.text.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.keyboard_reset_button_description),
                             modifier = Modifier.clickable { onReset() }
                         )
                     }
@@ -338,7 +338,7 @@ fun PasswordTextField(
                     if (searchQuery.text.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.keyboard_reset_button_description),
                             modifier = Modifier.clickable { onReset() }
                         )
                     }

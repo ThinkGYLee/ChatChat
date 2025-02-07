@@ -42,6 +42,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -243,7 +244,7 @@ fun IdTextField(
                     if (idQuery.text.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.keyboard_reset_button_description),
                             modifier = Modifier.clickable { onReset() }
                         )
                     }
@@ -303,7 +304,7 @@ fun NicknameTextField(
                     if (nicknameQuery.text.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.keyboard_reset_button_description),
                             modifier = Modifier.clickable { onReset() }
                         )
                     }
@@ -363,7 +364,7 @@ fun PasswordTextField(
                     if (passwordQuery.text.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.keyboard_reset_button_description),
                             modifier = Modifier.clickable { onReset() }
                         )
                     }
