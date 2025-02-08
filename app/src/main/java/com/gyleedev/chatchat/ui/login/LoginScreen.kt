@@ -72,9 +72,10 @@ fun LoginScreen(
     val idIsAvailable by viewModel.idIsAvailable.collectAsStateWithLifecycle()
     val passwordIsAvailable by viewModel.passwordIsAvailable.collectAsStateWithLifecycle()
     val signInIsAvailable by viewModel.logInIsAvailable.collectAsStateWithLifecycle()
-    val idComment = if (idIsAvailable || idQuery.text.isEmpty()) "" else "이메일 형식을 지켜주세요"
+    val idComment =
+        if (idIsAvailable || idQuery.text.isEmpty()) "" else stringResource(R.string.id_incorrect_message)
     val passwordComment =
-        if (passwordIsAvailable || passwordQuery.text.isEmpty()) "" else "8자리 이상을 입력해 주세요"
+        if (passwordIsAvailable || passwordQuery.text.isEmpty()) "" else stringResource(R.string.password_incorrect_message)
     val context = LocalContext.current
 
     LaunchedEffect(idQuery.text) {

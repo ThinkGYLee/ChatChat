@@ -32,4 +32,6 @@
     <string name="friend_list_screen_top_bar_title">친구</string>
     <string name="friend_list_screen_middle_title">친구</string>
     <string name="google_icon_description">google icon</string>
+    <string name="id_incorrect_message">이메일 형식을 지켜주세요</string>
+    <string name="password_incorrect_message">8자리 이상을 입력해 주세요</string>
 </resources>
