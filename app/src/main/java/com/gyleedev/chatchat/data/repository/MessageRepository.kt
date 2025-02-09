@@ -1,5 +1,8 @@
 package com.gyleedev.chatchat.data.repository
 
+import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -9,6 +12,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.gyleedev.chatchat.data.database.dao.MessageDao
 import com.gyleedev.chatchat.data.database.entity.MessageEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
@@ -26,6 +30,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
+import java.time.Instant
 import javax.inject.Inject
 
 interface MessageRepository {
@@ -45,11 +50,13 @@ interface MessageRepository {
 
 class MessageRepositoryImpl @Inject constructor(
     firebase: Firebase,
-    private val messageDao: MessageDao
+    private val messageDao: MessageDao,
 ) : MessageRepository {
 
     val database =
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
+
+    val imageStorage = firebase.storage
 
     override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long {
         return messageDao.insertMessage(
@@ -187,5 +194,25 @@ class MessageRepositoryImpl @Inject constructor(
 
     override suspend fun deleteMessage(messageId: Long) {
         return messageDao.deleteMessage(messageId)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun uploadImage(uri: Uri) = callbackFlow {
+
+        // storage 참조
+        val storageRef = imageStorage.getReference("image")
+        // storage에 저장할 파일명 선언
+        val fileName = Instant.now().toEpochMilli()
+        val mountainsRef = storageRef.child("${fileName}.png")
+
+        val uploadTask = mountainsRef.putFile(uri)
+        uploadTask.addOnSuccessListener { taskSnapshot ->
+            // 파일 업로드 성공
+            trySend("${fileName}.png")
+        }.addOnFailureListener {
+            // 파일 업로드 실패
+            trySend("")
+        }
+        awaitClose()
     }
 }
