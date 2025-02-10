@@ -56,7 +56,7 @@ class MessageRepositoryImpl @Inject constructor(
     val database =
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
-    val imageStorage = firebase.storage
+    private val imageStorage = firebase.storage
 
     override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long {
         return messageDao.insertMessage(
@@ -197,7 +197,7 @@ class MessageRepositoryImpl @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun uploadImage(uri: Uri) = callbackFlow {
+    private fun uploadImage(uri: Uri): Flow<String> = callbackFlow {
 
         // storage 참조
         val storageRef = imageStorage.getReference("image")
@@ -206,7 +206,7 @@ class MessageRepositoryImpl @Inject constructor(
         val mountainsRef = storageRef.child("${fileName}.png")
 
         val uploadTask = mountainsRef.putFile(uri)
-        uploadTask.addOnSuccessListener { taskSnapshot ->
+        uploadTask.addOnSuccessListener {
             // 파일 업로드 성공
             trySend("${fileName}.png")
         }.addOnFailureListener {
