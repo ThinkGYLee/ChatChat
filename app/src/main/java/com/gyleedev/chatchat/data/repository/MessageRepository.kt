@@ -199,18 +199,18 @@ class MessageRepositoryImpl @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun uploadImage(uri: Uri): Flow<String> = callbackFlow {
 
-        // storage 참조
+
         val storageRef = imageStorage.getReference("image")
-        // storage에 저장할 파일명 선언
+
         val fileName = Instant.now().toEpochMilli()
         val mountainsRef = storageRef.child("${fileName}.png")
 
         val uploadTask = mountainsRef.putFile(uri)
         uploadTask.addOnSuccessListener {
-            // 파일 업로드 성공
+
             trySend("${fileName}.png")
         }.addOnFailureListener {
-            // 파일 업로드 실패
+
             trySend("")
         }
         awaitClose()
