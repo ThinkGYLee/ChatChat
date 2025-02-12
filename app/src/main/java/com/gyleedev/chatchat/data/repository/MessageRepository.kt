@@ -46,6 +46,8 @@ interface MessageRepository {
     fun getMessage(message: MessageData): Flow<MessageEntity>
 
     suspend fun deleteMessage(messageId: Long)
+
+    suspend fun updateProfile()
 }
 
 class MessageRepositoryImpl @Inject constructor(
@@ -214,5 +216,9 @@ class MessageRepositoryImpl @Inject constructor(
             trySend("")
         }
         awaitClose()
+    }
+
+    override suspend fun updateProfile() {
+        TODO("Not yet implemented")
     }
 }
