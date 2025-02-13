@@ -1,5 +1,8 @@
 package com.gyleedev.chatchat.data.repository
 
+import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -11,6 +14,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FriendDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
@@ -35,6 +39,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 
@@ -81,6 +86,7 @@ interface UserRepository {
     fun getFriendListFromLocal(): Flow<List<FriendEntity>>
     suspend fun updateFriendInfoWithFriendEntity(friendEntity: FriendEntity)
     suspend fun updateFriendInfoByUid(uid: String)
+    suspend fun updateProfile()
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -94,6 +100,8 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
     val database =
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
+
+    private val imageStorage = firebase.storage
 
     override fun getUsersFromLocal(): List<UserData> {
         return friendDao.getUsers().map { it.toModel() }
@@ -505,5 +513,29 @@ class UserRepositoryImpl @Inject constructor(
 
     private suspend fun getFriendEntityFromLocalByUid(uid: String): FriendEntity {
         return friendDao.getFriendByUid(uid).first()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun uploadImage(uri: Uri): Flow<String> = callbackFlow {
+
+
+        val storageRef = imageStorage.getReference("image")
+
+        val fileName = Instant.now().toEpochMilli()
+        val mountainsRef = storageRef.child("${fileName}.png")
+
+        val uploadTask = mountainsRef.putFile(uri)
+        uploadTask.addOnSuccessListener {
+
+            trySend("${fileName}.png")
+        }.addOnFailureListener {
+
+            trySend("")
+        }
+        awaitClose()
+    }
+
+    override suspend fun updateProfile() {
+        TODO("Not yet implemented")
     }
 }
