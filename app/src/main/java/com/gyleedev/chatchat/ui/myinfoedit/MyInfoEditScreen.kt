@@ -1,6 +1,10 @@
 package com.gyleedev.chatchat.ui.myinfoedit
 
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,11 +17,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -59,11 +65,24 @@ fun MyInfoEditScreen(
     modifier: Modifier = Modifier,
     viewModel: MyInfoEditViewModel = hiltViewModel()
 ) {
-    val myData by viewModel.myUserData.collectAsStateWithLifecycle()
     val myName by viewModel.myNameQuery.collectAsStateWithLifecycle()
     val myStatus by viewModel.myStatusQuery.collectAsStateWithLifecycle()
+    val myPicture by viewModel.myPictureAddress.collectAsStateWithLifecycle()
     val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
+
+    val pickMedia =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            // Callback is invoked after the user selects a media item or closes the
+            // photo picker.
+            if (uri != null) {
+                viewModel.changePictureUri(uri)
+                Log.d("PhotoPicker", "Selected URI: $uri")
+            } else {
+                Log.d("PhotoPicker", "No media selected")
+            }
+        }
+
 
     LaunchedEffect(Unit) {
         viewModel.request
@@ -114,25 +133,45 @@ fun MyInfoEditScreen(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            GlideImage(
-                imageModel = {
-                    myData?.picture?.ifBlank { R.drawable.icons8__ }
-                },
-                modifier = Modifier
-                    .sizeIn(
-                        80.dp
-                    )
-                    .clip(RoundedCornerShape(20.dp)),
-                component = rememberImageComponent {
-                    +ShimmerPlugin(
-                        Shimmer.Flash(
-                            baseColor = Color.White,
-                            highlightColor = Color.LightGray
+            Box {
+                GlideImage(
+                    imageModel = {
+                        myPicture.ifBlank { R.drawable.icons8__ }
+                    },
+                    modifier = Modifier
+                        .sizeIn(
+                            maxWidth = 80.dp,
+                            maxHeight = 80.dp
                         )
+                        .clip(RoundedCornerShape(20.dp)),
+                    component = rememberImageComponent {
+                        +ShimmerPlugin(
+                            Shimmer.Flash(
+                                baseColor = Color.White,
+                                highlightColor = Color.LightGray
+                            )
+                        )
+                    },
+                    previewPlaceholder = painterResource(id = R.drawable.icons8__)
+                )
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.background,
+                            shape = CircleShape
+                        )
+                        .align(Alignment.BottomEnd)
+                        .clickable {
+                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = "",
                     )
-                },
-                previewPlaceholder = painterResource(id = R.drawable.icons8__)
-            )
+                }
+            }
+
             Spacer(modifier = Modifier.height(60.dp))
             Column(horizontalAlignment = Alignment.Start) {
                 Text(
