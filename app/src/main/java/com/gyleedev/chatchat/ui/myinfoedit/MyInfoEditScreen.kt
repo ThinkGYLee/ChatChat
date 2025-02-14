@@ -37,7 +37,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,15 +50,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.gyleedev.chatchat.R
+import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,6 +70,7 @@ fun MyInfoEditScreen(
     modifier: Modifier = Modifier,
     viewModel: MyInfoEditViewModel = hiltViewModel()
 ) {
+    val myData by viewModel.myUserData.collectAsStateWithLifecycle()
     val myName by viewModel.myNameQuery.collectAsStateWithLifecycle()
     val myStatus by viewModel.myStatusQuery.collectAsStateWithLifecycle()
     val myPicture by viewModel.myPictureAddress.collectAsStateWithLifecycle()
@@ -82,7 +88,6 @@ fun MyInfoEditScreen(
                 Log.d("PhotoPicker", "No media selected")
             }
         }
-
 
     LaunchedEffect(Unit) {
         viewModel.request
@@ -133,6 +138,16 @@ fun MyInfoEditScreen(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            var imageUrl by rememberSaveable {
+                mutableStateOf("")
+            }
+            LaunchedEffect(myData) {
+                if (myData?.picture?.isNotEmpty() == true) {
+                    imageUrl = getImageFromFireStore(myPicture).first()
+                    viewModel.changePictureUri(imageUrl.toUri())
+                }
+            }
+
             Box {
                 GlideImage(
                     imageModel = {
@@ -167,7 +182,7 @@ fun MyInfoEditScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = "",
+                        contentDescription = ""
                     )
                 }
             }
