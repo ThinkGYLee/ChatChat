@@ -22,7 +22,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,10 +39,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.chatchat.R
+import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,9 +85,17 @@ fun MyInfoScreen(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            var imageUrl by rememberSaveable {
+                mutableStateOf("")
+            }
+            LaunchedEffect(userData) {
+                if (userData != null) {
+                    imageUrl = getImageFromFireStore(userData!!.picture).first()
+                }
+            }
             GlideImage(
                 imageModel = {
-                    userData?.picture?.ifBlank { R.drawable.icons8__ }
+                    imageUrl.ifBlank { R.drawable.icons8__ }
                 },
                 modifier = Modifier
                     .sizeIn(
