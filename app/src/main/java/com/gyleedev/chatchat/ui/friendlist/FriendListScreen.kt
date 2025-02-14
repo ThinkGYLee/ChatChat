@@ -25,6 +25,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,11 +45,13 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,6 +142,13 @@ fun MyUserData(
     userData: UserData,
     modifier: Modifier = Modifier
 ) {
+    var imageUrl by rememberSaveable {
+        mutableStateOf("")
+    }
+    LaunchedEffect(userData) {
+        imageUrl = getImageFromFireStore(userData.picture).first()
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -145,7 +158,7 @@ fun MyUserData(
     ) {
         GlideImage(
             imageModel = {
-                userData.picture.ifBlank { R.drawable.icons8__ }
+                imageUrl.ifBlank { R.drawable.icons8__ }
             },
             imageOptions = ImageOptions(
                 contentScale = ContentScale.Crop
@@ -163,7 +176,6 @@ fun MyUserData(
             },
             previewPlaceholder = painterResource(id = R.drawable.icons8__)
         )
-        //GlideImage(imageModel = { userData.picture.ifBlank { R.drawable.icons8__ } })
         Spacer(modifier = Modifier.width(20.dp))
         Column(verticalArrangement = Arrangement.Center) {
             Text(text = userData.name)
@@ -183,6 +195,12 @@ fun FriendData(
     friendData: FriendData,
     modifier: Modifier = Modifier
 ) {
+    var imageUrl by rememberSaveable {
+        mutableStateOf("")
+    }
+    LaunchedEffect(friendData) {
+        imageUrl = getImageFromFireStore(friendData.picture).first()
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -190,7 +208,26 @@ fun FriendData(
             .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        GlideImage(imageModel = { friendData.picture.ifBlank { R.drawable.icons8__ } })
+        GlideImage(
+            imageModel = {
+                imageUrl.ifBlank { R.drawable.icons8__ }
+            },
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop
+            ),
+            modifier = Modifier
+                .size(60.dp)
+                .clip(RoundedCornerShape(20.dp)),
+            component = rememberImageComponent {
+                +ShimmerPlugin(
+                    Shimmer.Flash(
+                        baseColor = Color.White,
+                        highlightColor = Color.LightGray
+                    )
+                )
+            },
+            previewPlaceholder = painterResource(id = R.drawable.icons8__)
+        )
         Spacer(modifier = Modifier.width(20.dp))
         Column(horizontalAlignment = Alignment.Start) {
             Text(text = friendData.name, style = MaterialTheme.typography.bodyMedium)
