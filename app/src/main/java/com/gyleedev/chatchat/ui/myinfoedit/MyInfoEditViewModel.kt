@@ -1,5 +1,6 @@
 package com.gyleedev.chatchat.ui.myinfoedit
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
@@ -30,6 +31,9 @@ class MyInfoEditViewModel @Inject constructor(
     private val _myStatusQuery = MutableStateFlow("")
     val myStatusQuery: StateFlow<String> = _myStatusQuery
 
+    private val _myPictureAddress = MutableStateFlow("")
+    val myPictureAddress: StateFlow<String> = _myPictureAddress
+
     private val _request = MutableSharedFlow<Boolean>()
     val request: SharedFlow<Boolean> = _request
 
@@ -42,6 +46,7 @@ class MyInfoEditViewModel @Inject constructor(
                     _myUserData.emit(myUserData)
                     _myNameQuery.emit(myUserData.name)
                     _myStatusQuery.emit(myUserData.status)
+                    _myPictureAddress.emit(myUserData.picture)
                 }
             }
         }
@@ -59,11 +64,18 @@ class MyInfoEditViewModel @Inject constructor(
         }
     }
 
+    fun changePictureUri(uri: Uri) {
+        viewModelScope.launch {
+            _myPictureAddress.emit(uri.toString())
+        }
+    }
+
     fun updateMyInfo() {
         viewModelScope.launch {
             val userData = _myUserData.value.copy(
                 name = _myNameQuery.value,
-                status = _myStatusQuery.value
+                status = _myStatusQuery.value,
+                picture = _myPictureAddress.value
             )
             _request.emit(updateMyInfoUseCase(userData).first())
         }
