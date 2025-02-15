@@ -52,7 +52,7 @@ interface MessageRepository {
 
 class MessageRepositoryImpl @Inject constructor(
     firebase: Firebase,
-    private val messageDao: MessageDao,
+    private val messageDao: MessageDao
 ) : MessageRepository {
 
     val database =
@@ -200,19 +200,15 @@ class MessageRepositoryImpl @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun uploadImage(uri: Uri): Flow<String> = callbackFlow {
-
-
         val storageRef = imageStorage.getReference("image")
 
         val fileName = Instant.now().toEpochMilli()
-        val mountainsRef = storageRef.child("${fileName}.png")
+        val mountainsRef = storageRef.child("$fileName.png")
 
         val uploadTask = mountainsRef.putFile(uri)
         uploadTask.addOnSuccessListener {
-
-            trySend("${fileName}.png")
+            trySend("$fileName.png")
         }.addOnFailureListener {
-
             trySend("")
         }
         awaitClose()

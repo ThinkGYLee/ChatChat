@@ -193,7 +193,8 @@ fun LoginScreen(
             LoginBox(
                 icon = R.drawable.icons8__,
                 name = stringResource(R.string.login_box_google_text),
-                onClick = {})
+                onClick = {}
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
