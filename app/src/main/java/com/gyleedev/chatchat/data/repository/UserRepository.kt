@@ -3,6 +3,7 @@ package com.gyleedev.chatchat.data.repository
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -13,7 +14,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FriendDao
@@ -86,22 +86,19 @@ interface UserRepository {
     fun getFriendListFromLocal(): Flow<List<FriendEntity>>
     suspend fun updateFriendInfoWithFriendEntity(friendEntity: FriendEntity)
     suspend fun updateFriendInfoByUid(uid: String)
-    suspend fun updateProfile()
 }
 
 class UserRepositoryImpl @Inject constructor(
     private val friendDao: FriendDao,
     firebase: Firebase,
     private val auth: FirebaseAuth,
-    private val firebaseStorage: FirebaseStorage,
     private val chatRoomDao: ChatRoomDao,
     private val preferenceUtil: PreferenceUtil
-    // private val chatListWithMessageAndFriendDao: ChatListWithMessageAndFriendDao
 ) : UserRepository {
     val database =
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
-    private val imageStorage = firebase.storage
+    private val imageStorage = firebase.storage.getReference("image")
 
     override fun getUsersFromLocal(): List<UserData> {
         return friendDao.getUsers().map { it.toModel() }
@@ -275,7 +272,6 @@ class UserRepositoryImpl @Inject constructor(
         )
         awaitClose()
     }
-
 
     override suspend fun insertMyFriendListToLocal(list: List<UserData>) {
         withContext(Dispatchers.IO) {
@@ -468,14 +464,19 @@ class UserRepositoryImpl @Inject constructor(
         return friendDao.getFriendsAsFlow().flowOn(Dispatchers.IO)
     }
 
-    private fun getChatListWithMessageAndFriend() {
-        /*return chatListWithMessageAndFriendDao.getChatListFeed("a")*/
-    }
-
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun updateMyUserInfo(user: UserData): Flow<Boolean> = callbackFlow {
-        database.reference.child("users").child(user.uid).setValue(user)
+        val imageUrl = uploadImageToRemote(user.picture.toUri()).first()
+        val userData = UserData(
+            email = user.email,
+            name = user.name,
+            status = user.status,
+            uid = user.uid,
+            picture = imageUrl
+        )
+        database.reference.child("users").child(user.uid).setValue(userData)
             .addOnSuccessListener {
-                preferenceUtil.setMyData(user)
+                preferenceUtil.setMyData(userData)
                 trySend(true)
             }.addOnFailureListener {
                 trySend(false)
@@ -486,7 +487,6 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun updateFriendInfoWithFriendEntity(friendEntity: FriendEntity) {
         val remoteData = getFriendInfoFromRemote(friendEntity.uid).first()
         if (remoteData?.toEntity()?.toFriendData() != friendEntity.toFriendData()) {
-            println("update ${friendEntity.id}")
             friendDao.updateUser(
                 friendEntity.copy(
                     name = remoteData!!.name.ifBlank { friendEntity.name },
@@ -516,26 +516,15 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun uploadImage(uri: Uri): Flow<String> = callbackFlow {
-
-
-        val storageRef = imageStorage.getReference("image")
-
+    private fun uploadImageToRemote(uri: Uri): Flow<String> = callbackFlow {
         val fileName = Instant.now().toEpochMilli()
-        val mountainsRef = storageRef.child("${fileName}.png")
-
+        val mountainsRef = imageStorage.child("$fileName.png")
         val uploadTask = mountainsRef.putFile(uri)
         uploadTask.addOnSuccessListener {
-
-            trySend("${fileName}.png")
+            trySend("$fileName.png")
         }.addOnFailureListener {
-
             trySend("")
         }
         awaitClose()
-    }
-
-    override suspend fun updateProfile() {
-        TODO("Not yet implemented")
     }
 }
