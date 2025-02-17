@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,6 +25,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.CircularProgressIndicator
@@ -90,7 +92,10 @@ fun ChatRoomScreen(
 
     LaunchedEffect(Unit) {
         chatRoomViewModel.networkState.flowWithLifecycle(lifecycle.lifecycle).collectLatest {
-            if (!it) Toast.makeText(context, R.string.network_error_message, Toast.LENGTH_SHORT).show()
+            if (!it) {
+                Toast.makeText(context, R.string.network_error_message, Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
     }
 
@@ -121,18 +126,21 @@ fun ChatRoomScreen(
             }
         },
         bottomBar = {
-            CommentBottomBar(
-                query = query,
-                onClick = {
-                    chatRoomViewModel.sendMessage()
-                    query.edit {
-                        delete(
-                            0,
-                            query.text.length
-                        )
+            Column {
+                MediaBar(onPhotoButtonClick = {})
+                CommentBottomBar(
+                    query = query,
+                    onClick = {
+                        chatRoomViewModel.sendMessage()
+                        query.edit {
+                            delete(
+                                0,
+                                query.text.length
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     ) { innerPadding ->
         if (uiState is ChatRoomUiState.Success) {
@@ -212,6 +220,18 @@ fun ChatBubble(
 }
 
 @Composable
+fun MediaBar(
+    onPhotoButtonClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier.padding(start = 8.dp)) {
+        IconButton(onClick = onPhotoButtonClick) {
+            Icon(imageVector = Icons.Filled.Image, contentDescription = "")
+        }
+    }
+}
+
+@Composable
 fun CommentBottomBar(
     onClick: () -> Unit,
     query: TextFieldState,
@@ -221,7 +241,8 @@ fun CommentBottomBar(
     BasicTextField(
         state = query,
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .imePadding(),
         decorator = { innerTextField ->
             Box {
                 if (query.text.isEmpty()) {
@@ -257,6 +278,14 @@ fun CommentBottomBar(
         },
         textStyle = TextStyle.Default.copy(color = color)
     )
+}
+
+@Preview
+@Composable
+fun CommentBarPreview() {
+    ChatChatTheme {
+        CommentBottomBar(onClick = {}, query = TextFieldState())
+    }
 }
 
 @Composable
