@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.ChatRoomDataWithFriendAndMessage
+import com.gyleedev.chatchat.domain.MessageType
 import com.skydoves.landscapist.glide.GlideImage
 import java.time.Instant
 import java.time.LocalDate
@@ -60,7 +61,10 @@ fun ChatListScreen(
                 },
                 actions = {
                     IconButton(onClick = { }) {
-                        Icon(imageVector = Icons.Outlined.Add, contentDescription = stringResource(R.string.add_friend_button_description))
+                        Icon(
+                            imageVector = Icons.Outlined.Add,
+                            contentDescription = stringResource(R.string.add_friend_button_description)
+                        )
                     }
                 }
             )
@@ -93,6 +97,11 @@ fun ChatRoomItem(
     chatRoomDataWithFriendAndMessage: ChatRoomDataWithFriendAndMessage,
     modifier: Modifier = Modifier
 ) {
+    val text = when (chatRoomDataWithFriendAndMessage.lastMessageData.type) {
+        MessageType.Text -> chatRoomDataWithFriendAndMessage.lastMessageData.comment
+        MessageType.Photo -> stringResource(R.string.chat_list_screen_chat_type_photo)
+    }
+
     Row(
         modifier
             .fillMaxWidth()
@@ -111,7 +120,7 @@ fun ChatRoomItem(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(text = chatRoomDataWithFriendAndMessage.lastMessageData.comment)
+                Text(text = text)
             }
         }
 
