@@ -1,8 +1,8 @@
 package com.gyleedev.chatchat.data.repository
 
-import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import java.time.Instant
+import java.util.UUID
 import javax.inject.Inject
 
 interface MessageRepository {
@@ -47,7 +48,7 @@ interface MessageRepository {
 
     suspend fun deleteMessage(messageId: Long)
 
-    suspend fun updateProfile()
+    fun uploadImageToRemote(uri: String): Flow<String>
 }
 
 class MessageRepositoryImpl @Inject constructor(
@@ -58,7 +59,7 @@ class MessageRepositoryImpl @Inject constructor(
     val database =
         firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
-    private val imageStorage = firebase.storage
+    private val imageStorage = firebase.storage.getReference("image")
 
     override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long {
         return messageDao.insertMessage(
@@ -199,22 +200,16 @@ class MessageRepositoryImpl @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun uploadImage(uri: Uri): Flow<String> = callbackFlow {
-        val storageRef = imageStorage.getReference("image")
-
+    override fun uploadImageToRemote(uri: String): Flow<String> = callbackFlow {
         val fileName = Instant.now().toEpochMilli()
-        val mountainsRef = storageRef.child("$fileName.png")
-
-        val uploadTask = mountainsRef.putFile(uri)
+        val uuid = UUID.randomUUID().toString()
+        val mountainsRef = imageStorage.child("$uuid$fileName.png")
+        val uploadTask = mountainsRef.putFile(uri.toUri())
         uploadTask.addOnSuccessListener {
-            trySend("$fileName.png")
+            trySend("$uuid$fileName.png")
         }.addOnFailureListener {
             trySend("")
         }
         awaitClose()
-    }
-
-    override suspend fun updateProfile() {
-        TODO("Not yet implemented")
     }
 }
