@@ -10,6 +10,7 @@ import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
+import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.usecase.CancelMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomLocalDataByUidUseCase
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -39,7 +41,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatRoomViewModel @Inject constructor(
-    private val getMyUidFromLogInDataUseCase: GetMyUidFromLogInDataUseCase,
+    getMyUidFromLogInDataUseCase: GetMyUidFromLogInDataUseCase,
     private val getFriendDataUseCase: GetFriendDataUseCase,
     private val getChatRoomLocalDataByUidUseCase: GetChatRoomLocalDataByUidUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
@@ -60,6 +62,9 @@ class ChatRoomViewModel @Inject constructor(
 
     private val _messageQuery = MutableStateFlow("")
     private val _chatRoomLocalData = MutableStateFlow(ChatRoomLocalData())
+
+    private val _photoUri = MutableStateFlow("")
+    val photoUri: StateFlow<String> = _photoUri
 
     private val _networkState = MutableSharedFlow<Boolean>()
     val networkState: SharedFlow<Boolean> = _networkState
@@ -124,6 +129,35 @@ class ChatRoomViewModel @Inject constructor(
     fun editMessageQuery(query: String) {
         viewModelScope.launch {
             _messageQuery.emit(query)
+        }
+    }
+
+    fun editPhotoUri(uri: String) {
+        viewModelScope.launch {
+            _photoUri.emit(uri)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun sendPhotoMessage() {
+        viewModelScope.launch {
+            val networkState = getNetworkState()
+            _networkState.emit(networkState)
+            val message = uid?.let {
+                MessageData(
+                    chatRoomId = _chatRoomLocalData.value.rid,
+                    writer = it,
+                    type = MessageType.Photo,
+                    comment = photoUri.value,
+                    time = Instant.now().toEpochMilli(),
+                    messageSendState = MessageSendState.LOADING
+                )
+            }
+            val rid = _chatRoomLocalData.value.id
+            if (message != null) {
+                sendMessageUseCase(message, rid, networkState)
+            }
+            editPhotoUri("")
         }
     }
 
