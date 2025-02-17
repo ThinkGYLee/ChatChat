@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    fun insertMessage(message: MessageEntity): Long
+    suspend fun insertMessage(message: MessageEntity): Long
 
     @Query("SELECT * FROM message WHERE rid = :id ORDER BY time DESC")
     fun getMessagesWithPaging(id: String): PagingSource<Int, MessageEntity>
