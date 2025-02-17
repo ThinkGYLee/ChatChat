@@ -518,10 +518,11 @@ class UserRepositoryImpl @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun uploadImageToRemote(uri: Uri): Flow<String> = callbackFlow {
         val fileName = Instant.now().toEpochMilli()
-        val mountainsRef = imageStorage.child("$fileName.png")
+        val uuid = UUID.randomUUID().toString()
+        val mountainsRef = imageStorage.child("$uuid$fileName.png")
         val uploadTask = mountainsRef.putFile(uri)
         uploadTask.addOnSuccessListener {
-            trySend("$fileName.png")
+            trySend("$uuid$fileName.png")
         }.addOnFailureListener {
             trySend("")
         }
