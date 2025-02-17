@@ -8,6 +8,7 @@ import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.ChatRoomDataWithFriendAndMessage
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
+import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomListUseCase
 import com.gyleedev.chatchat.domain.usecase.GetLastMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +37,7 @@ class ChatListViewModel @Inject constructor(
                             chatRoomLocalData = it.chatRoomLocalData,
                             friendData = it.friendData,
                             lastMessageData = getLastMessageUseCase(it.chatRoomLocalData)
-                                ?: MessageData("", "", "", 0L, MessageSendState.COMPLETE)
+                                ?: MessageData("", "", "", type = MessageType.Text, 0L, MessageSendState.COMPLETE)
                         )
                     }
                 )
