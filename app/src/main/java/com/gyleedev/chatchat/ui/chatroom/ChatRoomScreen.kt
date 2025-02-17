@@ -1,7 +1,11 @@
 package com.gyleedev.chatchat.ui.chatroom
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -15,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,7 +29,9 @@ import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Refresh
@@ -42,14 +49,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -58,8 +70,15 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
+import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
+import com.gyleedev.chatchat.util.getImageFromFireStore
+import com.skydoves.landscapist.components.rememberImageComponent
+import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +90,7 @@ fun ChatRoomScreen(
 ) {
     val query = rememberTextFieldState()
     val messages = chatRoomViewModel.messages.collectAsLazyPagingItems()
+    val photoUri = chatRoomViewModel.photoUri.collectAsStateWithLifecycle()
 
     val lazyListState = remember {
         mutableStateOf(LazyListState(firstVisibleItemScrollOffset = messages.itemCount))
@@ -80,6 +100,21 @@ fun ChatRoomScreen(
 
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
+
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp
+
+    val pickMedia =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            // Callback is invoked after the user selects a media item or closes the
+            // photo picker.
+            if (uri != null) {
+                chatRoomViewModel.editPhotoUri(uri.toString())
+                Log.d("PhotoPicker", "Selected URI: $uri")
+            } else {
+                Log.d("PhotoPicker", "No media selected")
+            }
+        }
 
     LaunchedEffect(query.text) {
         chatRoomViewModel.editMessageQuery(query.text.toString())
@@ -98,13 +133,6 @@ fun ChatRoomScreen(
             }
         }
     }
-
-//    LifecycleStartEffect(Unit) {
-//        chatRoomViewModel.connectRemote()
-//        onStopOrDispose {
-//            chatRoomViewModel.disconnectRemote()
-//        }
-//    }
 
     Scaffold(
         modifier = modifier,
@@ -126,11 +154,13 @@ fun ChatRoomScreen(
             }
         },
         bottomBar = {
-            Column {
-                MediaBar(onPhotoButtonClick = {})
-                CommentBottomBar(
+            if (photoUri.value.isEmpty()) {
+                UniversalBar(
+                    onPhotoButtonClick = {
+                        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    },
                     query = query,
-                    onClick = {
+                    onSendButtonClick = {
                         chatRoomViewModel.sendMessage()
                         query.edit {
                             delete(
@@ -139,6 +169,17 @@ fun ChatRoomScreen(
                             )
                         }
                     }
+                )
+            } else {
+                PhotoBottomBar(
+                    onCancelButtonClick = {
+                        chatRoomViewModel.editPhotoUri("")
+                    },
+                    onSendButtonClick = {
+                        chatRoomViewModel.sendPhotoMessage()
+                    },
+                    uri = photoUri.value,
+                    screenWidth = screenWidth
                 )
             }
         }
@@ -159,12 +200,25 @@ fun ChatRoomScreen(
                 ) {
                     Row {
                         messages[it]?.let { messageData ->
-                            ChatBubble(
-                                me = (uiState as ChatRoomUiState.Success).uid,
-                                messageData = messageData,
-                                resend = { chatRoomViewModel.resendMessage(messageData) },
-                                cancel = { chatRoomViewModel.cancelMessage(messageData) }
-                            )
+                            when (messageData.type) {
+                                MessageType.Text -> {
+                                    ChatBubble(
+                                        me = (uiState as ChatRoomUiState.Success).uid,
+                                        messageData = messageData,
+                                        resend = { chatRoomViewModel.resendMessage(messageData) },
+                                        cancel = { chatRoomViewModel.cancelMessage(messageData) }
+                                    )
+                                }
+
+                                MessageType.Photo -> {
+                                    PhotoBubble(
+                                        me = (uiState as ChatRoomUiState.Success).uid,
+                                        messageData = messageData,
+                                        resend = { chatRoomViewModel.resendMessage(messageData) },
+                                        cancel = { chatRoomViewModel.cancelMessage(messageData) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -216,6 +270,134 @@ fun ChatBubble(
                 Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
             }
         }
+    }
+}
+
+@Composable
+fun PhotoBubble(
+    resend: () -> Unit,
+    cancel: () -> Unit,
+    me: String,
+    messageData: MessageData,
+    modifier: Modifier = Modifier
+) {
+    var imageUrl by rememberSaveable {
+        mutableStateOf("")
+    }
+    LaunchedEffect(messageData) {
+        imageUrl = getImageFromFireStore(messageData.comment).first()
+    }
+
+    val arrangement: Arrangement.Horizontal = if (messageData.writer == me) {
+        Arrangement.End
+    } else {
+        Arrangement.Start
+    }
+    Row(
+        modifier
+            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = arrangement,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (messageData.messageSendState == MessageSendState.LOADING) {
+            CircularProgressIndicator(modifier = Modifier.size(20.dp))
+        } else if (messageData.messageSendState == MessageSendState.FAIL) {
+            ResendButton(onResendClick = resend, onCancelClick = cancel)
+        }
+        Column(
+            Modifier.padding(horizontal = 16.dp)
+        ) {
+            GlideImage(
+                imageModel = {
+                    imageUrl.ifBlank { R.drawable.icons8__ }
+                },
+                modifier = Modifier
+                    .sizeIn(
+                        maxWidth = 200.dp,
+                        maxHeight = 320.dp
+                    )
+                    .clip(RoundedCornerShape(20.dp)),
+                component = rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray
+                        )
+                    )
+                }
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PhotoBubblePreview() {
+    ChatChatTheme {
+        PhotoBubble(
+            resend = {},
+            cancel = {},
+            me = "me",
+            messageData = MessageData(writer = "", type = MessageType.Photo, comment = "")
+        )
+    }
+}
+
+@Composable
+fun PhotoBottomBar(
+    screenWidth: Int,
+    onSendButtonClick: () -> Unit,
+    onCancelButtonClick: () -> Unit,
+    uri: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Absolute.SpaceBetween) {
+            IconButton(onClick = onCancelButtonClick) {
+                Icon(imageVector = Icons.Filled.Close, contentDescription = "")
+            }
+            IconButton(onClick = onSendButtonClick) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "")
+            }
+        }
+        Row(Modifier.fillMaxWidth()) {
+            GlideImage(
+                imageModel = { uri.toUri() },
+                modifier = Modifier
+                    .sizeIn(
+                        maxWidth = screenWidth.dp,
+                        maxHeight = screenWidth.dp
+                    )
+                    .clip(RoundedCornerShape(20.dp)),
+                component = rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray
+                        )
+                    )
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun UniversalBar(
+    onPhotoButtonClick: () -> Unit,
+    onSendButtonClick: () -> Unit,
+    query: TextFieldState,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier) {
+        MediaBar(
+            onPhotoButtonClick = onPhotoButtonClick
+        )
+        CommentBottomBar(
+            onClick = onSendButtonClick,
+            query = query
+        )
     }
 }
 
@@ -331,14 +513,5 @@ fun ResendButton(
 fun ResendButtonPreview() {
     ChatChatTheme {
         ResendButton(onResendClick = {}, onCancelClick = {})
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview
-@Composable
-fun ChatRoomScreenPreview() {
-    ChatChatTheme {
-        ChatRoomScreen(onBackPressKeyClick = {})
     }
 }
