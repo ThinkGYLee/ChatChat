@@ -8,6 +8,7 @@ data class MessageData(
     @SerializedName("chatRoomId") val chatRoomId: String = "",
     @SerializedName("writer") val writer: String = "",
     @SerializedName("comment") val comment: String = "",
+    @SerializedName("type") val type: MessageType = MessageType.Text,
     @SerializedName("time") val time: Long = 0L,
     @SerializedName("messageSendState") val messageSendState: MessageSendState = MessageSendState.COMPLETE
 )
@@ -17,6 +18,7 @@ fun MessageData.toRemoteModel(): MessageRemoteData {
         chatRoomId = chatRoomId,
         writer = writer,
         comment = comment,
+        type = type,
         time = time
     )
 }
