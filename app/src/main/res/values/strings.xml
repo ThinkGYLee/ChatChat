@@ -45,4 +45,5 @@
     <string name="login_id_text_field_hint">아이디</string>
     <string name="login_password_text_field_hint">비밀번호</string>
     <string name="chat_list_screen_chat_type_photo">사진</string>
+    <string name="chat_room_photo_bar_text">사진</string>
 </resources>

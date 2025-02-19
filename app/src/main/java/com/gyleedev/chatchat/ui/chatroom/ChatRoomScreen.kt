@@ -357,6 +357,7 @@ fun PhotoBottomBar(
             IconButton(onClick = onCancelButtonClick) {
                 Icon(imageVector = Icons.Filled.Close, contentDescription = "")
             }
+            Text(stringResource(R.string.chat_room_photo_bar_text))
             IconButton(onClick = onSendButtonClick) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "")
             }
