@@ -1,6 +1,9 @@
 package com.gyleedev.chatchat.ui.chatroom
 
 import android.os.Build
+import android.text.SpannableString
+import android.text.util.Linkify
+import android.text.util.Linkify.WEB_URLS
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -170,6 +173,7 @@ class ChatRoomViewModel @Inject constructor(
                 MessageData(
                     chatRoomId = _chatRoomLocalData.value.rid,
                     writer = it,
+                    type = isCommentContainLink(_messageQuery.value),
                     comment = _messageQuery.value,
                     time = Instant.now().toEpochMilli(),
                     messageSendState = MessageSendState.LOADING
@@ -203,6 +207,15 @@ class ChatRoomViewModel @Inject constructor(
     fun cancelMessage(messageData: MessageData) {
         viewModelScope.launch {
             cancelMessageUseCase(messageData)
+        }
+    }
+
+    private fun isCommentContainLink(comment: String): MessageType {
+        val spannableString = SpannableString.valueOf(comment)
+        return if (Linkify.addLinks(spannableString, WEB_URLS)) {
+            MessageType.Link
+        } else {
+            MessageType.Text
         }
     }
 }
