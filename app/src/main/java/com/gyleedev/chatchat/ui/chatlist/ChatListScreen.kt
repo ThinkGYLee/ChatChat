@@ -100,6 +100,7 @@ fun ChatRoomItem(
     val text = when (chatRoomDataWithFriendAndMessage.lastMessageData.type) {
         MessageType.Text -> chatRoomDataWithFriendAndMessage.lastMessageData.comment
         MessageType.Photo -> stringResource(R.string.chat_list_screen_chat_type_photo)
+        else -> ""
     }
 
     Row(

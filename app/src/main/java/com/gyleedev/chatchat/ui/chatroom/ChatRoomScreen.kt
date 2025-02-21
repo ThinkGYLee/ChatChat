@@ -218,6 +218,7 @@ fun ChatRoomScreen(
                                         cancel = { chatRoomViewModel.cancelMessage(messageData) }
                                     )
                                 }
+                                else -> {}
                             }
                         }
                     }
