@@ -113,4 +113,6 @@ dependencies {
 
     implementation(libs.paging.compose)
     implementation(libs.paging.runtime.ktx)
+
+    implementation(libs.jsoup)
 }
