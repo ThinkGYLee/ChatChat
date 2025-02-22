@@ -58,14 +58,6 @@ fun ChatListScreen(
             TopAppBar(
                 title = {
                     Text(text = stringResource(R.string.chat_list_screen_title))
-                },
-                actions = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Add,
-                            contentDescription = stringResource(R.string.add_friend_button_description)
-                        )
-                    }
                 }
             )
         },
