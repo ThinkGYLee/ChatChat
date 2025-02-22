@@ -49,6 +49,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -71,14 +72,19 @@ import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.MessageType
+import com.gyleedev.chatchat.domain.UrlMetaData
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
+import com.gyleedev.chatchat.util.detectUrl
 import com.gyleedev.chatchat.util.getImageFromFireStore
+import com.gyleedev.chatchat.util.getMedaData
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -218,6 +224,16 @@ fun ChatRoomScreen(
                                         cancel = { chatRoomViewModel.cancelMessage(messageData) }
                                     )
                                 }
+
+                                MessageType.Link -> {
+                                    LinkBubble(
+                                        me = (uiState as ChatRoomUiState.Success).uid,
+                                        messageData = messageData,
+                                        resend = { chatRoomViewModel.resendMessage(messageData) },
+                                        cancel = { chatRoomViewModel.cancelMessage(messageData) }
+                                    )
+                                }
+
                                 else -> {}
                             }
                         }
@@ -268,6 +284,66 @@ fun ChatBubble(
                 color = backgroundColor,
                 shape = backgroundShape
             ) {
+                Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun LinkBubble(
+    resend: () -> Unit,
+    cancel: () -> Unit,
+    me: String,
+    messageData: MessageData,
+    modifier: Modifier = Modifier
+) {
+    val backgroundColor: Color
+    val backgroundShape: RoundedCornerShape
+    val arrangement: Arrangement.Horizontal
+
+    val coroutineScope = rememberCoroutineScope()
+
+
+    if (messageData.writer == me) {
+        backgroundColor = MaterialTheme.colorScheme.primary
+        backgroundShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
+        arrangement = Arrangement.End
+    } else {
+        backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+        backgroundShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
+        arrangement = Arrangement.Start
+    }
+
+    val metaData = remember {
+        mutableStateOf(UrlMetaData())
+    }
+    LaunchedEffect(Unit) {
+        coroutineScope.launch(Dispatchers.Default) {
+            metaData.value = getMedaData(messageData.comment)
+        }
+    }
+
+    Row(
+        modifier
+            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = arrangement,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (messageData.messageSendState == MessageSendState.LOADING) {
+            CircularProgressIndicator(modifier = Modifier.size(20.dp))
+        } else if (messageData.messageSendState == MessageSendState.FAIL) {
+            ResendButton(onResendClick = resend, onCancelClick = cancel)
+        }
+        Column(
+            Modifier.padding(horizontal = 16.dp)
+        ) {
+            Surface(
+                color = backgroundColor,
+                shape = backgroundShape
+            ) {
+                println(detectUrl(messageData.comment))
                 Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
             }
         }
