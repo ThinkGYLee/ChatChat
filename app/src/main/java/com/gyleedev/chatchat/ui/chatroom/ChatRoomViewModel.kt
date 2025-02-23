@@ -144,14 +144,16 @@ class ChatRoomViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun sendPhotoMessage() {
         viewModelScope.launch {
+            val photoUrl = photoUri.value
             val networkState = getNetworkState()
+            editPhotoUri("")
             _networkState.emit(networkState)
             val message = uid?.let {
                 MessageData(
                     chatRoomId = _chatRoomLocalData.value.rid,
                     writer = it,
                     type = MessageType.Photo,
-                    comment = photoUri.value,
+                    comment = photoUrl,
                     time = Instant.now().toEpochMilli(),
                     messageSendState = MessageSendState.LOADING
                 )
@@ -160,7 +162,6 @@ class ChatRoomViewModel @Inject constructor(
             if (message != null) {
                 sendMessageUseCase(message, rid, networkState)
             }
-            editPhotoUri("")
         }
     }
 
