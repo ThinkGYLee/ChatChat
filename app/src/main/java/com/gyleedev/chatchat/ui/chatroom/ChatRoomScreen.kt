@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,6 +39,7 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,6 +63,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -267,7 +271,7 @@ fun ChatBubble(
     }
     Row(
         modifier
-            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
         horizontalArrangement = arrangement,
         verticalAlignment = Alignment.CenterVertically
@@ -277,16 +281,12 @@ fun ChatBubble(
         } else if (messageData.messageSendState == MessageSendState.FAIL) {
             ResendButton(onResendClick = resend, onCancelClick = cancel)
         }
-        Column(
-            Modifier.padding(horizontal = 16.dp)
-        ) {
             Surface(
                 color = backgroundColor,
                 shape = backgroundShape
             ) {
                 Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
             }
-        }
     }
 }
 
@@ -326,7 +326,7 @@ fun LinkBubble(
 
     Row(
         modifier
-            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
         horizontalArrangement = arrangement,
         verticalAlignment = Alignment.CenterVertically
@@ -336,16 +336,12 @@ fun LinkBubble(
         } else if (messageData.messageSendState == MessageSendState.FAIL) {
             ResendButton(onResendClick = resend, onCancelClick = cancel)
         }
-        Column(
-            Modifier.padding(horizontal = 16.dp)
-        ) {
             Surface(
                 color = backgroundColor,
                 shape = backgroundShape
             ) {
                 println(detectUrl(messageData.comment))
                 Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
-            }
         }
     }
 }
@@ -372,7 +368,7 @@ fun PhotoBubble(
     }
     Row(
         modifier
-            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
         horizontalArrangement = arrangement,
         verticalAlignment = Alignment.CenterVertically
@@ -382,12 +378,10 @@ fun PhotoBubble(
         } else if (messageData.messageSendState == MessageSendState.FAIL) {
             ResendButton(onResendClick = resend, onCancelClick = cancel)
         }
-        Column(
-            Modifier.padding(horizontal = 16.dp)
-        ) {
             GlideImage(
                 imageModel = {
-                    imageUrl.ifBlank { R.drawable.icons8__ }
+                    // TODO place holder size
+                    imageUrl//.ifBlank { R.drawable.icons8__ }
                 },
                 modifier = Modifier
                     .sizeIn(
@@ -404,7 +398,6 @@ fun PhotoBubble(
                     )
                 }
             )
-        }
     }
 }
 
@@ -429,35 +422,44 @@ fun PhotoBottomBar(
     uri: String,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Absolute.SpaceBetween) {
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             IconButton(onClick = onCancelButtonClick) {
                 Icon(imageVector = Icons.Filled.Close, contentDescription = "")
             }
-            Text(stringResource(R.string.chat_room_photo_bar_text))
+            Text(
+                text = stringResource(R.string.chat_room_photo_bar_text),
+                fontWeight = FontWeight.SemiBold
+            )
             IconButton(onClick = onSendButtonClick) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "")
             }
         }
-        Row(Modifier.fillMaxWidth()) {
-            GlideImage(
-                imageModel = { uri.toUri() },
-                modifier = Modifier
-                    .sizeIn(
-                        maxWidth = screenWidth.dp,
-                        maxHeight = screenWidth.dp
+        HorizontalDivider()
+        Spacer(Modifier.height(8.dp))
+        GlideImage(
+            imageModel = { uri.toUri() },
+            modifier = Modifier
+                .padding(12.dp)
+                .sizeIn(
+                    maxWidth = screenWidth.dp,
+                    maxHeight = screenWidth.dp
+                )
+                .clip(RoundedCornerShape(20.dp)),
+            component = rememberImageComponent {
+                +ShimmerPlugin(
+                    Shimmer.Flash(
+                        baseColor = Color.White,
+                        highlightColor = Color.LightGray
                     )
-                    .clip(RoundedCornerShape(20.dp)),
-                component = rememberImageComponent {
-                    +ShimmerPlugin(
-                        Shimmer.Flash(
-                            baseColor = Color.White,
-                            highlightColor = Color.LightGray
-                        )
-                    )
-                }
-            )
-        }
+                )
+            }
+        )
+        Spacer(Modifier.height(8.dp))
     }
 }
 
