@@ -281,12 +281,12 @@ fun ChatBubble(
         } else if (messageData.messageSendState == MessageSendState.FAIL) {
             ResendButton(onResendClick = resend, onCancelClick = cancel)
         }
-            Surface(
-                color = backgroundColor,
-                shape = backgroundShape
-            ) {
-                Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
-            }
+        Surface(
+            color = backgroundColor,
+            shape = backgroundShape
+        ) {
+            Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
+        }
     }
 }
 
@@ -303,7 +303,6 @@ fun LinkBubble(
     val arrangement: Arrangement.Horizontal
 
     val coroutineScope = rememberCoroutineScope()
-
 
     if (messageData.writer == me) {
         backgroundColor = MaterialTheme.colorScheme.primary
@@ -336,12 +335,12 @@ fun LinkBubble(
         } else if (messageData.messageSendState == MessageSendState.FAIL) {
             ResendButton(onResendClick = resend, onCancelClick = cancel)
         }
-            Surface(
-                color = backgroundColor,
-                shape = backgroundShape
-            ) {
-                println(detectUrl(messageData.comment))
-                Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
+        Surface(
+            color = backgroundColor,
+            shape = backgroundShape
+        ) {
+            println(detectUrl(messageData.comment))
+            Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
         }
     }
 }
@@ -378,26 +377,26 @@ fun PhotoBubble(
         } else if (messageData.messageSendState == MessageSendState.FAIL) {
             ResendButton(onResendClick = resend, onCancelClick = cancel)
         }
-            GlideImage(
-                imageModel = {
-                    // TODO place holder size
-                    imageUrl//.ifBlank { R.drawable.icons8__ }
-                },
-                modifier = Modifier
-                    .sizeIn(
-                        maxWidth = 200.dp,
-                        maxHeight = 320.dp
+        GlideImage(
+            imageModel = {
+                // place holder size
+                imageUrl // .ifBlank { R.drawable.icons8__ }
+            },
+            modifier = Modifier
+                .sizeIn(
+                    maxWidth = 200.dp,
+                    maxHeight = 320.dp
+                )
+                .clip(RoundedCornerShape(20.dp)),
+            component = rememberImageComponent {
+                +ShimmerPlugin(
+                    Shimmer.Flash(
+                        baseColor = Color.White,
+                        highlightColor = Color.LightGray
                     )
-                    .clip(RoundedCornerShape(20.dp)),
-                component = rememberImageComponent {
-                    +ShimmerPlugin(
-                        Shimmer.Flash(
-                            baseColor = Color.White,
-                            highlightColor = Color.LightGray
-                        )
-                    )
-                }
-            )
+                )
+            }
+        )
     }
 }
 

@@ -6,5 +6,5 @@ data class UrlMetaData(
     var name: String? = null,
     var description: String? = null,
     var url: String? = null,
-    var imageUrl: String? = null,
+    var imageUrl: String? = null
 )
