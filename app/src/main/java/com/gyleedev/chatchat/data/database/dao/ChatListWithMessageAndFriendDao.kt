@@ -1,13 +1,6 @@
 package com.gyleedev.chatchat.data.database.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
-import androidx.room.MapColumn
-import androidx.room.MapInfo
-import androidx.room.Query
-import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
-import com.gyleedev.chatchat.data.database.entity.FriendEntity
-import com.gyleedev.chatchat.data.database.entity.MessageEntity
 
 @Dao
 interface ChatListWithMessageAndFriendDao {
