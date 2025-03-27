@@ -251,7 +251,8 @@ fun FindUserCard(onFindComplete: () -> Unit, userData: UserData, modifier: Modif
                 },
                 modifier = Modifier
                     .sizeIn(
-                        80.dp
+                        maxWidth = 80.dp,
+                        maxHeight = 80.dp
                     )
                     .clip(RoundedCornerShape(20.dp)),
                 component = rememberImageComponent {
