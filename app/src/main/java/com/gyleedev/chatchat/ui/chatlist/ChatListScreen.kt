@@ -12,24 +12,42 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.ChatRoomDataWithFriendAndMessage
 import com.gyleedev.chatchat.domain.MessageType
+import com.gyleedev.chatchat.util.getImageFromFireStore
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import kotlinx.coroutines.flow.first
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -47,6 +65,10 @@ fun ChatListScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
         }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        chatRoomList.refresh()
     }
 
     Scaffold(
@@ -92,6 +114,15 @@ fun ChatRoomItem(
         else -> ""
     }
 
+    var imageUrl by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(chatRoomDataWithFriendAndMessage) {
+        imageUrl =
+            getImageFromFireStore(chatRoomDataWithFriendAndMessage.friendData.picture).first()
+    }
+
     Row(
         modifier
             .fillMaxWidth()
@@ -102,7 +133,26 @@ fun ChatRoomItem(
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
         Row(Modifier) {
-            GlideImage(imageModel = { chatRoomDataWithFriendAndMessage.friendData.picture.ifBlank { R.drawable.icons8__ } })
+            GlideImage(
+                imageModel = {
+                    imageUrl.ifBlank { R.drawable.icons8__ }
+                },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop
+                ),
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(20.dp)),
+                component = rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray
+                        )
+                    )
+                },
+                previewPlaceholder = painterResource(id = R.drawable.icons8__)
+            )
             Spacer(modifier = Modifier.width(20.dp))
             Column {
                 Text(
