@@ -30,7 +30,7 @@
 
 | 회원가입 | 로그인 | 친구 검색 |
 | --- | --- | --- |
-| <img src="https://github.com/user-attachments/assets/a7e9c1e7-b559-4182-9df0-2d0b64fac1ff" width="200"/> | <img src="https://github.com/user-attachments/assets/96f9a055-3502-40eb-8db3-7c416cfd3ea4" width="200"/> | <img src="https://github.com/user-attachments/assets/6e918fb5-f07a-4b1a-85a3-b6284a46d557" width="200"/> |
+| <img src="https://github.com/user-attachments/assets/04717381-fbdf-4cba-868a-a136ba2131ac" width="200"/> | <img src="https://github.com/user-attachments/assets/8b77d359-c1bf-4a2f-9f58-0313de961c90" width="200"/> | <img src="https://github.com/user-attachments/assets/6e918fb5-f07a-4b1a-85a3-b6284a46d557" width="200"/> |
 
 ## 주요 동영상
 | 회원가입 | 로그인 | 프로필 변경 |
