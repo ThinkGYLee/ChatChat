@@ -1,10 +1,10 @@
 package com.gyleedev.chatchat.domain.usecase
 
-import com.gyleedev.chatchat.data.repository.UserRepository
+import com.gyleedev.chatchat.data.repository.MessageRepository
 import javax.inject.Inject
 
 class GetMessagesFromLocalUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: MessageRepository
 ) {
     operator fun invoke(rid: String) = repository.getMessagesFromLocal(rid)
 }

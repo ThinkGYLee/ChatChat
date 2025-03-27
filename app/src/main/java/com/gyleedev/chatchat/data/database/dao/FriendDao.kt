@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.gyleedev.chatchat.data.database.entity.FriendEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FriendDao {
@@ -27,17 +28,23 @@ interface FriendDao {
     fun getLastFriend(): FriendEntity
 
     @Query("SELECT * FROM friend WHERE uid = :uid")
-    fun getFriendByUid(uid: String): FriendEntity
+    fun getFriendByUid(uid: String): Flow<FriendEntity>
 
     @Update
-    fun updateUser(user: FriendEntity)
+    suspend fun updateUser(user: FriendEntity)
 
     @Query("DELETE FROM friend")
     fun resetUser()
 
     @Query("SELECT * FROM friend")
-    fun getFriends(): PagingSource<Int, FriendEntity>
+    fun getFriendsPaging(): PagingSource<Int, FriendEntity>
 
     @Query("SELECT COUNT(*) FROM friend")
     fun getFriendsCount(): Long
+
+    @Query("SELECT * FROM friend")
+    fun getFriends(): List<FriendEntity>
+
+    @Query("SELECT * FROM friend")
+    fun getFriendsAsFlow(): Flow<List<FriendEntity>>
 }

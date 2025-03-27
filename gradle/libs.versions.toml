@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.2"
+agp = "8.7.3"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -22,6 +22,7 @@ splash = "1.0.1"
 landscapist = "2.3.3"
 paging = "3.3.2"
 crashlytics = "3.0.2"
+jsoup = "1.18.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,8 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material = { group = "androidx.compose.material", name = "material" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
@@ -61,6 +64,7 @@ landscapist-glide = { module = "com.github.skydoves:landscapist-glide", version.
 landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholder", version.ref = "landscapist" }
 paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
+jsoup = { module = "org.jsoup:jsoup", version.ref= "jsoup" }
 
 
 [plugins]

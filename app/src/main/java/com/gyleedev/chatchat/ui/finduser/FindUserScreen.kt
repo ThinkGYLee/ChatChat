@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -36,26 +37,39 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.util.getImageFromFireStore
+import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FindUserScreen(
+    onBackPressKeyClick: () -> Unit,
     onFindComplete: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FindUserViewModel = hiltViewModel()
@@ -68,15 +82,19 @@ fun FindUserScreen(
     LaunchedEffect(emailQuery.text) {
         viewModel.editEmail(emailQuery.text.toString())
     }
-
+    val lifecycle = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
-        viewModel.searchFailure.collect {
-            Toast.makeText(
-                context,
-                context.getString(R.string.search_user_failure_message),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        // lifecycle
+
+        viewModel.searchFailure
+            .flowWithLifecycle(lifecycle.lifecycle)
+            .collect {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.search_user_failure_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
     }
 
     LaunchedEffect(Unit) {
@@ -97,18 +115,18 @@ fun FindUserScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "연락처로 추가",
+                    text = stringResource(R.string.find_user_screen_top_bar_text),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
             },
             navigationIcon = {
                 IconButton(
-                    onClick = { /*TODO*/ }
+                    onClick = onBackPressKeyClick
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "ArrowBack Button"
+                        contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
                     )
                 }
             },
@@ -117,7 +135,7 @@ fun FindUserScreen(
                     onClick = viewModel::fetchUserData,
                     enabled = emailIsAvailable.value
                 ) {
-                    Text(text = "확인")
+                    Text(text = stringResource(R.string.find_user_screen_action_button_text))
                 }
             }
         )
@@ -180,7 +198,7 @@ fun FindUserTextField(
                         Box(modifier = Modifier.weight(10f)) {
                             if (idQuery.text.isEmpty()) {
                                 Text(
-                                    text = "친구 이메일 주소",
+                                    text = stringResource(R.string.find_user_text_field_hint),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = Color(0xFF848484),
                                     modifier = Modifier
@@ -195,7 +213,7 @@ fun FindUserTextField(
                         if (idQuery.text.isNotEmpty()) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
-                                contentDescription = null,
+                                contentDescription = stringResource(R.string.keyboard_reset_button_description),
                                 modifier = Modifier.clickable { onReset() }
                             )
                         }
@@ -221,12 +239,35 @@ fun FindUserCard(onFindComplete: () -> Unit, userData: UserData, modifier: Modif
                 .padding(vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            var imageUrl by rememberSaveable {
+                mutableStateOf("")
+            }
+            LaunchedEffect(userData) {
+                imageUrl = getImageFromFireStore(userData.picture).first()
+            }
             GlideImage(
-                imageModel = { userData.picture.ifBlank { R.drawable.icons8__ } }
+                imageModel = {
+                    imageUrl.ifBlank { R.drawable.icons8__ }
+                },
+                modifier = Modifier
+                    .sizeIn(
+                        maxWidth = 80.dp,
+                        maxHeight = 80.dp
+                    )
+                    .clip(RoundedCornerShape(20.dp)),
+                component = rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray
+                        )
+                    )
+                },
+                previewPlaceholder = painterResource(id = R.drawable.icons8__)
             )
             Text(text = userData.name)
             TextButton(onClick = { onFindComplete() }) {
-                Text(text = "친구 추가")
+                Text(text = stringResource(R.string.find_user_screen_add_button_text))
             }
         }
     }
@@ -236,6 +277,6 @@ fun FindUserCard(onFindComplete: () -> Unit, userData: UserData, modifier: Modif
 @Preview
 fun FindUserScreenPreview() {
     MaterialTheme {
-        FindUserScreen(onFindComplete = {})
+        FindUserScreen(onFindComplete = {}, onBackPressKeyClick = {})
     }
 }

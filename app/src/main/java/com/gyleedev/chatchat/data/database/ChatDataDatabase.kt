@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.data.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.gyleedev.chatchat.data.database.dao.ChatListWithMessageAndFriendDao
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FriendDao
 import com.gyleedev.chatchat.data.database.dao.MessageDao
@@ -23,4 +24,5 @@ abstract class ChatDataDatabase : RoomDatabase() {
     abstract fun friendDao(): FriendDao
     abstract fun chatRoomDao(): ChatRoomDao
     abstract fun messageDao(): MessageDao
+    abstract fun chatListWithMessageAndFriendDao(): ChatListWithMessageAndFriendDao
 }

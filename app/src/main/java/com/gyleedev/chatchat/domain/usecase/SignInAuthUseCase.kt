@@ -10,9 +10,9 @@ import javax.inject.Inject
 class SignInAuthUseCase @Inject constructor(
     private val repository: UserRepository
 ) {
-    suspend operator fun invoke(id: String, password: String): Flow<UserData?> {
+    suspend operator fun invoke(id: String, password: String, nickname: String): Flow<UserData?> {
         return withContext(Dispatchers.IO) {
-            repository.signInUser(id, password)
+            repository.signInUser(id, password, nickname)
         }
     }
 }

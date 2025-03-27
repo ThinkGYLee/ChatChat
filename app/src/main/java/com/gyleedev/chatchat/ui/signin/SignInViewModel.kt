@@ -21,11 +21,14 @@ class SignInViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _idQuery = MutableStateFlow("")
+    private val _nicknameQuery = MutableStateFlow("")
     private val _passwordQuery = MutableStateFlow("")
     private val _passwordCheckQuery = MutableStateFlow("")
 
     private val _idIsAvailable = MutableStateFlow(false)
     val idIsAvailable: StateFlow<Boolean> = _idIsAvailable
+    private val _nicknameIsAvailable = MutableStateFlow(false)
+    val nicknameIsAvailable: StateFlow<Boolean> = _nicknameIsAvailable
     private val _passwordIsAvailable = MutableStateFlow(false)
     val passwordIsAvailable: StateFlow<Boolean> = _passwordIsAvailable
     private val _passwordCheckIsAvailable = MutableStateFlow(false)
@@ -41,6 +44,13 @@ class SignInViewModel @Inject constructor(
     fun editId(id: String) {
         viewModelScope.launch {
             _idQuery.emit(id)
+            checkSignInAvailable()
+        }
+    }
+
+    fun editNickname(nickname: String) {
+        viewModelScope.launch {
+            _nicknameQuery.emit(nickname)
             checkSignInAvailable()
         }
     }
@@ -63,6 +73,7 @@ class SignInViewModel @Inject constructor(
         viewModelScope.launch {
             val pattern = android.util.Patterns.EMAIL_ADDRESS
             _idIsAvailable.emit(pattern.matcher(_idQuery.value).matches())
+            _nicknameIsAvailable.emit(_nicknameQuery.value.length >= 2)
             _passwordIsAvailable.emit(_passwordQuery.value.length >= 8)
             _passwordCheckIsAvailable.emit(_passwordCheckQuery.value.length >= 8)
             _passwordIsSame.emit(_passwordQuery.value == _passwordCheckQuery.value)
@@ -72,7 +83,11 @@ class SignInViewModel @Inject constructor(
 
     fun signInRequest() {
         viewModelScope.launch {
-            val process = signInAuthUseCase(id = _idQuery.value, password = _passwordQuery.value)
+            val process = signInAuthUseCase(
+                id = _idQuery.value,
+                password = _passwordQuery.value,
+                nickname = _nicknameQuery.value
+            )
             process.collect { value ->
                 if (value != null) {
                     signInDatabase(value)

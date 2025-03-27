@@ -46,8 +46,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -70,9 +72,10 @@ fun LoginScreen(
     val idIsAvailable by viewModel.idIsAvailable.collectAsStateWithLifecycle()
     val passwordIsAvailable by viewModel.passwordIsAvailable.collectAsStateWithLifecycle()
     val signInIsAvailable by viewModel.logInIsAvailable.collectAsStateWithLifecycle()
-    val idComment = if (idIsAvailable || idQuery.text.isEmpty()) "" else "이메일 형식을 지켜주세요"
+    val idComment =
+        if (idIsAvailable || idQuery.text.isEmpty()) "" else stringResource(R.string.id_incorrect_message)
     val passwordComment =
-        if (passwordIsAvailable || passwordQuery.text.isEmpty()) "" else "8자리 이상을 입력해 주세요"
+        if (passwordIsAvailable || passwordQuery.text.isEmpty()) "" else stringResource(R.string.password_incorrect_message)
     val context = LocalContext.current
 
     LaunchedEffect(idQuery.text) {
@@ -111,7 +114,7 @@ fun LoginScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "로그인 하기")
+                    Text(text = stringResource(R.string.login_screen_top_bar_title))
                 }
             )
         },
@@ -125,7 +128,7 @@ fun LoginScreen(
                 .padding(horizontal = 16.dp)
         ) {
             Row {
-                Text(text = "소셜 로그인으로 가입할 수 있습니다.")
+                Text(text = stringResource(R.string.social_login_available_message))
             }
             Spacer(modifier = Modifier.height(32.dp))
             IdTextField(searchQuery = idQuery, onReset = {
@@ -160,20 +163,20 @@ fun LoginScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "로그인")
+                Text(text = stringResource(R.string.login_screen_login_button_text))
             }
             Spacer(modifier = Modifier.height(32.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Text(text = "아이디 찾기")
+                Text(text = stringResource(R.string.login_screen_find_id_text))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "|")
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "비밀번호 찾기")
+                Text(text = stringResource(R.string.login_screen_find_password_text))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "|")
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "회원가입",
+                    text = stringResource(R.string.login_screen_sign_in_text),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable {
@@ -187,13 +190,17 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            LoginBox(icon = R.drawable.icons8__, name = "Google", onClick = {})
+            LoginBox(
+                icon = R.drawable.icons8__,
+                name = stringResource(R.string.login_box_google_text),
+                onClick = {}
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             LoginBox(
                 icon = R.drawable.icons8_facebook_96,
-                name = "Facebook",
+                name = stringResource(R.string.login_box_facebook_text),
                 onClick = { /*TODO*/ }
             )
         }
@@ -220,7 +227,7 @@ fun LoginBox(
     ) {
         Image(
             painter = painterResource(id = icon),
-            contentDescription = "google icon",
+            contentDescription = stringResource(R.string.google_icon_description),
             modifier = Modifier.size(24.dp)
         )
         Text(text = "$name 으로 시작하기")
@@ -237,7 +244,7 @@ fun IdTextField(
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(
-        modifier = modifier.border(0.1.dp, Color.Black),
+        modifier = modifier.border(0.1.dp, MaterialTheme.colorScheme.onSurface),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicTextField(
@@ -262,7 +269,7 @@ fun IdTextField(
                     Box(modifier = Modifier.weight(10f)) {
                         if (searchQuery.text.isEmpty()) {
                             Text(
-                                text = "아이디",
+                                text = stringResource(R.string.login_id_text_field_hint),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color(0xFF848484),
                                 modifier = Modifier
@@ -277,12 +284,13 @@ fun IdTextField(
                     if (searchQuery.text.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.keyboard_reset_button_description),
                             modifier = Modifier.clickable { onReset() }
                         )
                     }
                 }
-            }
+            },
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
@@ -296,7 +304,7 @@ fun PasswordTextField(
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(
-        modifier = modifier.border(0.1.dp, Color.Black),
+        modifier = modifier.border(0.1.dp, MaterialTheme.colorScheme.onSurface),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicSecureTextField(
@@ -320,7 +328,7 @@ fun PasswordTextField(
                     Box(modifier = Modifier.weight(10f)) {
                         if (searchQuery.text.isEmpty()) {
                             Text(
-                                text = "비밀번호",
+                                text = stringResource(R.string.login_password_text_field_hint),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color(0xFF848484),
                                 modifier = Modifier
@@ -335,12 +343,13 @@ fun PasswordTextField(
                     if (searchQuery.text.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.keyboard_reset_button_description),
                             modifier = Modifier.clickable { onReset() }
                         )
                     }
                 }
-            }
+            },
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
