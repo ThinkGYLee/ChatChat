@@ -469,7 +469,7 @@ fun UniversalBar(
     query: TextFieldState,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier) {
+    Column(modifier = modifier) {
         MediaBar(
             onPhotoButtonClick = onPhotoButtonClick
         )
