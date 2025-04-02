@@ -46,7 +46,7 @@ import javax.inject.Inject
 interface UserRepository {
     fun getUsersFromLocal(): List<UserData>
     suspend fun signInUser(id: String, password: String, nickname: String): Flow<UserData?>
-    suspend fun logInRequest(id: String, password: String): Flow<LogInResult>
+    suspend fun loginRequest(id: String, password: String): Flow<LogInResult>
     suspend fun searchUser(email: String): Flow<UserData?>
     fun fetchUserExists(): Boolean
     suspend fun writeUserToRemote(user: UserData): Flow<SignInResult>
@@ -86,6 +86,7 @@ interface UserRepository {
     fun getFriendListFromLocal(): Flow<List<FriendEntity>>
     suspend fun updateFriendInfoWithFriendEntity(friendEntity: FriendEntity)
     suspend fun updateFriendInfoByUid(uid: String)
+    suspend fun logoutRequest()
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -142,7 +143,7 @@ class UserRepositoryImpl @Inject constructor(
         friendDao.insertUser(user.toEntity())
     }
 
-    override suspend fun logInRequest(id: String, password: String): Flow<LogInResult> =
+    override suspend fun loginRequest(id: String, password: String): Flow<LogInResult> =
         callbackFlow {
             auth.signInWithEmailAndPassword(id, password).addOnSuccessListener {
                 trySend(LogInResult.Success)
@@ -527,5 +528,9 @@ class UserRepositoryImpl @Inject constructor(
             trySend("")
         }
         awaitClose()
+    }
+
+    override suspend fun logoutRequest() {
+        auth.signOut()
     }
 }
