@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
+    onLogoutRequest: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
@@ -75,6 +76,7 @@ fun SettingScreen(
                                     onClick = {
                                         openDialog = false
                                         viewModel.logout()
+                                        onLogoutRequest()
                                     }
                                 ) {
                                     Text("Confirm")
