@@ -1,7 +1,10 @@
 package com.gyleedev.chatchat.ui.setting
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -19,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,25 +57,31 @@ fun SettingScreen(
                         shape = MaterialTheme.shapes.large,
                         tonalElevation = AlertDialogDefaults.TonalElevation
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text =
-                                "This area typically contains the supportive text " +
-                                        "which presents the details regarding the Dialog's purpose.",
-                            )
-                            Spacer(modifier = Modifier.height(24.dp))
-                            TextButton(
-                                onClick = {
-                                    openDialog = false
-                                    viewModel.logout()
-                                },
-                                modifier = Modifier.align(Alignment.End)
+                        Column(modifier = Modifier.padding(24.dp)) {
+                            Text(text = "로그아웃 하시겠습니까?", style = MaterialTheme.typography.titleLarge)
+                            Spacer(Modifier.height(16.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Absolute.Right
                             ) {
-                                Text("Confirm")
+                                TextButton(
+                                    onClick = {
+                                        openDialog = false
+                                    }
+                                ) {
+                                    Text("Dismiss")
+                                }
+                                TextButton(
+                                    onClick = {
+                                        openDialog = false
+                                        viewModel.logout()
+                                    }
+                                ) {
+                                    Text("Confirm")
+                                }
                             }
                         }
                     }
-
                 },
                 modifier = Modifier.wrapContentSize()
             )
