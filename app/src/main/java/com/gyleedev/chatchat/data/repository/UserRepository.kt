@@ -90,6 +90,7 @@ interface UserRepository {
     suspend fun resetFriendData()
     suspend fun resetMyUserData()
     suspend fun resetChatRoomData()
+    fun setMyUserInformation(userData: UserData)
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -121,7 +122,7 @@ class UserRepositoryImpl @Inject constructor(
                 picture = " ",
                 status = " "
             )
-            preferenceUtil.setMyData(myData)
+            setMyUserInformation(myData)
             trySend(myData)
         }.addOnFailureListener {
             trySend(null)
@@ -199,7 +200,7 @@ class UserRepositoryImpl @Inject constructor(
                     for (ds in snapshot.children) {
                         val snap = ds.getValue(UserData::class.java)
                         if (snap != null) {
-                            preferenceUtil.setMyData(snap)
+                            setMyUserInformation(snap)
                             trySend(snap)
                         } else {
                             trySend(null)
@@ -480,7 +481,7 @@ class UserRepositoryImpl @Inject constructor(
         )
         database.reference.child("users").child(user.uid).setValue(userData)
             .addOnSuccessListener {
-                preferenceUtil.setMyData(userData)
+                setMyUserInformation(userData)
                 trySend(true)
             }.addOnFailureListener {
                 trySend(false)
@@ -547,5 +548,9 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun resetChatRoomData() {
         chatRoomDao.resetChatRoomDatabase()
+    }
+
+    override fun setMyUserInformation(userData: UserData) {
+        preferenceUtil.setMyData(userData)
     }
 }
