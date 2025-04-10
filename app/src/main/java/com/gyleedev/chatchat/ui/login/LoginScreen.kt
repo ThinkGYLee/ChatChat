@@ -56,7 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.chatchat.R
-import com.gyleedev.chatchat.domain.LogInResult
+import com.gyleedev.chatchat.domain.LogInState
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,7 +93,7 @@ fun LoginScreen(
 
     LaunchedEffect(Unit) {
         viewModel.logInResult.collect {
-            if (it == LogInResult.Success) {
+            if (it is LogInState.Success) {
                 Toast.makeText(
                     context,
                     context.getString(R.string.log_in_success_message),
