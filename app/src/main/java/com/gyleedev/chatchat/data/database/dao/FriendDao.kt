@@ -47,4 +47,7 @@ interface FriendDao {
 
     @Query("SELECT * FROM friend")
     fun getFriendsAsFlow(): Flow<List<FriendEntity>>
+
+    @Query("DELETE FROM friend")
+    suspend fun resetFriendDatabase()
 }

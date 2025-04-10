@@ -3,7 +3,7 @@ package com.gyleedev.chatchat.ui.login
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.LogInResult
-import com.gyleedev.chatchat.domain.usecase.LogInUseCase
+import com.gyleedev.chatchat.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val useCase: LogInUseCase
+    private val useCase: LoginUseCase
 ) : BaseViewModel() {
 
     private val _idQuery = MutableStateFlow("")

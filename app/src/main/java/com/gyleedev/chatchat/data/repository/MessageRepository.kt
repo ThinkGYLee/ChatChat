@@ -49,6 +49,8 @@ interface MessageRepository {
     suspend fun deleteMessage(messageId: Long)
 
     fun uploadImageToRemote(uri: String): Flow<String>
+
+    suspend fun resetMessageData()
 }
 
 class MessageRepositoryImpl @Inject constructor(
@@ -211,5 +213,9 @@ class MessageRepositoryImpl @Inject constructor(
             trySend("")
         }
         awaitClose()
+    }
+
+    override suspend fun resetMessageData() {
+        messageDao.resetMessageDatabase()
     }
 }

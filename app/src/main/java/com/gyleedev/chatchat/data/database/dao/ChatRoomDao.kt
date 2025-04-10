@@ -25,4 +25,7 @@ interface ChatRoomDao {
 
     @Query("SELECT * FROM chatroom")
     fun getChatRoomsWithPaging(): PagingSource<Int, ChatRoomEntity>
+
+    @Query("DELETE FROM chatroom")
+    suspend fun resetChatRoomDatabase()
 }
