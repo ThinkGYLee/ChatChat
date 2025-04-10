@@ -87,6 +87,9 @@ interface UserRepository {
     suspend fun updateFriendInfoWithFriendEntity(friendEntity: FriendEntity)
     suspend fun updateFriendInfoByUid(uid: String)
     suspend fun logoutRequest()
+    suspend fun resetFriendData()
+    suspend fun resetMyUserData()
+    suspend fun resetChatRoomData()
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -532,5 +535,17 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun logoutRequest() {
         auth.signOut()
+    }
+
+    override suspend fun resetMyUserData() {
+        preferenceUtil.setMyData(UserData())
+    }
+
+    override suspend fun resetFriendData() {
+        friendDao.resetFriendDatabase()
+    }
+
+    override suspend fun resetChatRoomData() {
+        chatRoomDao.resetChatRoomDatabase()
     }
 }
