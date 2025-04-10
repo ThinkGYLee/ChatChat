@@ -169,7 +169,16 @@ fun ChatChatScreen(
                 )
             }
             composable(route = BottomNavItem.SETTING.screenRoute) {
-                SettingScreen(modifier = Modifier.fillMaxSize())
+                SettingScreen(
+                    onLogoutRequest = {
+                        navController.navigate(BottomNavItem.LOGIN.screenRoute) {
+                            popUpTo(navController.graph.id) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             composable(route = BottomNavItem.FINDUSER.screenRoute) {
