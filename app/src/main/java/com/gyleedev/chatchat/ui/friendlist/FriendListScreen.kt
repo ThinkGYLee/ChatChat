@@ -107,7 +107,6 @@ fun FriendListScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
-                .padding(horizontal = 20.dp)
         ) {
             if (myUserData.value != null) {
                 MyUserData(
@@ -117,7 +116,10 @@ fun FriendListScreen(
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            ) {
                 Text(
                     text = stringResource(R.string.friend_list_screen_middle_title),
                     style = MaterialTheme.typography.labelMedium
@@ -180,8 +182,8 @@ fun MyUserData(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp, horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(
@@ -234,8 +236,8 @@ fun FriendData(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .combinedClickable(onLongClick = { onLongClick() }, onClick = { onClick() }),
+            .combinedClickable(onLongClick = { onLongClick() }, onClick = { onClick() })
+            .padding(vertical = 8.dp, horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(
