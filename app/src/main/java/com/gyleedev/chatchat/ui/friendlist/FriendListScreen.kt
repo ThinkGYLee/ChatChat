@@ -84,6 +84,7 @@ fun FriendListScreen(
     val items = viewModel.items.collectAsLazyPagingItems()
 
     var openFriendDialog by remember { mutableStateOf(false) }
+    var dialogFriendUid by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -141,7 +142,10 @@ fun FriendListScreen(
                         val friend = items[index] as FriendData
                         FriendData(
                             onClick = { onFriendClick(friend.uid) },
-                            onLongClick = { openFriendDialog = true },
+                            onLongClick = {
+                                dialogFriendUid = friend.uid
+                                openFriendDialog = true
+                            },
                             friendData = friend
                         )
                     }
@@ -150,7 +154,10 @@ fun FriendListScreen(
 
             if (openFriendDialog) {
                 FriendDialog(
-                    closeDialog = { openFriendDialog = false }
+                    closeDialog = {
+                        dialogFriendUid = ""
+                        openFriendDialog = false
+                    }
                 )
             }
         }
