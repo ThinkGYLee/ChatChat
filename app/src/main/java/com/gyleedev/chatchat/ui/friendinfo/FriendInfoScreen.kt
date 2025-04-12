@@ -15,6 +15,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +57,8 @@ fun FriendInfoScreen(
 ) {
     val friendData by viewModel.friendData.collectAsStateWithLifecycle()
 
+    var dropdownMenuExpanded by rememberSaveable { mutableStateOf(false) }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -66,6 +71,19 @@ fun FriendInfoScreen(
                             contentDescription = stringResource(R.string.close_button_description)
                         )
                     }
+                },
+                actions = {
+                    IconButton(onClick = { dropdownMenuExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Outlined.MoreVert,
+                            contentDescription = "more button"
+                        )
+                    }
+
+                    FriendDropDownMenu(
+                        dropdownMenuExpanded = dropdownMenuExpanded,
+                        onDismiss = { dropdownMenuExpanded = false })
+
                 }
             )
         }
@@ -128,5 +146,37 @@ fun FriendInfoScreen(
             }
             Spacer(modifier = Modifier.height(72.dp))
         }
+    }
+}
+
+@Composable
+fun FriendDropDownMenu(
+    dropdownMenuExpanded: Boolean,
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit
+) {
+    DropdownMenu(
+        expanded = dropdownMenuExpanded,
+        modifier = modifier,
+        onDismissRequest = onDismiss
+    ) {
+        DropdownMenuItem(
+            text = {
+                Text("친구 차단")
+            },
+            onClick = {}
+        )
+        DropdownMenuItem(
+            text = {
+                Text("친구 삭제")
+            },
+            onClick = {}
+        )
+        DropdownMenuItem(
+            text = {
+                Text("친구 숨김")
+            },
+            onClick = {}
+        )
     }
 }
