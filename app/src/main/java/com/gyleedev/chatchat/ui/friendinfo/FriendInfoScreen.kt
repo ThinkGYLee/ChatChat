@@ -82,8 +82,8 @@ fun FriendInfoScreen(
 
                     FriendDropDownMenu(
                         dropdownMenuExpanded = dropdownMenuExpanded,
-                        onDismiss = { dropdownMenuExpanded = false })
-
+                        onDismiss = { dropdownMenuExpanded = false }
+                    )
                 }
             )
         }
