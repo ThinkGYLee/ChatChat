@@ -163,7 +163,9 @@ fun ChatChatScreen(
                     modifier = Modifier.fillMaxSize(),
                     onSignInComplete = {
                         navController.navigate(BottomNavItem.CHATLIST.screenRoute) {
-                            popUpTo(BottomNavItem.LOGIN.screenRoute) { inclusive = true }
+                            popUpTo(BottomNavItem.LOGIN.screenRoute) {
+                                inclusive = true
+                            }
                         }
                     }
                 )
@@ -285,13 +287,7 @@ fun BottomNavigation(
                 selected = currentRoute == item.screenRoute,
                 alwaysShowLabel = false,
                 onClick = {
-                    navController.navigate(item.screenRoute) {
-                        navController.graph.startDestinationRoute?.let {
-                            popUpTo(it) { saveState = true }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    navController.navigate(item.screenRoute)
                 },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = NavigationBarDefaults.containerColor
