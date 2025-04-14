@@ -289,13 +289,13 @@ fun BottomNavigation(
                 alwaysShowLabel = false,
                 onClick = {
                     navController.navigate(item.screenRoute) {
-                        //시작 스크린 제외한 모든 스택을 pop 하여 백스택이 많이 쌓이는 것을 방지
+                        // 시작 스크린 제외한 모든 스택을 pop 하여 백스택이 많이 쌓이는 것을 방지
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                         }
                         // 같은 스크린이 여러번 쌓이는 것을 방지
                         launchSingleTop = true
-                        //같은 아이템이 선택됐을 때 원래 상태를 복원
+                        // 같은 아이템이 선택됐을 때 원래 상태를 복원
                         restoreState = true
                     }
                 },
