@@ -25,6 +25,7 @@ import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.ChatRoomDataWithFriend
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
+import com.gyleedev.chatchat.domain.DeleteFriendState
 import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.SignInResult
@@ -91,6 +92,9 @@ interface UserRepository {
     suspend fun resetMyUserData()
     suspend fun resetChatRoomData()
     fun setMyUserInformation(userData: UserData)
+    suspend fun deleteFriendRequest(friendData: FriendData): DeleteFriendState
+    suspend fun deleteFriendRemote(friendData: FriendData): Flow<Boolean>
+    suspend fun deleteFriendLocal(friendData: FriendData): Flow<DeleteFriendState>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -552,5 +556,47 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun setMyUserInformation(userData: UserData) {
         preferenceUtil.setMyData(userData)
+    }
+
+    override suspend fun deleteFriendRequest(friendData: FriendData): DeleteFriendState {
+        return try {
+            val remoteRequest = deleteFriendRemote(friendData).first()
+            if (remoteRequest) {
+                val localRequest = deleteFriendLocal(friendData).first()
+                if (localRequest == DeleteFriendState.SUCCESS) {
+                    DeleteFriendState.SUCCESS
+                } else {
+                    DeleteFriendState.FAILURE
+                }
+            } else {
+                DeleteFriendState.FAILURE
+            }
+        } catch (e: Exception) {
+            DeleteFriendState.FAILURE
+        }
+    }
+
+    override suspend fun deleteFriendLocal(friendData: FriendData): Flow<DeleteFriendState> =
+        callbackFlow {
+            try {
+                friendDao.deleteFriend(friendData.uid)
+                trySend(DeleteFriendState.SUCCESS)
+            } catch (e: Exception) {
+                trySend(DeleteFriendState.FAILURE)
+            }
+            awaitClose()
+        }
+
+    override suspend fun deleteFriendRemote(friendData: FriendData): Flow<Boolean> = callbackFlow {
+        auth.currentUser?.uid?.let {
+            database.reference.child("friends").child(it).child(friendData.uid).removeValue()
+                .addOnSuccessListener {
+                    println("complete")
+                    trySend(true)
+                }.addOnFailureListener {
+                    trySend(false)
+                }
+        }
+        awaitClose()
     }
 }
