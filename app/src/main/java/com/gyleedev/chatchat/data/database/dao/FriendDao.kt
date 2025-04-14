@@ -50,4 +50,7 @@ interface FriendDao {
 
     @Query("DELETE FROM friend")
     suspend fun resetFriendDatabase()
+
+    @Query("DELETE FROM friend where uid = :uid")
+    suspend fun deleteFriend(uid: String)
 }
