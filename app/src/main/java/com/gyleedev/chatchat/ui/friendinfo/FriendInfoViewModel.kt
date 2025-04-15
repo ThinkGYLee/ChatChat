@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.FriendData
+import com.gyleedev.chatchat.domain.usecase.DeleteFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendDataUseCase
 import com.gyleedev.chatchat.domain.usecase.UpdateFriendInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class FriendInfoViewModel @Inject constructor(
     private val getFriendDataUseCase: GetFriendDataUseCase,
     private val updateFriendInfoUseCase: UpdateFriendInfoUseCase,
+    private val deleteFriendUseCase: DeleteFriendUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
     private val _friendData = MutableStateFlow(FriendData())
@@ -35,6 +37,12 @@ class FriendInfoViewModel @Inject constructor(
                     getFriendDataUseCase(friendData.uid).first()
                 )
             }
+        }
+    }
+
+    fun deleteFriend() {
+        viewModelScope.launch {
+            deleteFriendUseCase(_friendData.value)
         }
     }
 }
