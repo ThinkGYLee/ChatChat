@@ -1,5 +1,6 @@
 package com.gyleedev.chatchat.ui.friendlist
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -43,13 +44,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.FriendData
@@ -84,7 +88,17 @@ fun FriendListScreen(
     val items = viewModel.items.collectAsLazyPagingItems()
 
     var openFriendDialog by remember { mutableStateOf(false) }
-    var dialogFriendUid by remember { mutableStateOf("") }
+    var dialogFriendData by remember { mutableStateOf<FriendData?>(null) }
+    val lifecycle = LocalLifecycleOwner.current
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.noSuchUserAlert
+            .flowWithLifecycle(lifecycle.lifecycle)
+            .collect {
+                Toast.makeText(context, "no such user", Toast.LENGTH_SHORT).show()
+            }
+    }
 
     Scaffold(
         topBar = {
@@ -145,7 +159,7 @@ fun FriendListScreen(
                         FriendData(
                             onClick = { onFriendClick(friend.uid) },
                             onLongClick = {
-                                dialogFriendUid = friend.uid
+                                dialogFriendData = friend
                                 openFriendDialog = true
                             },
                             friendData = friend
@@ -157,9 +171,14 @@ fun FriendListScreen(
             if (openFriendDialog) {
                 FriendDialog(
                     closeDialog = {
-                        dialogFriendUid = ""
+                        dialogFriendData = null
                         openFriendDialog = false
-                    }
+                    },
+                    blockRequest = {},
+                    deleteRequest = {
+                        viewModel.deleteFriend(dialogFriendData)
+                    },
+                    hideRequest = {}
                 )
             }
         }
@@ -236,7 +255,10 @@ fun FriendData(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .combinedClickable(onLongClick = { onLongClick() }, onClick = { onClick() })
+            .combinedClickable(
+                onLongClick = onLongClick,
+                onClick = onClick
+            )
             .padding(vertical = 8.dp, horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -276,13 +298,14 @@ fun FriendData(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendDialog(
+    blockRequest: () -> Unit,
+    deleteRequest: () -> Unit,
+    hideRequest: () -> Unit,
     closeDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BasicAlertDialog(
-        onDismissRequest = {
-            closeDialog()
-        },
+        onDismissRequest = closeDialog,
         content = {
             Surface(
                 modifier = Modifier.wrapContentSize(),
@@ -293,16 +316,31 @@ fun FriendDialog(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    TextButton(onClick = { closeDialog() }) {
-                        Text("친구 차단")
+                    TextButton(
+                        onClick = {
+                            blockRequest()
+                            closeDialog()
+                        }
+                    ) {
+                        Text(stringResource(R.string.friend_block_button_text))
                     }
                     HorizontalDivider()
-                    TextButton(onClick = { closeDialog() }) {
-                        Text("친구 삭제")
+                    TextButton(
+                        onClick = {
+                            deleteRequest()
+                            closeDialog()
+                        }
+                    ) {
+                        Text(stringResource(R.string.friend_delete_button_text))
                     }
                     HorizontalDivider()
-                    TextButton(onClick = { closeDialog() }) {
-                        Text("친구 숨김")
+                    TextButton(
+                        onClick = {
+                            hideRequest()
+                            closeDialog()
+                        }
+                    ) {
+                        Text(stringResource(R.string.friend_hide_button_text))
                     }
                 }
             }
