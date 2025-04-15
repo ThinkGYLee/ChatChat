@@ -82,7 +82,10 @@ fun FriendInfoScreen(
 
                     FriendDropDownMenu(
                         dropdownMenuExpanded = dropdownMenuExpanded,
-                        onDismiss = { dropdownMenuExpanded = false }
+                        onDismiss = { dropdownMenuExpanded = false },
+                        blockRequest = {},
+                        deleteRequest = { viewModel.deleteFriend() },
+                        hideRequest = {},
                     )
                 }
             )
@@ -151,6 +154,9 @@ fun FriendInfoScreen(
 
 @Composable
 fun FriendDropDownMenu(
+    blockRequest: () -> Unit,
+    deleteRequest: () -> Unit,
+    hideRequest: () -> Unit,
     dropdownMenuExpanded: Boolean,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit
@@ -162,21 +168,30 @@ fun FriendDropDownMenu(
     ) {
         DropdownMenuItem(
             text = {
-                Text("친구 차단")
+                Text(stringResource(R.string.friend_block_button_text))
             },
-            onClick = {}
+            onClick = {
+                blockRequest()
+                onDismiss()
+            }
         )
         DropdownMenuItem(
             text = {
-                Text("친구 삭제")
+                Text(stringResource(R.string.friend_delete_button_text))
             },
-            onClick = {}
+            onClick = {
+                deleteRequest()
+                onDismiss()
+            }
         )
         DropdownMenuItem(
             text = {
-                Text("친구 숨김")
+                Text(stringResource(R.string.friend_hide_button_text))
             },
-            onClick = {}
+            onClick = {
+                hideRequest()
+                onDismiss()
+            }
         )
     }
 }
