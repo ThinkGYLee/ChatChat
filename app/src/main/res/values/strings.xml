@@ -46,4 +46,7 @@
     <string name="login_password_text_field_hint">비밀번호</string>
     <string name="chat_list_screen_chat_type_photo">사진</string>
     <string name="chat_room_photo_bar_text">사진</string>
+    <string name="friend_block_button_text">친구 차단</string>
+    <string name="friend_hide_button_text">친구 숨김</string>
+    <string name="friend_delete_button_text">친구 삭제</string>
 </resources>
