@@ -1,8 +1,8 @@
 package com.gyleedev.chatchat.domain
 
-data class ChatRoomDataWithFriendAndMessage(
+data class ChatRoomDataWithAllRelatedUsersAndMessage(
     val chatRoomLocalData: ChatRoomLocalData,
-    val friendData: FriendData,
+    val relatedUserLocalData: RelatedUserLocalData,
     val lastMessageData: MessageData
 )
 // view에서 lastMessage 매핑하는 용
