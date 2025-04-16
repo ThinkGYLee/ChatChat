@@ -10,10 +10,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
-import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.MessageType
+import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.usecase.CancelMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomLocalDataByUidUseCase
@@ -57,7 +57,7 @@ class ChatRoomViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
-    private val friendData = MutableStateFlow(FriendData())
+    private val relatedUserLocalData = MutableStateFlow(RelatedUserLocalData())
 
     private var uid: String? = null
     private val myUid = getMyUidFromLogInDataUseCase()
@@ -77,7 +77,7 @@ class ChatRoomViewModel @Inject constructor(
         getMessagesFromLocalUseCase(it.rid).cachedIn(viewModelScope)
     }
 
-    val uiState = combine(friendData, myUid) { friendData, uid ->
+    val uiState = combine(relatedUserLocalData, myUid) { friendData, uid ->
         if (uid != null) {
             ChatRoomUiState.Success(
                 userName = friendData.name,
@@ -102,7 +102,7 @@ class ChatRoomViewModel @Inject constructor(
         }
         viewModelScope.launch {
             val friend = getFriendDataUseCase(friendUid).first()
-            friendData.emit(friend)
+            relatedUserLocalData.emit(friend)
             getChatRoomDataUseCase(friend)
             getChatRoomFromLocal()
 
@@ -125,7 +125,7 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     private suspend fun getChatRoomFromLocal() {
-        val data = getChatRoomLocalDataByUidUseCase(friendData.value.uid)
+        val data = getChatRoomLocalDataByUidUseCase(relatedUserLocalData.value.uid)
         _chatRoomLocalData.emit(data)
     }
 
