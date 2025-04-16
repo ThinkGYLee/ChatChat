@@ -5,7 +5,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.gyleedev.chatchat.core.BaseViewModel
-import com.gyleedev.chatchat.domain.ChatRoomDataWithFriendAndMessage
+import com.gyleedev.chatchat.domain.ChatRoomDataWithAllRelatedUsersAndMessage
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.MessageType
@@ -25,17 +25,17 @@ class ChatListViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _chatRoomList =
-        MutableStateFlow<PagingData<ChatRoomDataWithFriendAndMessage>>(PagingData.empty())
-    val chatRoomList: StateFlow<PagingData<ChatRoomDataWithFriendAndMessage>> = _chatRoomList
+        MutableStateFlow<PagingData<ChatRoomDataWithAllRelatedUsersAndMessage>>(PagingData.empty())
+    val chatRoomList: StateFlow<PagingData<ChatRoomDataWithAllRelatedUsersAndMessage>> = _chatRoomList
 
     init {
         viewModelScope.launch {
-            getChatRoomListUseCase().cachedIn(viewModelScope).collectLatest { chatRoomAndFriend ->
+            getChatRoomListUseCase().cachedIn(viewModelScope).collectLatest { chatRoomAndRelatedUsers ->
                 _chatRoomList.emit(
-                    chatRoomAndFriend.map {
-                        ChatRoomDataWithFriendAndMessage(
+                    chatRoomAndRelatedUsers.map {
+                        ChatRoomDataWithAllRelatedUsersAndMessage(
                             chatRoomLocalData = it.chatRoomLocalData,
-                            friendData = it.friendData,
+                            relatedUserLocalData = it.relatedUserLocalData,
                             lastMessageData = getLastMessageUseCase(it.chatRoomLocalData)
                                 ?: MessageData("", "", "", type = MessageType.Text, 0L, MessageSendState.COMPLETE)
                         )
