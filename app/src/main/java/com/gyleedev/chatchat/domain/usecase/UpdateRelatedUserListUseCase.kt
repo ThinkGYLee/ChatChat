@@ -4,13 +4,13 @@ import com.gyleedev.chatchat.data.repository.UserRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class UpdateFriendListUseCase @Inject constructor(
+class UpdateRelatedUserListUseCase @Inject constructor(
     private val repository: UserRepository
 ) {
     suspend operator fun invoke() {
-        val list = repository.getFriendListFromLocal().first()
+        val list = repository.getRelatedUserListFromLocal().first()
         list.forEach {
-            repository.updateFriendInfoWithFriendEntity(it)
+            repository.updateRelatedUserInfoWithUserEntity(it)
         }
     }
 }
