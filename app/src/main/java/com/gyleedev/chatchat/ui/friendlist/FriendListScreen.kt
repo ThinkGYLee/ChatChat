@@ -56,7 +56,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
-import com.gyleedev.chatchat.domain.FriendData
+import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.ImageOptions
@@ -88,7 +88,7 @@ fun FriendListScreen(
     val items = viewModel.items.collectAsLazyPagingItems()
 
     var openFriendDialog by remember { mutableStateOf(false) }
-    var dialogFriendData by remember { mutableStateOf<FriendData?>(null) }
+    var dialogRelatedUserLocalData by remember { mutableStateOf<RelatedUserLocalData?>(null) }
     val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
 
@@ -155,14 +155,14 @@ fun FriendListScreen(
                         key = { items[it]!!.email },
                         contentType = { 0 }
                     ) { index ->
-                        val friend = items[index] as FriendData
+                        val friend = items[index] as RelatedUserLocalData
                         FriendData(
                             onClick = { onFriendClick(friend.uid) },
                             onLongClick = {
-                                dialogFriendData = friend
+                                dialogRelatedUserLocalData = friend
                                 openFriendDialog = true
                             },
-                            friendData = friend
+                            relatedUserLocalData = friend
                         )
                     }
                 }
@@ -171,12 +171,12 @@ fun FriendListScreen(
             if (openFriendDialog) {
                 FriendDialog(
                     closeDialog = {
-                        dialogFriendData = null
+                        dialogRelatedUserLocalData = null
                         openFriendDialog = false
                     },
                     blockRequest = {},
                     deleteRequest = {
-                        viewModel.deleteFriend(dialogFriendData)
+                        viewModel.deleteFriend(dialogRelatedUserLocalData)
                     },
                     hideRequest = {}
                 )
@@ -243,14 +243,14 @@ fun MyUserData(
 fun FriendData(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    friendData: FriendData,
+    relatedUserLocalData: RelatedUserLocalData,
     modifier: Modifier = Modifier
 ) {
     var imageUrl by rememberSaveable {
         mutableStateOf("")
     }
-    LaunchedEffect(friendData) {
-        imageUrl = getImageFromFireStore(friendData.picture).first()
+    LaunchedEffect(relatedUserLocalData) {
+        imageUrl = getImageFromFireStore(relatedUserLocalData.picture).first()
     }
     Row(
         modifier = modifier
@@ -284,10 +284,10 @@ fun FriendData(
         )
         Spacer(modifier = Modifier.width(20.dp))
         Column(horizontalAlignment = Alignment.Start) {
-            Text(text = friendData.name, style = MaterialTheme.typography.bodyMedium)
-            if (friendData.status.isNotBlank()) {
+            Text(text = relatedUserLocalData.name, style = MaterialTheme.typography.bodyMedium)
+            if (relatedUserLocalData.status.isNotBlank()) {
                 Text(
-                    text = friendData.status,
+                    text = relatedUserLocalData.status,
                     style = MaterialTheme.typography.labelSmall
                 )
             }
