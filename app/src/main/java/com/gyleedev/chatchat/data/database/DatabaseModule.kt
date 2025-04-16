@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.gyleedev.chatchat.data.database.dao.ChatListWithMessageAndFriendDao
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
-import com.gyleedev.chatchat.data.database.dao.FriendDao
 import com.gyleedev.chatchat.data.database.dao.MessageDao
+import com.gyleedev.chatchat.data.database.dao.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,8 +29,8 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun providesFriendDao(chatDataDatabase: ChatDataDatabase): FriendDao =
-        chatDataDatabase.friendDao()
+    fun providesUserDao(chatDataDatabase: ChatDataDatabase): UserDao =
+        chatDataDatabase.userDao()
 
     @Singleton
     @Provides
