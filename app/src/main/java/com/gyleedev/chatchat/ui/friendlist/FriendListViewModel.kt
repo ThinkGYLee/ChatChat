@@ -3,13 +3,14 @@ package com.gyleedev.chatchat.ui.friendlist
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.gyleedev.chatchat.core.BaseViewModel
-import com.gyleedev.chatchat.domain.FriendData
+import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
+import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserData
-import com.gyleedev.chatchat.domain.usecase.AddFriendsUseCase
+import com.gyleedev.chatchat.domain.usecase.AddMyRelatedUsersUseCase
 import com.gyleedev.chatchat.domain.usecase.DeleteFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendsCountUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendsUseCase
-import com.gyleedev.chatchat.domain.usecase.GetMyFriendFromRemoteUseCase
+import com.gyleedev.chatchat.domain.usecase.GetMyRelatedUserListFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,8 +25,8 @@ import javax.inject.Inject
 class FriendListViewModel @Inject constructor(
     private val getMyUserDataUseCase: GetMyUserDataUseCase,
     getFriendsUseCase: GetFriendsUseCase,
-    private val getMyFriendFromRemoteUseCase: GetMyFriendFromRemoteUseCase,
-    private val addFriendsUseCase: AddFriendsUseCase,
+    private val getMyRelatedUserListFromRemoteUseCase: GetMyRelatedUserListFromRemoteUseCase,
+    private val addMyRelatedUsersUseCase: AddMyRelatedUsersUseCase,
     private val getFriendsCountUseCase: GetFriendsCountUseCase,
     private val deleteFriendUseCase: DeleteFriendUseCase
 ) : BaseViewModel() {
@@ -42,7 +43,7 @@ class FriendListViewModel @Inject constructor(
         viewModelScope.launch {
             fetchMyUserData()
             if (getFriendsCount() == 0L) {
-                getMyFriendsFromRemote()
+                getMyRelatedUsersFromRemote()
             }
         }
     }
@@ -58,23 +59,23 @@ class FriendListViewModel @Inject constructor(
         return getFriendsCountUseCase()
     }
 
-    private fun getMyFriendsFromRemote() {
+    private fun getMyRelatedUsersFromRemote() {
         viewModelScope.launch {
-            val request = getMyFriendFromRemoteUseCase().first()
+            val request = getMyRelatedUserListFromRemoteUseCase().first()
             if (request != null) {
-                addMyFriendsToLocal(request)
+                addMyRelatedUsersToLocal(request)
             }
         }
     }
 
-    private suspend fun addMyFriendsToLocal(friends: List<UserData>) {
-        addFriendsUseCase(friends)
+    private suspend fun addMyRelatedUsersToLocal(friends: List<RelatedUserRemoteData>) {
+        addMyRelatedUsersUseCase(friends)
     }
 
-    fun deleteFriend(friendData: FriendData?) {
+    fun deleteFriend(relatedUserLocalData: RelatedUserLocalData?) {
         viewModelScope.launch {
-            if (friendData != null) {
-                deleteFriendUseCase(friendData)
+            if (relatedUserLocalData != null) {
+                deleteFriendUseCase(relatedUserLocalData)
             } else {
                 _noSuchUserAlert.emit(Unit)
             }
