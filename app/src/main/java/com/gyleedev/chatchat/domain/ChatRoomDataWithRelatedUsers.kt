@@ -1,7 +1,7 @@
 package com.gyleedev.chatchat.domain
 
-data class ChatRoomDataWithFriend(
+data class ChatRoomDataWithRelatedUsers(
     val chatRoomLocalData: ChatRoomLocalData,
-    val friendData: FriendData
+    val relatedUserLocalData: RelatedUserLocalData
 )
 // 레포지토리에서 맵핑하는 용
