@@ -39,7 +39,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
-import com.gyleedev.chatchat.domain.ChatRoomDataWithFriendAndMessage
+import com.gyleedev.chatchat.domain.ChatRoomDataWithAllRelatedUsersAndMessage
 import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.ImageOptions
@@ -104,13 +104,13 @@ fun ChatListScreen(
 @Composable
 fun ChatRoomItem(
     onClick: (String) -> Unit,
-    chatRoomDataWithFriendAndMessage: ChatRoomDataWithFriendAndMessage,
+    chatRoomDataWithAllRelatedUsersAndMessage: ChatRoomDataWithAllRelatedUsersAndMessage,
     modifier: Modifier = Modifier
 ) {
-    val text = when (chatRoomDataWithFriendAndMessage.lastMessageData.type) {
-        MessageType.Text -> chatRoomDataWithFriendAndMessage.lastMessageData.comment
+    val text = when (chatRoomDataWithAllRelatedUsersAndMessage.lastMessageData.type) {
+        MessageType.Text -> chatRoomDataWithAllRelatedUsersAndMessage.lastMessageData.comment
         MessageType.Photo -> stringResource(R.string.chat_list_screen_chat_type_photo)
-        MessageType.Link -> chatRoomDataWithFriendAndMessage.lastMessageData.comment
+        MessageType.Link -> chatRoomDataWithAllRelatedUsersAndMessage.lastMessageData.comment
         else -> ""
     }
 
@@ -118,9 +118,9 @@ fun ChatRoomItem(
         mutableStateOf("")
     }
 
-    LaunchedEffect(chatRoomDataWithFriendAndMessage) {
+    LaunchedEffect(chatRoomDataWithAllRelatedUsersAndMessage) {
         imageUrl =
-            getImageFromFireStore(chatRoomDataWithFriendAndMessage.friendData.picture).first()
+            getImageFromFireStore(chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.picture).first()
     }
 
     Row(
@@ -128,7 +128,7 @@ fun ChatRoomItem(
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 16.dp)
             .clickable {
-                onClick(chatRoomDataWithFriendAndMessage.friendData.uid)
+                onClick(chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.uid)
             },
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
@@ -156,7 +156,7 @@ fun ChatRoomItem(
             Spacer(modifier = Modifier.width(20.dp))
             Column {
                 Text(
-                    text = chatRoomDataWithFriendAndMessage.friendData.name,
+                    text = chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.name,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(2.dp))
@@ -166,7 +166,7 @@ fun ChatRoomItem(
 
         Text(
             text = LocalDate.ofInstant(
-                Instant.ofEpochMilli(chatRoomDataWithFriendAndMessage.lastMessageData.time),
+                Instant.ofEpochMilli(chatRoomDataWithAllRelatedUsersAndMessage.lastMessageData.time),
                 ZoneId.of("Asia/Seoul")
             ).format(
                 DateTimeFormatter.ofPattern("MM-dd")
