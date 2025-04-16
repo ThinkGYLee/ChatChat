@@ -3,7 +3,7 @@ package com.gyleedev.chatchat.data.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.gyleedev.chatchat.domain.RelatedUseLocalData
+import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.UserRelationState
 
@@ -28,7 +28,7 @@ data class UserEntity(
     val relation: UserRelationState
 )
 
-fun RelatedUseLocalData.toEntity(): UserEntity {
+fun RelatedUserLocalData.toEntity(): UserEntity {
     return UserEntity(
         id = 0,
         name = name,
@@ -40,8 +40,8 @@ fun RelatedUseLocalData.toEntity(): UserEntity {
     )
 }
 
-fun UserEntity.toRelationLocalData(): RelatedUseLocalData {
-    return RelatedUseLocalData(
+fun UserEntity.toRelationLocalData(): RelatedUserLocalData {
+    return RelatedUserLocalData(
         id = id,
         name = name,
         email = email,
