@@ -3,7 +3,7 @@ package com.gyleedev.chatchat.data.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.gyleedev.chatchat.domain.FriendData
+import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserData
 
 @Entity(
@@ -36,8 +36,8 @@ fun UserData.toEntity(): FriendEntity {
     )
 }
 
-fun FriendEntity.toFriendData(): FriendData {
-    return FriendData(
+fun FriendEntity.toFriendData(): RelatedUserLocalData {
+    return RelatedUserLocalData(
         id = id,
         name = name,
         email = email,
