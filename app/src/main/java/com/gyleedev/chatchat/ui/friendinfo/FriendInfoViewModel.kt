@@ -3,7 +3,7 @@ package com.gyleedev.chatchat.ui.friendinfo
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
-import com.gyleedev.chatchat.domain.FriendData
+import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.usecase.DeleteFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendDataUseCase
 import com.gyleedev.chatchat.domain.usecase.UpdateFriendInfoUseCase
@@ -21,19 +21,19 @@ class FriendInfoViewModel @Inject constructor(
     private val deleteFriendUseCase: DeleteFriendUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
-    private val _friendData = MutableStateFlow(FriendData())
-    val friendData: StateFlow<FriendData?> = _friendData
+    private val _relatedUserLocalData = MutableStateFlow(RelatedUserLocalData())
+    val relatedUserLocalData: StateFlow<RelatedUserLocalData?> = _relatedUserLocalData
 
     init {
         viewModelScope.launch {
             val userUid = savedStateHandle.get<String>("friend")
             if (userUid != null) {
                 val friendData = getFriendDataUseCase(userUid).first()
-                _friendData.emit(
+                _relatedUserLocalData.emit(
                     friendData
                 )
                 updateFriendInfoUseCase(friendData.uid)
-                _friendData.emit(
+                _relatedUserLocalData.emit(
                     getFriendDataUseCase(friendData.uid).first()
                 )
             }
@@ -42,7 +42,7 @@ class FriendInfoViewModel @Inject constructor(
 
     fun deleteFriend() {
         viewModelScope.launch {
-            deleteFriendUseCase(_friendData.value)
+            deleteFriendUseCase(_relatedUserLocalData.value)
         }
     }
 }
