@@ -55,7 +55,7 @@ fun FriendInfoScreen(
     modifier: Modifier = Modifier,
     viewModel: FriendInfoViewModel = hiltViewModel()
 ) {
-    val friendData by viewModel.friendData.collectAsStateWithLifecycle()
+    val friendData by viewModel.relatedUserLocalData.collectAsStateWithLifecycle()
 
     var dropdownMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -85,7 +85,7 @@ fun FriendInfoScreen(
                         onDismiss = { dropdownMenuExpanded = false },
                         blockRequest = {},
                         deleteRequest = { viewModel.deleteFriend() },
-                        hideRequest = {},
+                        hideRequest = {}
                     )
                 }
             )
