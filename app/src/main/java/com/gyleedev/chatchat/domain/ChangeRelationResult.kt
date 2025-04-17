@@ -1,6 +1,6 @@
 package com.gyleedev.chatchat.domain
 
-enum class DeleteFriendState {
+enum class ChangeRelationResult {
     SUCCESS,
     FAILURE
 }
