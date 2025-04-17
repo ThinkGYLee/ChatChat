@@ -25,10 +25,10 @@ import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.data.database.entity.toRelationLocalData
 import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
 import com.gyleedev.chatchat.data.model.toRelatedUserLocalData
+import com.gyleedev.chatchat.domain.ChangeRelationResult
 import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.ChatRoomDataWithRelatedUsers
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
-import com.gyleedev.chatchat.domain.DeleteFriendState
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.SignInResult
@@ -101,7 +101,7 @@ interface UserRepository {
     suspend fun resetMyUserData()
     suspend fun resetChatRoomData()
     fun setMyUserInformation(userData: UserData)
-    suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): DeleteFriendState
+    suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
     suspend fun changeRelationRemote(
         relatedUserLocalData: RelatedUserLocalData,
         relation: UserRelationState
@@ -110,7 +110,10 @@ interface UserRepository {
     suspend fun changeRelationLocal(
         relatedUserLocalData: RelatedUserLocalData,
         relation: UserRelationState
-    ): Flow<DeleteFriendState>
+    ): Flow<ChangeRelationResult>
+
+    suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
+    suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -588,37 +591,37 @@ class UserRepositoryImpl @Inject constructor(
         preferenceUtil.setMyData(userData)
     }
 
-    override suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): DeleteFriendState {
+    override suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
         return try {
             val relation = UserRelationState.UNKNOWN
             val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
             if (remoteRequest) {
                 val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
-                if (localRequest == DeleteFriendState.SUCCESS) {
-                    DeleteFriendState.SUCCESS
+                if (localRequest == ChangeRelationResult.SUCCESS) {
+                    ChangeRelationResult.SUCCESS
                 } else {
-                    DeleteFriendState.FAILURE
+                    ChangeRelationResult.FAILURE
                 }
             } else {
-                DeleteFriendState.FAILURE
+                ChangeRelationResult.FAILURE
             }
         } catch (e: Exception) {
-            DeleteFriendState.FAILURE
+            ChangeRelationResult.FAILURE
         }
     }
 
     override suspend fun changeRelationLocal(
         relatedUserLocalData: RelatedUserLocalData,
         relation: UserRelationState
-    ): Flow<DeleteFriendState> =
+    ): Flow<ChangeRelationResult> =
         callbackFlow {
             try {
                 userDao.updateUser(
                     relatedUserLocalData.toEntity().copy(relation = relation)
                 )
-                trySend(DeleteFriendState.SUCCESS)
+                trySend(ChangeRelationResult.SUCCESS)
             } catch (e: Exception) {
-                trySend(DeleteFriendState.FAILURE)
+                trySend(ChangeRelationResult.FAILURE)
             }
             awaitClose()
         }
@@ -642,4 +645,42 @@ class UserRepositoryImpl @Inject constructor(
             }
             awaitClose()
         }
+
+    override suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
+        return try {
+            val relation = UserRelationState.HIDE
+            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
+            if (remoteRequest) {
+                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
+                if (localRequest == ChangeRelationResult.SUCCESS) {
+                    ChangeRelationResult.SUCCESS
+                } else {
+                    ChangeRelationResult.FAILURE
+                }
+            } else {
+                ChangeRelationResult.FAILURE
+            }
+        } catch (e: Exception) {
+            ChangeRelationResult.FAILURE
+        }
+    }
+
+    override suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
+        return try {
+            val relation = UserRelationState.BLOCKED
+            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
+            if (remoteRequest) {
+                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
+                if (localRequest == ChangeRelationResult.SUCCESS) {
+                    ChangeRelationResult.SUCCESS
+                } else {
+                    ChangeRelationResult.FAILURE
+                }
+            } else {
+                ChangeRelationResult.FAILURE
+            }
+        } catch (e: Exception) {
+            ChangeRelationResult.FAILURE
+        }
+    }
 }
