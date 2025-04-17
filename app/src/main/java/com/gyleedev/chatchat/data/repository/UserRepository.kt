@@ -35,6 +35,7 @@ import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.UserRelationState
+import com.gyleedev.chatchat.domain.toRemoteData
 import com.gyleedev.chatchat.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -101,8 +102,15 @@ interface UserRepository {
     suspend fun resetChatRoomData()
     fun setMyUserInformation(userData: UserData)
     suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): DeleteFriendState
-    suspend fun deleteFriendRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
-    suspend fun deleteFriendLocal(relatedUserLocalData: RelatedUserLocalData): Flow<DeleteFriendState>
+    suspend fun changeRelationRemote(
+        relatedUserLocalData: RelatedUserLocalData,
+        relation: UserRelationState
+    ): Flow<Boolean>
+
+    suspend fun changeRelationLocal(
+        relatedUserLocalData: RelatedUserLocalData,
+        relation: UserRelationState
+    ): Flow<DeleteFriendState>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -582,9 +590,10 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): DeleteFriendState {
         return try {
-            val remoteRequest = deleteFriendRemote(relatedUserLocalData).first()
+            val relation = UserRelationState.UNKNOWN
+            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
             if (remoteRequest) {
-                val localRequest = deleteFriendLocal(relatedUserLocalData).first()
+                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
                 if (localRequest == DeleteFriendState.SUCCESS) {
                     DeleteFriendState.SUCCESS
                 } else {
@@ -598,10 +607,15 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteFriendLocal(relatedUserLocalData: RelatedUserLocalData): Flow<DeleteFriendState> =
+    override suspend fun changeRelationLocal(
+        relatedUserLocalData: RelatedUserLocalData,
+        relation: UserRelationState
+    ): Flow<DeleteFriendState> =
         callbackFlow {
             try {
-                userDao.deleteFriend(relatedUserLocalData.uid)
+                userDao.updateUser(
+                    relatedUserLocalData.toEntity().copy(relation = relation)
+                )
                 trySend(DeleteFriendState.SUCCESS)
             } catch (e: Exception) {
                 trySend(DeleteFriendState.FAILURE)
@@ -609,13 +623,18 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    override suspend fun deleteFriendRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean> =
+    override suspend fun changeRelationRemote(
+        relatedUserLocalData: RelatedUserLocalData,
+        relation: UserRelationState
+    ): Flow<Boolean> =
         callbackFlow {
             auth.currentUser?.uid?.let {
                 database.reference.child("relations").child(it).child(relatedUserLocalData.uid)
-                    .removeValue()
-                    .addOnSuccessListener {
-                        println("complete")
+                    .setValue(
+                        relatedUserLocalData.toRemoteData().copy(
+                            userRelation = relation
+                        )
+                    ).addOnSuccessListener {
                         trySend(true)
                     }.addOnFailureListener {
                         trySend(false)
