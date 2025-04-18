@@ -30,7 +30,7 @@ data class UserEntity(
 
 fun RelatedUserLocalData.toEntity(): UserEntity {
     return UserEntity(
-        id = 0,
+        id = id,
         name = name,
         email = email,
         uid = uid,
@@ -64,7 +64,7 @@ fun UserEntity.toModel(): UserData {
 
 fun UserData.toEntityAsFriend(): UserEntity {
     return UserEntity(
-        id = 0,
+        id = 0L,
         name = name,
         email = email,
         uid = uid,
