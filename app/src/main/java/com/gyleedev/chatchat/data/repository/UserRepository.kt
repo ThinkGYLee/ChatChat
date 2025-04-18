@@ -16,20 +16,26 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
-import com.gyleedev.chatchat.data.database.dao.FriendDao
+import com.gyleedev.chatchat.data.database.dao.UserDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
-import com.gyleedev.chatchat.data.database.entity.FriendEntity
+import com.gyleedev.chatchat.data.database.entity.UserEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
-import com.gyleedev.chatchat.data.database.entity.toFriendData
+import com.gyleedev.chatchat.data.database.entity.toEntityAsFriend
 import com.gyleedev.chatchat.data.database.entity.toModel
+import com.gyleedev.chatchat.data.database.entity.toRelationLocalData
+import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
+import com.gyleedev.chatchat.data.model.toRelatedUserLocalData
+import com.gyleedev.chatchat.domain.ChangeRelationResult
 import com.gyleedev.chatchat.domain.ChatRoomData
-import com.gyleedev.chatchat.domain.ChatRoomDataWithFriend
+import com.gyleedev.chatchat.domain.ChatRoomDataWithRelatedUsers
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
-import com.gyleedev.chatchat.domain.FriendData
 import com.gyleedev.chatchat.domain.LogInResult
+import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.domain.UserRelationState
+import com.gyleedev.chatchat.domain.toRemoteData
 import com.gyleedev.chatchat.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -52,24 +58,24 @@ interface UserRepository {
     suspend fun writeUserToRemote(user: UserData): Flow<SignInResult>
     suspend fun getMyUserInformation(): Flow<UserData?>
     suspend fun addFriendToRemote(user: UserData): Flow<Boolean>
-    suspend fun getMyFriendListFromRemote(): Flow<List<UserData>?>
-    suspend fun insertMyFriendListToLocal(list: List<UserData>)
+    suspend fun getMyRelatedUserListFromRemote(): Flow<List<RelatedUserRemoteData>?>
+    suspend fun insertMyRelationsToLocal(list: List<RelatedUserRemoteData>)
     suspend fun insertFriendToLocal(user: UserData)
-    fun getFriends(): Flow<PagingData<FriendData>>
+    fun getFriends(): Flow<PagingData<RelatedUserLocalData>>
     suspend fun getFriendsCount(): Long
-    fun checkChatRoomExistsInRemote(friendData: FriendData): Flow<Boolean>
+    fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
     suspend fun createChatRoomData(): Flow<ChatRoomData?>
     suspend fun createMyUserChatRoom(
-        friendData: FriendData,
+        relatedUserLocalData: RelatedUserLocalData,
         chatRoomData: ChatRoomData
     )
 
     suspend fun createFriendUserChatRoom(
-        friendData: FriendData,
+        relatedUserLocalData: RelatedUserLocalData,
         chatRoomData: ChatRoomData
     )
 
-    fun getFriendById(uid: String): Flow<FriendData>
+    fun getFriendById(uid: String): Flow<RelatedUserLocalData>
 
     suspend fun makeNewChatRoom(rid: String, receiver: String): Long
 
@@ -77,24 +83,41 @@ interface UserRepository {
 
     fun getMyUidFromLogInData(): String?
 
-    fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?>
-    fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?>
-    suspend fun insertChatRoomToLocal(friendData: FriendData, chatRoomData: ChatRoomData): Long
-    suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithFriend>>
+    fun getChatRoomIdFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<String?>
+    fun getChatRoomFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<ChatRoomData?>
+    suspend fun insertChatRoomToLocal(
+        relatedUserLocalData: RelatedUserLocalData,
+        chatRoomData: ChatRoomData
+    ): Long
+
+    suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithRelatedUsers>>
     suspend fun updateMyUserInfo(user: UserData): Flow<Boolean>
-    suspend fun getFriendInfoFromRemote(uid: String): Flow<UserData?>
-    fun getFriendListFromLocal(): Flow<List<FriendEntity>>
-    suspend fun updateFriendInfoWithFriendEntity(friendEntity: FriendEntity)
-    suspend fun updateFriendInfoByUid(uid: String)
+    suspend fun getUserInfoFromRemote(uid: String): Flow<UserData?>
+    fun getRelatedUserListFromLocal(): Flow<List<UserEntity>>
+    suspend fun updateRelatedUserInfoWithUserEntity(userEntity: UserEntity)
+    suspend fun updateUserInfoByUid(uid: String)
     suspend fun logoutRequest()
     suspend fun resetFriendData()
     suspend fun resetMyUserData()
     suspend fun resetChatRoomData()
     fun setMyUserInformation(userData: UserData)
+    suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
+    suspend fun changeRelationRemote(
+        relatedUserLocalData: RelatedUserLocalData,
+        relation: UserRelationState
+    ): Flow<Boolean>
+
+    suspend fun changeRelationLocal(
+        relatedUserLocalData: RelatedUserLocalData,
+        relation: UserRelationState
+    ): Flow<ChangeRelationResult>
+
+    suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
+    suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
 }
 
 class UserRepositoryImpl @Inject constructor(
-    private val friendDao: FriendDao,
+    private val userDao: UserDao,
     firebase: Firebase,
     private val auth: FirebaseAuth,
     private val chatRoomDao: ChatRoomDao,
@@ -106,7 +129,7 @@ class UserRepositoryImpl @Inject constructor(
     private val imageStorage = firebase.storage.getReference("image")
 
     override fun getUsersFromLocal(): List<UserData> {
-        return friendDao.getUsers().map { it.toModel() }
+        return userDao.getUsers().map { it.toModel() }
     }
 
     override suspend fun signInUser(
@@ -144,7 +167,7 @@ class UserRepositoryImpl @Inject constructor(
         }
 
     private fun writeUserToLocal(user: UserData) {
-        friendDao.insertUser(user.toEntity())
+        userDao.insertUser(user.toEntityAsFriend())
     }
 
     override suspend fun loginRequest(id: String, password: String): Flow<LogInResult> =
@@ -217,8 +240,16 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addFriendToRemote(user: UserData): Flow<Boolean> = callbackFlow {
+        val relation = RelatedUserRemoteData(
+            uid = user.uid,
+            email = user.email,
+            name = user.name,
+            picture = user.picture,
+            status = user.status,
+            userRelation = UserRelationState.FRIEND
+        )
         auth.currentUser?.let {
-            database.reference.child("friends").child(it.uid).child(user.uid).setValue(user)
+            database.reference.child("relations").child(it.uid).child(user.uid).setValue(relation)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         trySend(true)
@@ -230,32 +261,33 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override suspend fun getMyFriendListFromRemote(): Flow<List<UserData>?> = callbackFlow {
-        auth.currentUser?.let {
-            database.reference.child("friends").child(it.uid)
-                .addListenerForSingleValueEvent(
-                    object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            val friendList = mutableListOf<UserData>()
-                            for (ds in snapshot.children) {
-                                val snap = ds.getValue(UserData::class.java)
-                                if (snap != null) {
-                                    friendList.add(snap)
+    override suspend fun getMyRelatedUserListFromRemote(): Flow<List<RelatedUserRemoteData>?> =
+        callbackFlow {
+            auth.currentUser?.let {
+                database.reference.child("relations").child(it.uid)
+                    .addListenerForSingleValueEvent(
+                        object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                val relationList = mutableListOf<RelatedUserRemoteData>()
+                                for (ds in snapshot.children) {
+                                    val snap = ds.getValue(RelatedUserRemoteData::class.java)
+                                    if (snap != null) {
+                                        relationList.add(snap)
+                                    }
                                 }
+                                trySend(relationList)
                             }
-                            trySend(friendList)
-                        }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            trySend(null)
+                            override fun onCancelled(error: DatabaseError) {
+                                trySend(null)
+                            }
                         }
-                    }
-                )
+                    )
+            }
+            awaitClose()
         }
-        awaitClose()
-    }
 
-    override suspend fun getFriendInfoFromRemote(uid: String): Flow<UserData?> = callbackFlow {
+    override suspend fun getUserInfoFromRemote(uid: String): Flow<UserData?> = callbackFlow {
         val query = database.reference.child("users").orderByChild("uid").equalTo(uid)
         query.addListenerForSingleValueEvent(
             object : ValueEventListener {
@@ -278,36 +310,36 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override suspend fun insertMyFriendListToLocal(list: List<UserData>) {
+    override suspend fun insertMyRelationsToLocal(list: List<RelatedUserRemoteData>) {
         withContext(Dispatchers.IO) {
-            friendDao.insertUsers(list.map { it.toEntity() })
+            userDao.insertUsers(list.map { it.toRelatedUserLocalData().toEntity() })
         }
     }
 
     override suspend fun insertFriendToLocal(user: UserData) {
-        friendDao.insertUser(user.toEntity())
+        userDao.insertUser(user.toEntityAsFriend())
     }
 
-    override fun getFriends(): Flow<PagingData<FriendData>> {
+    override fun getFriends(): Flow<PagingData<RelatedUserLocalData>> {
         return Pager(
             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
             pagingSourceFactory = {
-                friendDao.getFriendsPaging()
+                userDao.getFriendsPaging()
             }
         ).flow.map { value ->
-            value.map { it.toFriendData() }
+            value.map { it.toRelationLocalData() }
         }
     }
 
     override suspend fun getFriendsCount(): Long {
-        return friendDao.getFriendsCount()
+        return userDao.getFriendsCount()
     }
 
-    override fun checkChatRoomExistsInRemote(friendData: FriendData): Flow<Boolean> =
+    override fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean> =
         callbackFlow {
             auth.currentUser?.uid?.let {
                 database.reference.child("userChatRooms").child(it).orderByChild("receiver")
-                    .equalTo(friendData.uid)
+                    .equalTo(relatedUserLocalData.uid)
             }?.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.value != null) {
@@ -342,23 +374,28 @@ class UserRepositoryImpl @Inject constructor(
         }
 
     override suspend fun createMyUserChatRoom(
-        friendData: FriendData,
+        relatedUserLocalData: RelatedUserLocalData,
         chatRoomData: ChatRoomData
     ) {
-        UserChatRoomData(rid = chatRoomData.rid, receiver = friendData.uid)
+        UserChatRoomData(rid = chatRoomData.rid, receiver = relatedUserLocalData.uid)
         auth.currentUser?.uid?.let {
             database.reference.child("userChatRooms").child(it).child(chatRoomData.rid)
-                .setValue(UserChatRoomData(rid = chatRoomData.rid, receiver = friendData.uid))
+                .setValue(
+                    UserChatRoomData(
+                        rid = chatRoomData.rid,
+                        receiver = relatedUserLocalData.uid
+                    )
+                )
         }
     }
 
     override suspend fun createFriendUserChatRoom(
-        friendData: FriendData,
+        relatedUserLocalData: RelatedUserLocalData,
         chatRoomData: ChatRoomData
     ) {
         auth.currentUser?.uid?.let {
             val userChatRoomData = UserChatRoomData(rid = chatRoomData.rid, receiver = it)
-            database.reference.child("userChatRooms").child(friendData.uid)
+            database.reference.child("userChatRooms").child(relatedUserLocalData.uid)
                 .child(chatRoomData.rid)
                 .setValue(userChatRoomData)
         }
@@ -368,8 +405,8 @@ class UserRepositoryImpl @Inject constructor(
         return chatRoomDao.insertChatRoom(ChatRoomEntity(0, rid, receiver, ""))
     }
 
-    override fun getFriendById(uid: String): Flow<FriendData> {
-        return friendDao.getFriendByUid(uid).map { it.toFriendData() }.flowOn(Dispatchers.IO)
+    override fun getFriendById(uid: String): Flow<RelatedUserLocalData> {
+        return userDao.getUserInfoByUid(uid).map { it.toRelationLocalData() }.flowOn(Dispatchers.IO)
     }
 
     override suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData {
@@ -380,11 +417,11 @@ class UserRepositoryImpl @Inject constructor(
         return auth.currentUser?.uid
     }
 
-    override fun getChatRoomIdFromRemote(friendData: FriendData): Flow<String?> =
+    override fun getChatRoomIdFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<String?> =
         callbackFlow {
             auth.currentUser?.uid?.let {
                 database.reference.child("userChatRooms").child(it).orderByChild("receiver")
-                    .equalTo(friendData.uid)
+                    .equalTo(relatedUserLocalData.uid)
             }?.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (ds in snapshot.children) {
@@ -404,11 +441,11 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    override fun getChatRoomFromRemote(friendData: FriendData): Flow<ChatRoomData?> =
+    override fun getChatRoomFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<ChatRoomData?> =
         callbackFlow {
             auth.currentUser?.uid?.let {
                 database.reference.child("userChatRooms").child(it).orderByChild("receiver")
-                    .equalTo(friendData.uid)
+                    .equalTo(relatedUserLocalData.uid)
             }?.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (ds in snapshot.children) {
@@ -429,22 +466,22 @@ class UserRepositoryImpl @Inject constructor(
         }
 
     override suspend fun insertChatRoomToLocal(
-        friendData: FriendData,
+        relatedUserLocalData: RelatedUserLocalData,
         chatRoomData: ChatRoomData
     ): Long {
         return chatRoomDao.insertChatRoom(
             ChatRoomEntity(
                 id = 0L,
-                receiver = friendData.uid,
+                receiver = relatedUserLocalData.uid,
                 lastMessage = "",
                 rid = chatRoomData.rid
             )
         )
     }
 
-    override suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithFriend>> {
+    override suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithRelatedUsers>> {
         return withContext(Dispatchers.IO) {
-            val friends = getFriendsForChatRoomList()
+            val relatedUsers = getRelatedUsersForChatRoomList()
             Pager(
                 config = PagingConfig(pageSize = 10, enablePlaceholders = false),
                 pagingSourceFactory = {
@@ -452,21 +489,21 @@ class UserRepositoryImpl @Inject constructor(
                 }
             ).flow.map { value ->
                 value.map { chatRoom ->
-                    ChatRoomDataWithFriend(
+                    ChatRoomDataWithRelatedUsers(
                         chatRoomLocalData = chatRoom.toModel(),
-                        friendData = friends.find { chatRoom.receiver == it.uid }!!
+                        relatedUserLocalData = relatedUsers.find { chatRoom.receiver == it.uid }!!
                     )
                 }
             }
         }
     }
 
-    private fun getFriendsForChatRoomList(): List<FriendData> {
-        return friendDao.getFriends().map { it.toFriendData() }
+    private fun getRelatedUsersForChatRoomList(): List<RelatedUserLocalData> {
+        return userDao.getRelatedUsers().map { it.toRelationLocalData() }
     }
 
-    override fun getFriendListFromLocal(): Flow<List<FriendEntity>> {
-        return friendDao.getFriendsAsFlow().flowOn(Dispatchers.IO)
+    override fun getRelatedUserListFromLocal(): Flow<List<UserEntity>> {
+        return userDao.getAllRelatedUsersAsFlow().flowOn(Dispatchers.IO)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -489,24 +526,24 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override suspend fun updateFriendInfoWithFriendEntity(friendEntity: FriendEntity) {
-        val remoteData = getFriendInfoFromRemote(friendEntity.uid).first()
-        if (remoteData?.toEntity()?.toFriendData() != friendEntity.toFriendData()) {
-            friendDao.updateUser(
-                friendEntity.copy(
-                    name = remoteData!!.name.ifBlank { friendEntity.name },
-                    status = remoteData.status.ifBlank { friendEntity.status },
-                    picture = remoteData.picture.ifBlank { friendEntity.picture }
+    override suspend fun updateRelatedUserInfoWithUserEntity(userEntity: UserEntity) {
+        val remoteData = getUserInfoFromRemote(userEntity.uid).first()
+        if (remoteData != userEntity.toModel()) {
+            userDao.updateUser(
+                userEntity.copy(
+                    name = remoteData!!.name.ifBlank { userEntity.name },
+                    status = remoteData.status.ifBlank { userEntity.status },
+                    picture = remoteData.picture.ifBlank { userEntity.picture }
                 )
             )
         }
     }
 
-    override suspend fun updateFriendInfoByUid(uid: String) {
-        val localEntity = getFriendEntityFromLocalByUid(uid)
-        val remoteData = getFriendInfoFromRemote(uid).first()
-        if (localEntity.toFriendData() != remoteData?.toEntity()?.toFriendData()) {
-            friendDao.updateUser(
+    override suspend fun updateUserInfoByUid(uid: String) {
+        val localEntity = getUserEntityFromLocalByUid(uid)
+        val remoteData = getUserInfoFromRemote(uid).first()
+        if (localEntity.toModel() != remoteData) {
+            userDao.updateUser(
                 localEntity.copy(
                     name = remoteData!!.name.ifBlank { localEntity.name },
                     status = remoteData.status.ifBlank { localEntity.status },
@@ -516,8 +553,8 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun getFriendEntityFromLocalByUid(uid: String): FriendEntity {
-        return friendDao.getFriendByUid(uid).first()
+    private suspend fun getUserEntityFromLocalByUid(uid: String): UserEntity {
+        return userDao.getUserInfoByUid(uid).first()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -543,7 +580,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun resetFriendData() {
-        friendDao.resetFriendDatabase()
+        userDao.resetUserDatabase()
     }
 
     override suspend fun resetChatRoomData() {
@@ -552,5 +589,98 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun setMyUserInformation(userData: UserData) {
         preferenceUtil.setMyData(userData)
+    }
+
+    override suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
+        return try {
+            val relation = UserRelationState.UNKNOWN
+            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
+            if (remoteRequest) {
+                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
+                if (localRequest == ChangeRelationResult.SUCCESS) {
+                    ChangeRelationResult.SUCCESS
+                } else {
+                    ChangeRelationResult.FAILURE
+                }
+            } else {
+                ChangeRelationResult.FAILURE
+            }
+        } catch (e: Exception) {
+            ChangeRelationResult.FAILURE
+        }
+    }
+
+    override suspend fun changeRelationLocal(
+        relatedUserLocalData: RelatedUserLocalData,
+        relation: UserRelationState
+    ): Flow<ChangeRelationResult> =
+        callbackFlow {
+            try {
+                userDao.updateUser(
+                    relatedUserLocalData.toEntity().copy(relation = relation)
+                )
+                trySend(ChangeRelationResult.SUCCESS)
+            } catch (e: Exception) {
+                trySend(ChangeRelationResult.FAILURE)
+            }
+            awaitClose()
+        }
+
+    override suspend fun changeRelationRemote(
+        relatedUserLocalData: RelatedUserLocalData,
+        relation: UserRelationState
+    ): Flow<Boolean> =
+        callbackFlow {
+            auth.currentUser?.uid?.let {
+                database.reference.child("relations").child(it).child(relatedUserLocalData.uid)
+                    .setValue(
+                        relatedUserLocalData.toRemoteData().copy(
+                            userRelation = relation
+                        )
+                    ).addOnSuccessListener {
+                        trySend(true)
+                    }.addOnFailureListener {
+                        trySend(false)
+                    }
+            }
+            awaitClose()
+        }
+
+    override suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
+        return try {
+            val relation = UserRelationState.HIDE
+            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
+            if (remoteRequest) {
+                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
+                if (localRequest == ChangeRelationResult.SUCCESS) {
+                    ChangeRelationResult.SUCCESS
+                } else {
+                    ChangeRelationResult.FAILURE
+                }
+            } else {
+                ChangeRelationResult.FAILURE
+            }
+        } catch (e: Exception) {
+            ChangeRelationResult.FAILURE
+        }
+    }
+
+    override suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
+        return try {
+            val relation = UserRelationState.BLOCKED
+            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
+            if (remoteRequest) {
+                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
+                if (localRequest == ChangeRelationResult.SUCCESS) {
+                    ChangeRelationResult.SUCCESS
+                } else {
+                    ChangeRelationResult.FAILURE
+                }
+            } else {
+                ChangeRelationResult.FAILURE
+            }
+        } catch (e: Exception) {
+            ChangeRelationResult.FAILURE
+        }
     }
 }

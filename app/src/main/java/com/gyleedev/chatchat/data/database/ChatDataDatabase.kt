@@ -4,15 +4,15 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.gyleedev.chatchat.data.database.dao.ChatListWithMessageAndFriendDao
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
-import com.gyleedev.chatchat.data.database.dao.FriendDao
 import com.gyleedev.chatchat.data.database.dao.MessageDao
+import com.gyleedev.chatchat.data.database.dao.UserDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
-import com.gyleedev.chatchat.data.database.entity.FriendEntity
 import com.gyleedev.chatchat.data.database.entity.MessageEntity
+import com.gyleedev.chatchat.data.database.entity.UserEntity
 
 @Database(
     entities = [
-        FriendEntity::class,
+        UserEntity::class,
         ChatRoomEntity::class,
         MessageEntity::class
     ],
@@ -21,7 +21,7 @@ import com.gyleedev.chatchat.data.database.entity.MessageEntity
 )
 
 abstract class ChatDataDatabase : RoomDatabase() {
-    abstract fun friendDao(): FriendDao
+    abstract fun userDao(): UserDao
     abstract fun chatRoomDao(): ChatRoomDao
     abstract fun messageDao(): MessageDao
     abstract fun chatListWithMessageAndFriendDao(): ChatListWithMessageAndFriendDao

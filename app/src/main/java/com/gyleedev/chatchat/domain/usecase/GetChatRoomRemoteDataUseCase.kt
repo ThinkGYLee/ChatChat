@@ -1,7 +1,7 @@
 package com.gyleedev.chatchat.domain.usecase
 
 import com.gyleedev.chatchat.domain.ChatRoomData
-import com.gyleedev.chatchat.domain.FriendData
+import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -11,14 +11,14 @@ class GetChatRoomRemoteDataUseCase @Inject constructor(
     private val createChatRoomsUseCase: CreateChatRoomsUseCase,
     private val retrieveAndInsertChatRoomDataFromRemote: RetrieveAndInsertChatRoomDataFromRemote
 ) {
-    suspend operator fun invoke(friendData: FriendData): ChatRoomData? {
+    suspend operator fun invoke(relatedUserLocalData: RelatedUserLocalData): ChatRoomData? {
         return withContext(Dispatchers.IO) {
             // 존재하나 확인하기
-            val checkRemote = checkChatRoomExistsUseCase(friendData)
+            val checkRemote = checkChatRoomExistsUseCase(relatedUserLocalData)
             if (checkRemote) {
-                retrieveAndInsertChatRoomDataFromRemote(friendData)
+                retrieveAndInsertChatRoomDataFromRemote(relatedUserLocalData)
             } else {
-                createChatRoomsUseCase(friendData)
+                createChatRoomsUseCase(relatedUserLocalData)
             }
         }
     }

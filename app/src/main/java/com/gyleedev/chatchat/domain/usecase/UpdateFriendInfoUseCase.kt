@@ -7,6 +7,6 @@ class UpdateFriendInfoUseCase @Inject constructor(
     private val repository: UserRepository
 ) {
     suspend operator fun invoke(uid: String) {
-        repository.updateFriendInfoByUid(uid)
+        repository.updateUserInfoByUid(uid)
     }
 }

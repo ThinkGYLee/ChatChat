@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -163,7 +164,9 @@ fun ChatChatScreen(
                     modifier = Modifier.fillMaxSize(),
                     onSignInComplete = {
                         navController.navigate(BottomNavItem.CHATLIST.screenRoute) {
-                            popUpTo(BottomNavItem.LOGIN.screenRoute) { inclusive = true }
+                            popUpTo(BottomNavItem.LOGIN.screenRoute) {
+                                inclusive = true
+                            }
                         }
                     }
                 )
@@ -286,10 +289,13 @@ fun BottomNavigation(
                 alwaysShowLabel = false,
                 onClick = {
                     navController.navigate(item.screenRoute) {
-                        navController.graph.startDestinationRoute?.let {
-                            popUpTo(it) { saveState = true }
+                        // 시작 스크린 제외한 모든 스택을 pop 하여 백스택이 많이 쌓이는 것을 방지
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
                         }
+                        // 같은 스크린이 여러번 쌓이는 것을 방지
                         launchSingleTop = true
+                        // 같은 아이템이 선택됐을 때 원래 상태를 복원
                         restoreState = true
                     }
                 },

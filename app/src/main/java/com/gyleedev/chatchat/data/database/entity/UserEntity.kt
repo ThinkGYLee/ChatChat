@@ -5,11 +5,12 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.domain.UserRelationState
 
 @Entity(
-    tableName = "friend"
+    tableName = "user"
 )
-data class FriendEntity(
+data class UserEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Long,
@@ -22,37 +23,53 @@ data class FriendEntity(
     @ColumnInfo(name = "picture")
     val picture: String,
     @ColumnInfo(name = "status")
-    val status: String
+    val status: String,
+    @ColumnInfo(name = "relation")
+    val relation: UserRelationState
 )
 
-fun UserData.toEntity(): FriendEntity {
-    return FriendEntity(
-        id = 0,
+fun RelatedUserLocalData.toEntity(): UserEntity {
+    return UserEntity(
+        id = id,
         name = name,
         email = email,
         uid = uid,
         picture = picture,
-        status = status
+        status = status,
+        relation = userRelation
     )
 }
 
-fun FriendEntity.toFriendData(): RelatedUserLocalData {
+fun UserEntity.toRelationLocalData(): RelatedUserLocalData {
     return RelatedUserLocalData(
         id = id,
         name = name,
         email = email,
         uid = uid,
         picture = picture,
-        status = status
+        status = status,
+        userRelation = relation
     )
 }
 
-fun FriendEntity.toModel(): UserData {
+fun UserEntity.toModel(): UserData {
     return UserData(
         name = name,
         email = email,
         uid = uid,
         picture = picture,
         status = status
+    )
+}
+
+fun UserData.toEntityAsFriend(): UserEntity {
+    return UserEntity(
+        id = 0L,
+        name = name,
+        email = email,
+        uid = uid,
+        picture = picture,
+        status = status,
+        relation = UserRelationState.FRIEND
     )
 }

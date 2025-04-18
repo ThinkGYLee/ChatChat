@@ -1,7 +1,7 @@
 package com.gyleedev.chatchat.domain.usecase
 
 import com.gyleedev.chatchat.domain.ChatRoomLocalDataWrapper
-import com.gyleedev.chatchat.domain.FriendData
+import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -10,10 +10,10 @@ import javax.inject.Inject
 class GetChatRoomDataFromLocalUseCase @Inject constructor(
     private val getChatRoomLocalDataByUidUseCase: GetChatRoomLocalDataByUidUseCase
 ) {
-    suspend operator fun invoke(friendData: FriendData): ChatRoomLocalDataWrapper {
+    suspend operator fun invoke(relatedUserLocalData: RelatedUserLocalData): ChatRoomLocalDataWrapper {
         return withContext(Dispatchers.IO) {
             try {
-                ChatRoomLocalDataWrapper.Success(getChatRoomLocalDataByUidUseCase(friendData.uid))
+                ChatRoomLocalDataWrapper.Success(getChatRoomLocalDataByUidUseCase(relatedUserLocalData.uid))
             } catch (e: Exception) {
                 ChatRoomLocalDataWrapper.Failure
             }

@@ -15,6 +15,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,7 +55,9 @@ fun FriendInfoScreen(
     modifier: Modifier = Modifier,
     viewModel: FriendInfoViewModel = hiltViewModel()
 ) {
-    val friendData by viewModel.friendData.collectAsStateWithLifecycle()
+    val friendData by viewModel.relatedUserLocalData.collectAsStateWithLifecycle()
+
+    var dropdownMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -66,6 +71,22 @@ fun FriendInfoScreen(
                             contentDescription = stringResource(R.string.close_button_description)
                         )
                     }
+                },
+                actions = {
+                    IconButton(onClick = { dropdownMenuExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Outlined.MoreVert,
+                            contentDescription = "more button"
+                        )
+                    }
+
+                    FriendDropDownMenu(
+                        dropdownMenuExpanded = dropdownMenuExpanded,
+                        onDismiss = { dropdownMenuExpanded = false },
+                        blockRequest = {},
+                        deleteRequest = { viewModel.deleteFriend() },
+                        hideRequest = {}
+                    )
                 }
             )
         }
@@ -128,5 +149,49 @@ fun FriendInfoScreen(
             }
             Spacer(modifier = Modifier.height(72.dp))
         }
+    }
+}
+
+@Composable
+fun FriendDropDownMenu(
+    blockRequest: () -> Unit,
+    deleteRequest: () -> Unit,
+    hideRequest: () -> Unit,
+    dropdownMenuExpanded: Boolean,
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit
+) {
+    DropdownMenu(
+        expanded = dropdownMenuExpanded,
+        modifier = modifier,
+        onDismissRequest = onDismiss
+    ) {
+        DropdownMenuItem(
+            text = {
+                Text(stringResource(R.string.friend_block_button_text))
+            },
+            onClick = {
+                blockRequest()
+                onDismiss()
+            }
+        )
+        DropdownMenuItem(
+            text = {
+                Text(stringResource(R.string.friend_delete_button_text))
+            },
+            onClick = {
+                deleteRequest()
+                onDismiss()
+            }
+        )
+        DropdownMenuItem(
+            text = {
+                Text(stringResource(R.string.friend_hide_button_text))
+            },
+            onClick = {
+                hideRequest()
+                onDismiss()
+            }
+        )
     }
 }
