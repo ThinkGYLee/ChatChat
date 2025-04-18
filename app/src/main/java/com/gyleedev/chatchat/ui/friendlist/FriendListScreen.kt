@@ -20,8 +20,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -75,11 +78,6 @@ fun FriendListScreen(
     modifier: Modifier = Modifier,
     viewModel: FriendListViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.fetchState.collect {
-        }
-    }
-
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.fetchMyUserData()
     }
@@ -91,6 +89,13 @@ fun FriendListScreen(
     var dialogRelatedUserLocalData by remember { mutableStateOf<RelatedUserLocalData?>(null) }
     val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
+
+    var dropdownMenuExpanded by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchState.collect {
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.noSuchUserAlert
@@ -111,6 +116,21 @@ fun FriendListScreen(
                             contentDescription = stringResource(R.string.add_friend_button_description)
                         )
                     }
+
+                    IconButton(onClick = { dropdownMenuExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = stringResource(R.string.friend_list_setting_button_description)
+                        )
+                    }
+
+                    FriendManagementDropDownMenu(
+                        dropdownMenuExpanded = dropdownMenuExpanded,
+                        onDismiss = { dropdownMenuExpanded = false },
+                        editRequest = {},
+                        manageFriendRequest = {},
+                        settingRequest = {}
+                    )
                 }
             )
         },
@@ -351,4 +371,48 @@ fun FriendDialog(
         },
         modifier = modifier.wrapContentSize()
     )
+}
+
+@Composable
+fun FriendManagementDropDownMenu(
+    editRequest: () -> Unit,
+    manageFriendRequest: () -> Unit,
+    settingRequest: () -> Unit,
+    dropdownMenuExpanded: Boolean,
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit
+) {
+    DropdownMenu(
+        expanded = dropdownMenuExpanded,
+        modifier = modifier,
+        onDismissRequest = onDismiss
+    ) {
+        DropdownMenuItem(
+            text = {
+                Text(stringResource(R.string.edit_button_text))
+            },
+            onClick = {
+                editRequest()
+                onDismiss()
+            }
+        )
+        DropdownMenuItem(
+            text = {
+                Text(stringResource(R.string.manage_friend_button_text))
+            },
+            onClick = {
+                manageFriendRequest()
+                onDismiss()
+            }
+        )
+        DropdownMenuItem(
+            text = {
+                Text(stringResource(R.string.entire_setting_button_text))
+            },
+            onClick = {
+                settingRequest()
+                onDismiss()
+            }
+        )
+    }
 }
