@@ -28,7 +28,9 @@ class FriendListViewModel @Inject constructor(
     private val getMyRelatedUserListFromRemoteUseCase: GetMyRelatedUserListFromRemoteUseCase,
     private val addMyRelatedUsersUseCase: AddMyRelatedUsersUseCase,
     private val getFriendsCountUseCase: GetFriendsCountUseCase,
-    private val deleteFriendUseCase: DeleteFriendUseCase
+    private val deleteFriendUseCase: DeleteFriendUseCase,
+    private val hideFriendUseCase: DeleteFriendUseCase,
+    private val blockFriendUseCase: DeleteFriendUseCase
 ) : BaseViewModel() {
 
     private val _myUserData = MutableStateFlow<UserData?>(null)
