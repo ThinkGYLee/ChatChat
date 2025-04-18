@@ -174,11 +174,15 @@ fun FriendListScreen(
                         dialogRelatedUserLocalData = null
                         openFriendDialog = false
                     },
-                    blockRequest = {},
+                    blockRequest = {
+                        viewModel.blockFriend(dialogRelatedUserLocalData)
+                    },
                     deleteRequest = {
                         viewModel.deleteFriend(dialogRelatedUserLocalData)
                     },
-                    hideRequest = {}
+                    hideRequest = {
+                        viewModel.hideFriend(dialogRelatedUserLocalData)
+                    }
                 )
             }
         }
