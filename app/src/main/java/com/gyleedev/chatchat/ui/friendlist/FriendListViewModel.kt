@@ -7,11 +7,13 @@ import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.usecase.AddMyRelatedUsersUseCase
+import com.gyleedev.chatchat.domain.usecase.BlockFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.DeleteFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendsCountUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendsUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyRelatedUserListFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyUserDataUseCase
+import com.gyleedev.chatchat.domain.usecase.HideFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,8 +31,8 @@ class FriendListViewModel @Inject constructor(
     private val addMyRelatedUsersUseCase: AddMyRelatedUsersUseCase,
     private val getFriendsCountUseCase: GetFriendsCountUseCase,
     private val deleteFriendUseCase: DeleteFriendUseCase,
-    private val hideFriendUseCase: DeleteFriendUseCase,
-    private val blockFriendUseCase: DeleteFriendUseCase
+    private val hideFriendUseCase: HideFriendUseCase,
+    private val blockFriendUseCase: BlockFriendUseCase
 ) : BaseViewModel() {
 
     private val _myUserData = MutableStateFlow<UserData?>(null)
@@ -78,6 +80,26 @@ class FriendListViewModel @Inject constructor(
         viewModelScope.launch {
             if (relatedUserLocalData != null) {
                 deleteFriendUseCase(relatedUserLocalData)
+            } else {
+                _noSuchUserAlert.emit(Unit)
+            }
+        }
+    }
+
+    fun hideFriend(relatedUserLocalData: RelatedUserLocalData?) {
+        viewModelScope.launch {
+            if (relatedUserLocalData != null) {
+                hideFriendUseCase(relatedUserLocalData)
+            } else {
+                _noSuchUserAlert.emit(Unit)
+            }
+        }
+    }
+
+    fun blockFriend(relatedUserLocalData: RelatedUserLocalData?) {
+        viewModelScope.launch {
+            if (relatedUserLocalData != null) {
+                blockFriendUseCase(relatedUserLocalData)
             } else {
                 _noSuchUserAlert.emit(Unit)
             }
