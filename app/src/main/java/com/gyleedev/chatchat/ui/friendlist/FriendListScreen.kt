@@ -75,6 +75,9 @@ fun FriendListScreen(
     onMyInfoClick: (String) -> Unit,
     onFriendClick: (String) -> Unit,
     onFindUserButtonClick: () -> Unit,
+    onEditFriendClick: () -> Unit,
+    onManageFriendClick: () -> Unit,
+    onSettingClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FriendListViewModel = hiltViewModel()
 ) {
@@ -127,9 +130,9 @@ fun FriendListScreen(
                     FriendManagementDropDownMenu(
                         dropdownMenuExpanded = dropdownMenuExpanded,
                         onDismiss = { dropdownMenuExpanded = false },
-                        editRequest = {},
-                        manageFriendRequest = {},
-                        settingRequest = {}
+                        editRequest = onEditFriendClick,
+                        manageFriendRequest = onManageFriendClick,
+                        settingRequest = onSettingClick
                     )
                 }
             )
