@@ -163,7 +163,8 @@ fun FriendEditScreen(
                             ) {
                                 items[it]?.let { it1 ->
                                     FriendData(
-                                        relatedUserLocalData = it1
+                                        relatedUserLocalData = it1,
+                                        onHideRequest = { viewModel.hideFriend(it1) }
                                     )
                                 }
                             }
@@ -185,7 +186,8 @@ fun FriendEditScreen(
                             ) {
                                 searchItems[it]?.let { it1 ->
                                     FriendData(
-                                        relatedUserLocalData = it1
+                                        relatedUserLocalData = it1,
+                                        onHideRequest = { viewModel.hideFriend(it1) }
                                     )
                                 }
                             }
@@ -264,6 +266,7 @@ fun FriendFilterTextField(
 
 @Composable
 fun FriendData(
+    onHideRequest: () -> Unit,
     relatedUserLocalData: RelatedUserLocalData,
     modifier: Modifier = Modifier
 ) {
@@ -312,8 +315,7 @@ fun FriendData(
 
         TextButton(
             border = BorderStroke(0.5.dp, color = MaterialTheme.colorScheme.onSurface),
-            onClick = {
-            }
+            onClick = onHideRequest
         ) {
             Text("숨김")
         }
@@ -333,7 +335,8 @@ fun FriendDataPreview() {
                 picture = "",
                 uid = "",
                 userRelation = UserRelationState.FRIEND
-            )
+            ),
+            onHideRequest = {}
         )
     }
 }
