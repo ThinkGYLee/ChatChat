@@ -95,20 +95,6 @@ fun FriendEditScreen(
             }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.addProcessComplete.collect {
-            if (it) {
-                onFindComplete()
-            } else {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.add_user_failure_message),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
     Scaffold(modifier = modifier, topBar = {
         TopAppBar(
             title = {
