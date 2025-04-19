@@ -25,7 +25,9 @@ data class UserEntity(
     @ColumnInfo(name = "status")
     val status: String,
     @ColumnInfo(name = "relation")
-    val relation: UserRelationState
+    val relation: UserRelationState,
+    @ColumnInfo(name = "favorite")
+    val favorite: Boolean
 )
 
 fun RelatedUserLocalData.toEntity(): UserEntity {
@@ -36,7 +38,8 @@ fun RelatedUserLocalData.toEntity(): UserEntity {
         uid = uid,
         picture = picture,
         status = status,
-        relation = userRelation
+        relation = userRelation,
+        favorite = favorite
     )
 }
 
@@ -48,7 +51,8 @@ fun UserEntity.toRelationLocalData(): RelatedUserLocalData {
         uid = uid,
         picture = picture,
         status = status,
-        userRelation = relation
+        userRelation = relation,
+        favorite = favorite
     )
 }
 
@@ -70,6 +74,7 @@ fun UserData.toEntityAsFriend(): UserEntity {
         uid = uid,
         picture = picture,
         status = status,
-        relation = UserRelationState.FRIEND
+        relation = UserRelationState.FRIEND,
+        favorite = false
     )
 }
