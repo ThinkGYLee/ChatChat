@@ -3,7 +3,7 @@ package com.gyleedev.chatchat.ui.finduser
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.UserData
-import com.gyleedev.chatchat.domain.usecase.AddFriendUseCase
+import com.gyleedev.chatchat.domain.usecase.AddFriendRequestUseCase
 import com.gyleedev.chatchat.domain.usecase.GetUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FindUserViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
-    private val addFriendUseCase: AddFriendUseCase
+    private val addFriendRequestUseCase: AddFriendRequestUseCase
 ) : BaseViewModel() {
 
     private val _emailQuery = MutableStateFlow("")
@@ -62,7 +62,7 @@ class FindUserViewModel @Inject constructor(
 
     fun addFriend() {
         viewModelScope.launch {
-            val request = userData.value?.let { addFriendUseCase.invoke(it) }
+            val request = userData.value?.let { addFriendRequestUseCase(it) }
             request?.collect { value ->
                 _addProcessComplete.emit(value)
             }
