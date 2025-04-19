@@ -46,6 +46,9 @@ interface UserDao {
     @Query("SELECT * FROM user")
     fun getFriends(): List<UserEntity>
 
+    @Query("SELECT * FROM user WHERE name LIKE :query AND relation = :relation")
+    fun getFriendsWithName(query: String, relation: UserRelationState = UserRelationState.FRIEND): PagingSource<Int, UserEntity>
+
     @Query("SELECT * FROM user")
     fun getRelatedUsers(): List<UserEntity>
 
