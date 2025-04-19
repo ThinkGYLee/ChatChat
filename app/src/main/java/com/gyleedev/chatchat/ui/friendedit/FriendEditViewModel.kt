@@ -34,9 +34,6 @@ class FriendEditViewModel @Inject constructor(
     private val _searchFailure = MutableSharedFlow<Unit>()
     val searchFailure: SharedFlow<Unit> = _searchFailure
 
-    private val _addProcessComplete = MutableSharedFlow<Boolean>()
-    val addProcessComplete: SharedFlow<Boolean> = _addProcessComplete
-
     val items = getFriendsUseCase().cachedIn(viewModelScope)
 
     fun editSearchQuery(query: String) {
