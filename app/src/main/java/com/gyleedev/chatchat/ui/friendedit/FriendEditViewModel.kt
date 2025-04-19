@@ -4,8 +4,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.gyleedev.chatchat.core.BaseViewModel
+import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.usecase.GetFriendsUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendsWithNameUseCase
+import com.gyleedev.chatchat.domain.usecase.HideFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -22,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class FriendEditViewModel @Inject constructor(
     private val getFriendsUseCase: GetFriendsUseCase,
-    private val getFriendsWithNameUseCase: GetFriendsWithNameUseCase
+    private val getFriendsWithNameUseCase: GetFriendsWithNameUseCase,
+    private val hideFriendUseCase: HideFriendUseCase
 ) : BaseViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -50,4 +53,10 @@ class FriendEditViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5_000),
         PagingData.empty()
     )
+
+    fun hideFriend(friend: RelatedUserLocalData) {
+        viewModelScope.launch {
+            hideFriendUseCase(friend)
+        }
+    }
 }
