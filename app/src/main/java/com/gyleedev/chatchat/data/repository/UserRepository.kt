@@ -60,7 +60,7 @@ interface UserRepository {
     suspend fun addFriendToRemote(user: UserData): Flow<Boolean>
     suspend fun getMyRelatedUserListFromRemote(): Flow<List<RelatedUserRemoteData>?>
     suspend fun insertMyRelationsToLocal(list: List<RelatedUserRemoteData>)
-    suspend fun insertFriendToLocal(user: UserData)
+    suspend fun insertFriendToLocal(user: UserData): Flow<Boolean>
     fun getFriends(): Flow<PagingData<RelatedUserLocalData>>
     suspend fun getFriendsCount(): Long
     fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
@@ -114,6 +114,8 @@ interface UserRepository {
 
     suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
     suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
+
+    fun getFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -316,8 +318,14 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertFriendToLocal(user: UserData) {
-        userDao.insertUser(user.toEntityAsFriend())
+    override suspend fun insertFriendToLocal(user: UserData): Flow<Boolean> = callbackFlow {
+        try {
+            userDao.insertUser(user.toEntityAsFriend())
+            trySend(true)
+        } catch (e: Exception) {
+            trySend(false)
+        }
+        awaitClose()
     }
 
     override fun getFriends(): Flow<PagingData<RelatedUserLocalData>> {
@@ -681,6 +689,20 @@ class UserRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             ChangeRelationResult.FAILURE
+        }
+    }
+
+    override fun getFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>> {
+        val searchQuery = "%$query%"
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                userDao.getFriendsWithName(searchQuery)
+            }
+        ).flow.map { value ->
+            value.map { entity ->
+                entity.toRelationLocalData()
+            }
         }
     }
 }
