@@ -36,6 +36,7 @@ import com.gyleedev.chatchat.ui.friendedit.FriendEditScreen
 import com.gyleedev.chatchat.ui.friendinfo.FriendInfoScreen
 import com.gyleedev.chatchat.ui.friendlist.FriendListScreen
 import com.gyleedev.chatchat.ui.friendmanage.FriendManageScreen
+import com.gyleedev.chatchat.ui.hidemanage.HideManageScreen
 import com.gyleedev.chatchat.ui.login.LoginScreen
 import com.gyleedev.chatchat.ui.myinfo.MyInfoScreen
 import com.gyleedev.chatchat.ui.myinfoedit.MyInfoEditScreen
@@ -105,6 +106,16 @@ sealed class BottomNavItem(
     data object FRIENDMANAGE : BottomNavItem(
         Icons.Outlined.ThumbUp,
         com.gyleedev.chatchat.ui.FRIENDMANAGE
+    )
+
+    data object MANAGEHIDE : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        com.gyleedev.chatchat.ui.MANAGEHIDE
+    )
+
+    data object MANAGEBLOCKED : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        com.gyleedev.chatchat.ui.MANAGEBLOCKED
     )
 }
 
@@ -285,7 +296,16 @@ fun ChatChatScreen(
             ) {
                 FriendManageScreen(
                     onBackPressKeyClick = { navController.navigateUp() },
-                    onFindComplete = {}
+                    onBlockedClick = {},
+                    onHideClick = { navController.navigate(BottomNavItem.MANAGEHIDE.screenRoute) }
+                )
+            }
+
+            composable(
+                route = BottomNavItem.MANAGEHIDE.screenRoute
+            ) {
+                HideManageScreen(
+                    onBackPressKeyClick = { navController.navigateUp() }
                 )
             }
         }
