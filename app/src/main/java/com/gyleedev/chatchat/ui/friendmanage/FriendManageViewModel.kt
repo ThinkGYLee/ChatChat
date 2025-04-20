@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.ui.finduser
+package com.gyleedev.chatchat.ui.friendmanage
 
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FindUserViewModel @Inject constructor(
+class FriendManageViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val addFriendRequestUseCase: AddFriendRequestUseCase
 ) : BaseViewModel() {
@@ -62,7 +62,7 @@ class FindUserViewModel @Inject constructor(
 
     fun addFriend() {
         viewModelScope.launch {
-            val request = userData.value?.let { addFriendRequestUseCase(it) }
+            val request = userData.value?.let { addFriendRequestUseCase.invoke(it) }
             request?.collect { value ->
                 _addProcessComplete.emit(value)
             }

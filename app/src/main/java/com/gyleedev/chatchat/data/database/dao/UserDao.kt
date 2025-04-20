@@ -40,11 +40,26 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE relation = :userRelationState")
     fun getFriendsPaging(userRelationState: UserRelationState = UserRelationState.FRIEND): PagingSource<Int, UserEntity>
 
+    @Query("SELECT * FROM user WHERE relation = :userRelationState")
+    fun getHideUsersPaging(userRelationState: UserRelationState = UserRelationState.HIDE): PagingSource<Int, UserEntity>
+
     @Query("SELECT COUNT(*) FROM user WHERE relation = :userRelationState")
     fun getFriendsCount(userRelationState: UserRelationState = UserRelationState.FRIEND): Long
 
     @Query("SELECT * FROM user")
     fun getFriends(): List<UserEntity>
+
+    @Query("SELECT * FROM user WHERE name LIKE :query AND relation = :relation")
+    fun getFriendsWithName(
+        query: String,
+        relation: UserRelationState = UserRelationState.FRIEND
+    ): PagingSource<Int, UserEntity>
+
+    @Query("SELECT * FROM user WHERE name LIKE :query AND relation = :relation")
+    fun getHideFriendsWithName(
+        query: String,
+        relation: UserRelationState = UserRelationState.HIDE
+    ): PagingSource<Int, UserEntity>
 
     @Query("SELECT * FROM user")
     fun getRelatedUsers(): List<UserEntity>

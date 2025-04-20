@@ -11,7 +11,8 @@ data class RelatedUserRemoteData(
     @SerializedName("uid") val uid: String = "",
     @SerializedName("picture") val picture: String = "",
     @SerializedName("status") val status: String = "",
-    @SerializedName("userRelation") val userRelation: UserRelationState = UserRelationState.UNKNOWN
+    @SerializedName("userRelation") val userRelation: UserRelationState = UserRelationState.UNKNOWN,
+    @SerializedName("favorite") val favorite: Boolean = false
 )
 
 fun RelatedUserRemoteData.toRelatedUserLocalData(): RelatedUserLocalData {
@@ -22,6 +23,7 @@ fun RelatedUserRemoteData.toRelatedUserLocalData(): RelatedUserLocalData {
         uid = uid,
         picture = picture,
         status = status,
-        userRelation = userRelation
+        userRelation = userRelation,
+        favorite = favorite
     )
 }

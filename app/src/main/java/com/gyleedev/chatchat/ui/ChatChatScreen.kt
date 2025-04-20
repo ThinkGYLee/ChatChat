@@ -32,8 +32,11 @@ import androidx.navigation.navArgument
 import com.gyleedev.chatchat.ui.chatlist.ChatListScreen
 import com.gyleedev.chatchat.ui.chatroom.ChatRoomScreen
 import com.gyleedev.chatchat.ui.finduser.FindUserScreen
+import com.gyleedev.chatchat.ui.friendedit.FriendEditScreen
 import com.gyleedev.chatchat.ui.friendinfo.FriendInfoScreen
 import com.gyleedev.chatchat.ui.friendlist.FriendListScreen
+import com.gyleedev.chatchat.ui.friendmanage.FriendManageScreen
+import com.gyleedev.chatchat.ui.hidemanage.HideManageScreen
 import com.gyleedev.chatchat.ui.login.LoginScreen
 import com.gyleedev.chatchat.ui.myinfo.MyInfoScreen
 import com.gyleedev.chatchat.ui.myinfoedit.MyInfoEditScreen
@@ -94,6 +97,26 @@ sealed class BottomNavItem(
         Icons.Outlined.ThumbUp,
         com.gyleedev.chatchat.ui.MYINFOEDIT
     )
+
+    data object FRIENDEDIT : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        com.gyleedev.chatchat.ui.FRIENDEDIT
+    )
+
+    data object FRIENDMANAGE : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        com.gyleedev.chatchat.ui.FRIENDMANAGE
+    )
+
+    data object MANAGEHIDE : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        com.gyleedev.chatchat.ui.MANAGEHIDE
+    )
+
+    data object MANAGEBLOCKED : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        com.gyleedev.chatchat.ui.MANAGEBLOCKED
+    )
 }
 
 @Composable
@@ -136,7 +159,9 @@ fun ChatChatScreen(
                     onMyInfoClick = { navController.navigate("${BottomNavItem.MYINFO.screenRoute}/$it") },
                     onFriendClick = { navController.navigate("${BottomNavItem.FRIENDINFO.screenRoute}/$it") },
                     onFindUserButtonClick = { navController.navigate(BottomNavItem.FINDUSER.screenRoute) },
-                    modifier = Modifier.fillMaxSize()
+                    onEditFriendClick = { navController.navigate(BottomNavItem.FRIENDEDIT.screenRoute) },
+                    onManageFriendClick = { navController.navigate(BottomNavItem.FRIENDMANAGE.screenRoute) },
+                    onSettingClick = { navController.navigate(BottomNavItem.SETTING.screenRoute) }
                 )
             }
 
@@ -254,6 +279,33 @@ fun ChatChatScreen(
             ) {
                 MyInfoEditScreen(
                     onBackKeyPressed = { navController.navigateUp() }
+                )
+            }
+
+            composable(
+                route = BottomNavItem.FRIENDEDIT.screenRoute
+            ) {
+                FriendEditScreen(
+                    onBackPressKeyClick = { navController.navigateUp() },
+                    onFindComplete = {}
+                )
+            }
+
+            composable(
+                route = BottomNavItem.FRIENDMANAGE.screenRoute
+            ) {
+                FriendManageScreen(
+                    onBackPressKeyClick = { navController.navigateUp() },
+                    onBlockedClick = {},
+                    onHideClick = { navController.navigate(BottomNavItem.MANAGEHIDE.screenRoute) }
+                )
+            }
+
+            composable(
+                route = BottomNavItem.MANAGEHIDE.screenRoute
+            ) {
+                HideManageScreen(
+                    onBackPressKeyClick = { navController.navigateUp() }
                 )
             }
         }
