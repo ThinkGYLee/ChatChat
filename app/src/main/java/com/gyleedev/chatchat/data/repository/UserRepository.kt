@@ -70,6 +70,8 @@ interface UserRepository {
         chatRoomData: ChatRoomData
     )
 
+    fun getHideFriends(): Flow<PagingData<RelatedUserLocalData>>
+
     suspend fun createFriendUserChatRoom(
         relatedUserLocalData: RelatedUserLocalData,
         chatRoomData: ChatRoomData
@@ -114,8 +116,10 @@ interface UserRepository {
 
     suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
     suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
+    suspend fun userToFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
 
     fun getFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
+    fun getHideFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -692,12 +696,58 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun userToFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
+        return try {
+            val relation = UserRelationState.FRIEND
+            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
+            if (remoteRequest) {
+                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
+                if (localRequest == ChangeRelationResult.SUCCESS) {
+                    ChangeRelationResult.SUCCESS
+                } else {
+                    ChangeRelationResult.FAILURE
+                }
+            } else {
+                ChangeRelationResult.FAILURE
+            }
+        } catch (e: Exception) {
+            ChangeRelationResult.FAILURE
+        }
+    }
+
     override fun getFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>> {
         val searchQuery = "%$query%"
         return Pager(
             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
             pagingSourceFactory = {
                 userDao.getFriendsWithName(searchQuery)
+            }
+        ).flow.map { value ->
+            value.map { entity ->
+                entity.toRelationLocalData()
+            }
+        }
+    }
+
+    override fun getHideFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>> {
+        val searchQuery = "%$query%"
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                userDao.getHideFriendsWithName(searchQuery)
+            }
+        ).flow.map { value ->
+            value.map { entity ->
+                entity.toRelationLocalData()
+            }
+        }
+    }
+
+    override fun getHideFriends(): Flow<PagingData<RelatedUserLocalData>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                userDao.getHideUsersPaging()
             }
         ).flow.map { value ->
             value.map { entity ->
