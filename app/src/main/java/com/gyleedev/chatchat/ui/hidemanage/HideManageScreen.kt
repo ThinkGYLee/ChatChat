@@ -94,28 +94,28 @@ fun HideManageScreen(
             }
     }
 
-    Scaffold(modifier = modifier, topBar = {
-        TopAppBar(
-            title = {
-                Text(
-                    text = "숨김 친구 관리",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            navigationIcon = {
-                IconButton(
-                    onClick = onBackPressKeyClick
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "숨김 친구 관리",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackPressKeyClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                        )
+                    }
                 }
-            }
-        )
-    }) { innerPadding ->
-
+            )
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -123,12 +123,8 @@ fun HideManageScreen(
         ) {
             FriendFilterTextField(
                 searchQuery = searchQuery.value,
-                onReset = {
-                    viewModel.editSearchQuery("")
-                },
-                onValueChange = {
-                    viewModel.editSearchQuery(it)
-                }
+                onReset = { viewModel.editSearchQuery("") },
+                onValueChange = viewModel::editSearchQuery
             )
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -143,7 +139,7 @@ fun HideManageScreen(
                         LazyColumn {
                             items(
                                 items.itemCount,
-                                key = { items[it]!!.email },
+                                key = { requireNotNull(items[it]).email },
                                 contentType = { 0 }
                             ) {
                                 items[it]?.let { it1 ->
@@ -214,7 +210,6 @@ fun FriendFilterTextField(
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                 decorationBox = { innerTextField ->
-
                     Row(
                         modifier = Modifier
                             .padding(vertical = 12.dp),
