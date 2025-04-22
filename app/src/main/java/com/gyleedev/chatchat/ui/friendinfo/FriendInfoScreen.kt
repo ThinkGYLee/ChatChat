@@ -99,18 +99,14 @@ fun FriendInfoScreen(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            var imageUrl by rememberSaveable {
-                mutableStateOf("")
-            }
+            var imageUrl by rememberSaveable { mutableStateOf("") }
             LaunchedEffect(friendData) {
                 if (friendData != null) {
-                    imageUrl = getImageFromFireStore(friendData!!.picture).first()
+                    imageUrl = getImageFromFireStore(requireNotNull(friendData).picture).first()
                 }
             }
             GlideImage(
-                imageModel = {
-                    imageUrl.ifBlank { R.drawable.icons8__ }
-                },
+                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
                 modifier = Modifier
                     .sizeIn(
                         maxWidth = 80.dp,
@@ -134,9 +130,7 @@ fun FriendInfoScreen(
             Spacer(modifier = Modifier.height(60.dp))
             Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 Column(
-                    modifier = Modifier.clickable {
-                        friendData?.let { onChatRoomClick(it.uid) }
-                    },
+                    modifier = Modifier.clickable { friendData?.let { onChatRoomClick(it.uid) } },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
@@ -167,27 +161,21 @@ fun FriendDropDownMenu(
         onDismissRequest = onDismiss
     ) {
         DropdownMenuItem(
-            text = {
-                Text(stringResource(R.string.friend_block_button_text))
-            },
+            text = { Text(stringResource(R.string.friend_block_button_text)) },
             onClick = {
                 blockRequest()
                 onDismiss()
             }
         )
         DropdownMenuItem(
-            text = {
-                Text(stringResource(R.string.friend_delete_button_text))
-            },
+            text = { Text(stringResource(R.string.friend_delete_button_text)) },
             onClick = {
                 deleteRequest()
                 onDismiss()
             }
         )
         DropdownMenuItem(
-            text = {
-                Text(stringResource(R.string.friend_hide_button_text))
-            },
+            text = { Text(stringResource(R.string.friend_hide_button_text)) },
             onClick = {
                 hideRequest()
                 onDismiss()
