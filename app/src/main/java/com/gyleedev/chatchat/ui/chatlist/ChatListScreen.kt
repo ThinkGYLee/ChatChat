@@ -90,7 +90,7 @@ fun ChatListScreen(
             ) {
                 items(
                     chatRoomList.itemCount,
-                    key = { chatRoomList[it]!!.chatRoomLocalData.id },
+                    key = { requireNotNull(chatRoomList[it]).chatRoomLocalData.id },
                     contentType = { 0 }
                 ) { index ->
                     chatRoomList[index]?.let { ChatRoomItem(onClick = onClick, it) }
@@ -134,12 +134,8 @@ fun ChatRoomItem(
     ) {
         Row(Modifier) {
             GlideImage(
-                imageModel = {
-                    imageUrl.ifBlank { R.drawable.icons8__ }
-                },
-                imageOptions = ImageOptions(
-                    contentScale = ContentScale.Crop
-                ),
+                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+                imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
                     .size(60.dp)
                     .clip(RoundedCornerShape(20.dp)),
