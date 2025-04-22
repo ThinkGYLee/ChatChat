@@ -94,18 +94,10 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.logInResult.collect {
             if (it is LogInState.Success) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.log_in_success_message),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, context.getString(R.string.log_in_success_message), Toast.LENGTH_SHORT).show()
                 onLogInComplete()
             } else {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.log_in_failure_message),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, context.getString(R.string.log_in_failure_message), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -113,9 +105,7 @@ fun LoginScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(text = stringResource(R.string.login_screen_top_bar_title))
-                }
+                title = { Text(text = stringResource(R.string.login_screen_top_bar_title)) }
             )
         },
         modifier = modifier
@@ -131,24 +121,16 @@ fun LoginScreen(
                 Text(text = stringResource(R.string.social_login_available_message))
             }
             Spacer(modifier = Modifier.height(32.dp))
-            IdTextField(searchQuery = idQuery, onReset = {
-                idQuery.edit {
-                    delete(
-                        0,
-                        idQuery.text.length
-                    )
-                }
-            })
+            IdTextField(
+                searchQuery = idQuery,
+                onReset = { idQuery.edit { delete(0, idQuery.text.length) } }
+            )
             Text(text = idComment, style = MaterialTheme.typography.labelMedium, color = Color.Red)
             Spacer(modifier = Modifier.height(20.dp))
-            PasswordTextField(searchQuery = passwordQuery, onReset = {
-                passwordQuery.edit {
-                    delete(
-                        0,
-                        passwordQuery.text.length
-                    )
-                }
-            })
+            PasswordTextField(
+                searchQuery = passwordQuery,
+                onReset = { passwordQuery.edit { delete(0, passwordQuery.text.length) } }
+            )
             Text(
                 text = passwordComment,
                 style = MaterialTheme.typography.labelMedium,
@@ -158,9 +140,7 @@ fun LoginScreen(
 
             Button(
                 enabled = signInIsAvailable,
-                onClick = {
-                    viewModel.logInButtonClick()
-                },
+                onClick = viewModel::logInButtonClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(R.string.login_screen_login_button_text))
@@ -179,9 +159,7 @@ fun LoginScreen(
                     text = stringResource(R.string.login_screen_sign_in_text),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable {
-                        onSignInClicked()
-                    }
+                    modifier = Modifier.clickable { onSignInClicked() }
                 )
             }
             Spacer(modifier = Modifier.height(32.dp))
@@ -219,9 +197,7 @@ fun LoginBox(
             .fillMaxWidth()
             .border(0.1.dp, Color.Black)
             .padding(20.dp)
-            .clickable {
-                onClick()
-            },
+            .clickable { onClick() },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -253,17 +229,14 @@ fun IdTextField(
                     color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .onFocusChanged {
-                    alpha = if (it.isFocused) 0.6f else 1f
-                }
+                .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                 .padding(horizontal = 16.dp),
             state = searchQuery,
             lineLimits = TextFieldLineLimits.SingleLine,
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
             decorator = { innerTextField ->
                 Row(
-                    modifier = Modifier
-                        .padding(vertical = 12.dp),
+                    modifier = Modifier.padding(vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(modifier = Modifier.weight(10f)) {
@@ -313,16 +286,13 @@ fun PasswordTextField(
                     color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .onFocusChanged {
-                    alpha = if (it.isFocused) 0.6f else 1f
-                }
+                .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                 .padding(horizontal = 16.dp),
             state = searchQuery,
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
             decorator = { innerTextField ->
                 Row(
-                    modifier = Modifier
-                        .padding(vertical = 12.dp),
+                    modifier = Modifier.padding(vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(modifier = Modifier.weight(10f)) {
