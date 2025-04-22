@@ -196,7 +196,7 @@ fun MyInfoEditScreen(
                 Row {
                     MyEditTextField(
                         myName,
-                        onValueChange = { viewModel.changeNameQuery(it) },
+                        onValueChange = viewModel::changeNameQuery,
                         onReset = { viewModel.changeNameQuery("") }
                     )
                 }
@@ -209,7 +209,7 @@ fun MyInfoEditScreen(
                 Row {
                     MyEditTextField(
                         myStatus,
-                        onValueChange = { viewModel.changeStatusQuery(it) },
+                        onValueChange = viewModel::changeStatusQuery,
                         onReset = { viewModel.changeStatusQuery("") }
                     )
                 }
