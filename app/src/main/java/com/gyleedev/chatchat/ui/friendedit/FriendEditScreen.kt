@@ -124,7 +124,7 @@ fun FriendEditScreen(
             FriendFilterTextField(
                 searchQuery = searchQuery.value,
                 onReset = { viewModel.editSearchQuery("") },
-                onValueChange = { viewModel.editSearchQuery(it) }
+                onValueChange = viewModel::editSearchQuery
             )
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -142,10 +142,10 @@ fun FriendEditScreen(
                                 key = { requireNotNull(items[it]).email },
                                 contentType = { 0 }
                             ) {
-                                items[it]?.let { it1 ->
+                                items[it]?.let { userData ->
                                     FriendData(
-                                        relatedUserLocalData = it1,
-                                        onHideRequest = { viewModel.hideFriend(it1) }
+                                        relatedUserLocalData = userData,
+                                        onHideRequest = { viewModel.hideFriend(userData) }
                                     )
                                 }
                             }
@@ -165,10 +165,10 @@ fun FriendEditScreen(
                                 key = { requireNotNull(searchItems[it]).email },
                                 contentType = { 0 }
                             ) {
-                                searchItems[it]?.let { it1 ->
+                                searchItems[it]?.let { userData ->
                                     FriendData(
-                                        relatedUserLocalData = it1,
-                                        onHideRequest = { viewModel.hideFriend(it1) }
+                                        relatedUserLocalData = userData,
+                                        onHideRequest = { viewModel.hideFriend(userData) }
                                     )
                                 }
                             }
