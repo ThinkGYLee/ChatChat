@@ -37,9 +37,7 @@ fun FriendManageScreen(
             TopAppBar(
                 title = { Text("친구 관리") },
                 navigationIcon = {
-                    IconButton(
-                        onClick = onBackPressKeyClick
-                    ) {
+                    IconButton(onClick = onBackPressKeyClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
