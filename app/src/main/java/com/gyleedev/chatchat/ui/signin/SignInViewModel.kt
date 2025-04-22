@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -83,27 +84,25 @@ class SignInViewModel @Inject constructor(
 
     fun signInRequest() {
         viewModelScope.launch {
-            val process = signInAuthUseCase(
-                id = _idQuery.value,
-                password = _passwordQuery.value,
-                nickname = _nicknameQuery.value
-            )
-            process.collect { value ->
-                if (value != null) {
-                    signInDatabase(value)
-                } else {
-                    _signInProgress.emit(SignInResult.Failure)
-                }
+            val process =
+                signInAuthUseCase(
+                    id = _idQuery.value,
+                    password = _passwordQuery.value,
+                    nickname = _nicknameQuery.value
+                ).first()
+
+            if (process != null) {
+                signInDatabase(process)
+            } else {
+                _signInProgress.emit(SignInResult.Failure)
             }
         }
     }
 
     private fun signInDatabase(userData: UserData) {
         viewModelScope.launch {
-            val process = signInDatabaseUseCase(userData)
-            process.collect { value ->
-                _signInProgress.emit(value)
-            }
+            val process = signInDatabaseUseCase(userData).first()
+            _signInProgress.emit(process)
         }
     }
 }
