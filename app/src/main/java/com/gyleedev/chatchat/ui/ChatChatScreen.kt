@@ -286,8 +286,7 @@ fun ChatChatScreen(
                 route = BottomNavItem.FRIENDEDIT.screenRoute
             ) {
                 FriendEditScreen(
-                    onBackPressKeyClick = { navController.navigateUp() },
-                    onFindComplete = {}
+                    onBackPressKeyClick = { navController.navigateUp() }
                 )
             }
 
