@@ -85,18 +85,14 @@ fun MyInfoScreen(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            var imageUrl by rememberSaveable {
-                mutableStateOf("")
-            }
+            var imageUrl by rememberSaveable { mutableStateOf("") }
             LaunchedEffect(userData) {
                 if (userData != null) {
                     imageUrl = getImageFromFireStore(userData!!.picture).first()
                 }
             }
             GlideImage(
-                imageModel = {
-                    imageUrl.ifBlank { R.drawable.icons8__ }
-                },
+                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
                 modifier = Modifier
                     .sizeIn(
                         maxWidth = 80.dp,
@@ -122,7 +118,9 @@ fun MyInfoScreen(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    IconButton(onClick = { userData?.uid?.let { onChatRoomClick(it) } }) {
+                    IconButton(
+                        onClick = { onChatRoomClick(requireNotNull(userData).uid) }
+                    ) {
                         Icon(
                             imageVector = Icons.Outlined.Email,
                             contentDescription = stringResource(R.string.message_button_description)
@@ -131,10 +129,10 @@ fun MyInfoScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = stringResource(R.string.message_button_message))
                 }
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    IconButton(onClick = { userData?.uid?.let { onProfileEditClick(it) } }) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    IconButton(
+                        onClick = { onProfileEditClick(requireNotNull(userData?.uid)) }
+                    ) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
                             contentDescription = stringResource(R.string.edit_button_description)
