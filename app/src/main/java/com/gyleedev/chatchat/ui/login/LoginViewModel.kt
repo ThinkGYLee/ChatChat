@@ -18,10 +18,8 @@ class LoginViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _idQuery = MutableStateFlow("")
-    private val idQuery: StateFlow<String> = _idQuery
 
     private val _passwordQuery = MutableStateFlow("")
-    private val passwordQuery: StateFlow<String> = _passwordQuery
 
     private val _idIsAvailable = MutableStateFlow(false)
     val idIsAvailable: StateFlow<Boolean> = _idIsAvailable
@@ -38,7 +36,6 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _idQuery.emit(id)
             checkSignInAvailable()
-            //
         }
     }
 

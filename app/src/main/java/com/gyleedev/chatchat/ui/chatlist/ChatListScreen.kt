@@ -90,10 +90,13 @@ fun ChatListScreen(
             ) {
                 items(
                     chatRoomList.itemCount,
-                    key = { chatRoomList[it]!!.chatRoomLocalData.id },
+                    key = { requireNotNull(chatRoomList[it]).chatRoomLocalData.id },
                     contentType = { 0 }
                 ) { index ->
-                    chatRoomList[index]?.let { ChatRoomItem(onClick = onClick, it) }
+                    ChatRoomItem(
+                        onClick = onClick,
+                        requireNotNull(chatRoomList[index])
+                    )
                 }
             }
         }
@@ -120,7 +123,9 @@ fun ChatRoomItem(
 
     LaunchedEffect(chatRoomDataWithAllRelatedUsersAndMessage) {
         imageUrl =
-            getImageFromFireStore(chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.picture).first()
+            getImageFromFireStore(
+                chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.picture
+            ).first()
     }
 
     Row(
@@ -134,12 +139,8 @@ fun ChatRoomItem(
     ) {
         Row(Modifier) {
             GlideImage(
-                imageModel = {
-                    imageUrl.ifBlank { R.drawable.icons8__ }
-                },
-                imageOptions = ImageOptions(
-                    contentScale = ContentScale.Crop
-                ),
+                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+                imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
                     .size(60.dp)
                     .clip(RoundedCornerShape(20.dp)),

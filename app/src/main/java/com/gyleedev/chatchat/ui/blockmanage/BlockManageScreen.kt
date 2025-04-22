@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.ui.hidemanage
+package com.gyleedev.chatchat.ui.blockmanage
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -71,10 +71,10 @@ import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HideManageScreen(
+fun BlockManageScreen(
     onBackPressKeyClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HideManageViewModel = hiltViewModel()
+    viewModel: BlockManageViewModel = hiltViewModel()
 ) {
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -285,7 +285,10 @@ fun FriendData(
         }
 
         TextButton(
-            border = BorderStroke(0.5.dp, color = MaterialTheme.colorScheme.onSurface),
+            border = BorderStroke(
+                0.5.dp,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
             onClick = onHideRequest
         ) {
             Text("헤제")

@@ -98,7 +98,7 @@ fun FindUserScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.addProcessComplete.collect { it ->
+        viewModel.addProcessComplete.collect {
             if (it) {
                 onFindComplete()
             } else {
@@ -146,17 +146,18 @@ fun FindUserScreen(
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
         ) {
-            FindUserTextField(idQuery = emailQuery, onReset = {
-                emailQuery.edit {
-                    delete(
-                        0,
-                        emailQuery.text.length
-                    )
+            FindUserTextField(
+                idQuery = emailQuery,
+                onReset = {
+                    emailQuery.edit { delete(0, emailQuery.text.length) }
                 }
-            })
+            )
 
             if (userData.value != null) {
-                FindUserCard(onFindComplete = viewModel::addFriend, userData = userData.value!!)
+                FindUserCard(
+                    onFindComplete = viewModel::addFriend,
+                    userData = requireNotNull(userData.value)
+                )
             }
         }
     }
@@ -181,9 +182,7 @@ fun FindUserTextField(
                         color = MaterialTheme.colorScheme.surface,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .onFocusChanged {
-                        alpha = if (it.isFocused) 0.6f else 1f
-                    }
+                    .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                     .padding(horizontal = 16.dp),
                 state = idQuery,
                 lineLimits = TextFieldLineLimits.SingleLine,
@@ -191,8 +190,7 @@ fun FindUserTextField(
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                 decorator = { innerTextField ->
                     Row(
-                        modifier = Modifier
-                            .padding(vertical = 12.dp),
+                        modifier = Modifier.padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(modifier = Modifier.weight(10f)) {
@@ -227,7 +225,11 @@ fun FindUserTextField(
 }
 
 @Composable
-fun FindUserCard(onFindComplete: () -> Unit, userData: UserData, modifier: Modifier = Modifier) {
+fun FindUserCard(
+    onFindComplete: () -> Unit,
+    userData: UserData,
+    modifier: Modifier = Modifier
+) {
     Card(
         modifier = modifier
             .padding(20.dp)
@@ -239,16 +241,10 @@ fun FindUserCard(onFindComplete: () -> Unit, userData: UserData, modifier: Modif
                 .padding(vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            var imageUrl by rememberSaveable {
-                mutableStateOf("")
-            }
-            LaunchedEffect(userData) {
-                imageUrl = getImageFromFireStore(userData.picture).first()
-            }
+            var imageUrl by rememberSaveable { mutableStateOf("") }
+            LaunchedEffect(userData) { imageUrl = getImageFromFireStore(userData.picture).first() }
             GlideImage(
-                imageModel = {
-                    imageUrl.ifBlank { R.drawable.icons8__ }
-                },
+                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
                 modifier = Modifier
                     .sizeIn(
                         maxWidth = 80.dp,
@@ -266,7 +262,7 @@ fun FindUserCard(onFindComplete: () -> Unit, userData: UserData, modifier: Modif
                 previewPlaceholder = painterResource(id = R.drawable.icons8__)
             )
             Text(text = userData.name)
-            TextButton(onClick = { onFindComplete() }) {
+            TextButton(onClick = onFindComplete) {
                 Text(text = stringResource(R.string.find_user_screen_add_button_text))
             }
         }

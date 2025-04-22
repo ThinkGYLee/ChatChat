@@ -103,9 +103,7 @@ fun FriendListScreen(
     LaunchedEffect(Unit) {
         viewModel.noSuchUserAlert
             .flowWithLifecycle(lifecycle.lifecycle)
-            .collect {
-                Toast.makeText(context, "no such user", Toast.LENGTH_SHORT).show()
-            }
+            .collect { Toast.makeText(context, "no such user", Toast.LENGTH_SHORT).show() }
     }
 
     Scaffold(
@@ -147,8 +145,16 @@ fun FriendListScreen(
         ) {
             if (myUserData.value != null) {
                 MyUserData(
-                    onClick = { if (myUserData.value != null) onMyInfoClick(myUserData.value!!.uid) },
-                    userData = myUserData.value!!
+                    onClick = {
+                        if (myUserData.value != null) {
+                            onMyInfoClick(
+                                requireNotNull(
+                                    myUserData.value
+                                ).uid
+                            )
+                        }
+                    },
+                    userData = requireNotNull(myUserData.value)
                 )
             }
 
@@ -175,7 +181,7 @@ fun FriendListScreen(
                 ) {
                     items(
                         items.itemCount,
-                        key = { items[it]!!.email },
+                        key = { requireNotNull(items[it]).email },
                         contentType = { 0 }
                     ) { index ->
                         val friend = items[index] as RelatedUserLocalData
@@ -197,15 +203,9 @@ fun FriendListScreen(
                         dialogRelatedUserLocalData = null
                         openFriendDialog = false
                     },
-                    blockRequest = {
-                        viewModel.blockFriend(dialogRelatedUserLocalData)
-                    },
-                    deleteRequest = {
-                        viewModel.deleteFriend(dialogRelatedUserLocalData)
-                    },
-                    hideRequest = {
-                        viewModel.hideFriend(dialogRelatedUserLocalData)
-                    }
+                    blockRequest = { viewModel.blockFriend(dialogRelatedUserLocalData) },
+                    deleteRequest = { viewModel.deleteFriend(dialogRelatedUserLocalData) },
+                    hideRequest = { viewModel.hideFriend(dialogRelatedUserLocalData) }
                 )
             }
         }
@@ -218,12 +218,8 @@ fun MyUserData(
     userData: UserData,
     modifier: Modifier = Modifier
 ) {
-    var imageUrl by rememberSaveable {
-        mutableStateOf("")
-    }
-    LaunchedEffect(userData) {
-        imageUrl = getImageFromFireStore(userData.picture).first()
-    }
+    var imageUrl by rememberSaveable { mutableStateOf("") }
+    LaunchedEffect(userData) { imageUrl = getImageFromFireStore(userData.picture).first() }
 
     Row(
         modifier = modifier
@@ -233,12 +229,8 @@ fun MyUserData(
         verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(
-            imageModel = {
-                imageUrl.ifBlank { R.drawable.icons8__ }
-            },
-            imageOptions = ImageOptions(
-                contentScale = ContentScale.Crop
-            ),
+            imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+            imageOptions = ImageOptions(contentScale = ContentScale.Crop),
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(20.dp)),
@@ -273,9 +265,7 @@ fun FriendData(
     relatedUserLocalData: RelatedUserLocalData,
     modifier: Modifier = Modifier
 ) {
-    var imageUrl by rememberSaveable {
-        mutableStateOf("")
-    }
+    var imageUrl by rememberSaveable { mutableStateOf("") }
     LaunchedEffect(relatedUserLocalData) {
         imageUrl = getImageFromFireStore(relatedUserLocalData.picture).first()
     }
@@ -290,12 +280,8 @@ fun FriendData(
         verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(
-            imageModel = {
-                imageUrl.ifBlank { R.drawable.icons8__ }
-            },
-            imageOptions = ImageOptions(
-                contentScale = ContentScale.Crop
-            ),
+            imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+            imageOptions = ImageOptions(contentScale = ContentScale.Crop),
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(20.dp)),
@@ -391,27 +377,21 @@ fun FriendManagementDropDownMenu(
         onDismissRequest = onDismiss
     ) {
         DropdownMenuItem(
-            text = {
-                Text(stringResource(R.string.edit_button_text))
-            },
+            text = { Text(stringResource(R.string.edit_button_text)) },
             onClick = {
                 editRequest()
                 onDismiss()
             }
         )
         DropdownMenuItem(
-            text = {
-                Text(stringResource(R.string.manage_friend_button_text))
-            },
+            text = { Text(stringResource(R.string.manage_friend_button_text)) },
             onClick = {
                 manageFriendRequest()
                 onDismiss()
             }
         )
         DropdownMenuItem(
-            text = {
-                Text(stringResource(R.string.entire_setting_button_text))
-            },
+            text = { Text(stringResource(R.string.entire_setting_button_text)) },
             onClick = {
                 settingRequest()
                 onDismiss()

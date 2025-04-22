@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.ui.hidemanage
+package com.gyleedev.chatchat.ui.blockmanage
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -22,8 +22,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HideManageViewModel @Inject constructor(
-    getHideFriendsUseCase: GetHideFriendsUseCase,
+class BlockManageViewModel @Inject constructor(
+    private val getHideFriendsUseCase: GetHideFriendsUseCase,
     private val userToFriendUseCase: UserToFriendUseCase,
     private val getHideFriendsWithNameUseCase: GetHideFriendsWithNameUseCase
 ) : BaseViewModel() {

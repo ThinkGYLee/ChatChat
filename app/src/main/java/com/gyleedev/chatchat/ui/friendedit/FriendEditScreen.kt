@@ -73,7 +73,6 @@ import kotlinx.coroutines.flow.first
 @Composable
 fun FriendEditScreen(
     onBackPressKeyClick: () -> Unit,
-    onFindComplete: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FriendEditViewModel = hiltViewModel()
 ) {
@@ -95,27 +94,28 @@ fun FriendEditScreen(
             }
     }
 
-    Scaffold(modifier = modifier, topBar = {
-        TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.friend_edit_title_text),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            navigationIcon = {
-                IconButton(
-                    onClick = onBackPressKeyClick
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.friend_edit_title_text),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackPressKeyClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                        )
+                    }
                 }
-            }
-        )
-    }) { innerPadding ->
+            )
+        }
+    ) { innerPadding ->
 
         Column(
             modifier = Modifier
@@ -124,12 +124,8 @@ fun FriendEditScreen(
         ) {
             FriendFilterTextField(
                 searchQuery = searchQuery.value,
-                onReset = {
-                    viewModel.editSearchQuery("")
-                },
-                onValueChange = {
-                    viewModel.editSearchQuery(it)
-                }
+                onReset = { viewModel.editSearchQuery("") },
+                onValueChange = viewModel::editSearchQuery
             )
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -144,13 +140,13 @@ fun FriendEditScreen(
                         LazyColumn {
                             items(
                                 items.itemCount,
-                                key = { items[it]!!.email },
+                                key = { requireNotNull(items[it]).email },
                                 contentType = { 0 }
                             ) {
-                                items[it]?.let { it1 ->
+                                items[it]?.let { userData ->
                                     FriendData(
-                                        relatedUserLocalData = it1,
-                                        onHideRequest = { viewModel.hideFriend(it1) }
+                                        relatedUserLocalData = userData,
+                                        onHideRequest = { viewModel.hideFriend(userData) }
                                     )
                                 }
                             }
@@ -167,13 +163,13 @@ fun FriendEditScreen(
                         LazyColumn {
                             items(
                                 searchItems.itemCount,
-                                key = { searchItems[it]!!.email },
+                                key = { requireNotNull(searchItems[it]).email },
                                 contentType = { 0 }
                             ) {
-                                searchItems[it]?.let { it1 ->
+                                searchItems[it]?.let { userData ->
                                     FriendData(
-                                        relatedUserLocalData = it1,
-                                        onHideRequest = { viewModel.hideFriend(it1) }
+                                        relatedUserLocalData = userData,
+                                        onHideRequest = { viewModel.hideFriend(userData) }
                                     )
                                 }
                             }
@@ -205,9 +201,7 @@ fun FriendFilterTextField(
                         color = MaterialTheme.colorScheme.surfaceContainer,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .onFocusChanged {
-                        alpha = if (it.isFocused) 0.6f else 1f
-                    }
+                    .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                     .padding(horizontal = 16.dp),
                 value = searchQuery,
                 onValueChange = onValueChange,
@@ -217,8 +211,7 @@ fun FriendFilterTextField(
                 decorationBox = { innerTextField ->
 
                     Row(
-                        modifier = Modifier
-                            .padding(vertical = 12.dp),
+                        modifier = Modifier.padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(modifier = Modifier.weight(10f)) {
@@ -256,9 +249,7 @@ fun FriendData(
     relatedUserLocalData: RelatedUserLocalData,
     modifier: Modifier = Modifier
 ) {
-    var imageUrl by rememberSaveable {
-        mutableStateOf("")
-    }
+    var imageUrl by rememberSaveable { mutableStateOf("") }
     LaunchedEffect(relatedUserLocalData) {
         imageUrl = getImageFromFireStore(relatedUserLocalData.picture).first()
     }
@@ -272,12 +263,8 @@ fun FriendData(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             GlideImage(
-                imageModel = {
-                    imageUrl.ifBlank { R.drawable.icons8__ }
-                },
-                imageOptions = ImageOptions(
-                    contentScale = ContentScale.Crop
-                ),
+                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+                imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
                     .size(60.dp)
                     .clip(RoundedCornerShape(20.dp)),

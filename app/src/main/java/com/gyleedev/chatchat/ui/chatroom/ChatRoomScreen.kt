@@ -103,7 +103,9 @@ fun ChatRoomScreen(
     val photoUri = chatRoomViewModel.photoUri.collectAsStateWithLifecycle()
 
     val lazyListState = remember {
-        mutableStateOf(LazyListState(firstVisibleItemScrollOffset = messages.itemCount))
+        mutableStateOf(
+            LazyListState(firstVisibleItemScrollOffset = messages.itemCount)
+        )
     }
 
     val uiState by chatRoomViewModel.uiState.collectAsStateWithLifecycle()
@@ -120,7 +122,6 @@ fun ChatRoomScreen(
             // photo picker.
             if (uri != null) {
                 chatRoomViewModel.editPhotoUri(uri.toString())
-                Log.d("PhotoPicker", "Selected URI: $uri")
             } else {
                 Log.d("PhotoPicker", "No media selected")
             }
@@ -130,7 +131,7 @@ fun ChatRoomScreen(
         chatRoomViewModel.editMessageQuery(query.text.toString())
     }
 
-    // 보냈을때 내려간다던지로 변경
+    // TODO 보냈을때 내려간다던지로 변경
     LaunchedEffect(messages.itemCount) {
         lazyListState.value.animateScrollToItem(0)
     }
@@ -138,8 +139,7 @@ fun ChatRoomScreen(
     LaunchedEffect(Unit) {
         chatRoomViewModel.networkState.flowWithLifecycle(lifecycle.lifecycle).collectLatest {
             if (!it) {
-                Toast.makeText(context, R.string.network_error_message, Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(context, R.string.network_error_message, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -151,9 +151,7 @@ fun ChatRoomScreen(
                 TopAppBar(
                     title = { Text(text = "${(uiState as ChatRoomUiState.Success).userName} 님과의 대화") },
                     navigationIcon = {
-                        IconButton(
-                            onClick = onBackPressKeyClick
-                        ) {
+                        IconButton(onClick = onBackPressKeyClick) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
@@ -167,27 +165,22 @@ fun ChatRoomScreen(
             if (photoUri.value.isEmpty()) {
                 UniversalBar(
                     onPhotoButtonClick = {
-                        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        pickMedia.launch(
+                            PickVisualMediaRequest(
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
+                        )
                     },
                     query = query,
                     onSendButtonClick = {
                         chatRoomViewModel.sendMessage()
-                        query.edit {
-                            delete(
-                                0,
-                                query.text.length
-                            )
-                        }
+                        query.edit { delete(0, query.text.length) }
                     }
                 )
             } else {
                 PhotoBottomBar(
-                    onCancelButtonClick = {
-                        chatRoomViewModel.editPhotoUri("")
-                    },
-                    onSendButtonClick = {
-                        chatRoomViewModel.sendPhotoMessage()
-                    },
+                    onCancelButtonClick = { chatRoomViewModel.editPhotoUri("") },
+                    onSendButtonClick = chatRoomViewModel::sendPhotoMessage,
                     uri = photoUri.value,
                     screenWidth = screenWidth
                 )
@@ -205,7 +198,7 @@ fun ChatRoomScreen(
             ) {
                 items(
                     count = messages.itemCount,
-                    key = { messages[it]?.time!! },
+                    key = { requireNotNull(messages[it]?.time) },
                     contentType = { messages[it]?.writer }
                 ) {
                     Row {
@@ -353,12 +346,8 @@ fun PhotoBubble(
     messageData: MessageData,
     modifier: Modifier = Modifier
 ) {
-    var imageUrl by rememberSaveable {
-        mutableStateOf("")
-    }
-    LaunchedEffect(messageData) {
-        imageUrl = getImageFromFireStore(messageData.comment).first()
-    }
+    var imageUrl by rememberSaveable { mutableStateOf("") }
+    LaunchedEffect(messageData) { imageUrl = getImageFromFireStore(messageData.comment).first() }
 
     val arrangement: Arrangement.Horizontal = if (messageData.writer == me) {
         Arrangement.End
@@ -470,9 +459,7 @@ fun UniversalBar(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        MediaBar(
-            onPhotoButtonClick = onPhotoButtonClick
-        )
+        MediaBar(onPhotoButtonClick = onPhotoButtonClick)
         CommentBottomBar(
             onClick = onSendButtonClick,
             query = query
@@ -559,10 +546,7 @@ fun ResendButton(
         Surface(
             color = Color.Red,
             shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
-            modifier = Modifier
-                .clickable {
-                    onResendClick()
-                }
+            modifier = Modifier.clickable { onResendClick() }
         ) {
             Icon(
                 imageVector = Icons.Outlined.Refresh,
@@ -573,10 +557,7 @@ fun ResendButton(
         Surface(
             color = Color.Red,
             shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
-            modifier = Modifier
-                .clickable {
-                    onCancelClick()
-                }
+            modifier = Modifier.clickable { onCancelClick() }
         ) {
             Icon(
                 imageVector = Icons.Outlined.Close,

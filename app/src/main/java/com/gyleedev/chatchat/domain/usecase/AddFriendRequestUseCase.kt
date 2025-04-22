@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+// TODO 로직관련은 레포지토리로 유스케이스는 깔끔하게 유지할것
 class AddFriendRequestUseCase @Inject constructor(
     private val addFriendToRemoteUseCase: AddFriendToRemoteUseCase,
     private val addFriendToLocalUseCase: AddFriendToLocalUseCase

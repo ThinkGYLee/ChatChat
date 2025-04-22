@@ -39,19 +39,13 @@ fun SettingScreen(
         modifier = modifier
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            Button(
-                onClick = {
-                    openDialog = true
-                }
-            ) {
+            Button(onClick = { openDialog = true }) {
                 Text("log out")
             }
         }
         if (openDialog) {
             BasicAlertDialog(
-                onDismissRequest = {
-                    openDialog = false
-                },
+                onDismissRequest = { openDialog = false },
                 content = {
                     Surface(
                         modifier = Modifier.wrapContentSize(),
@@ -59,16 +53,17 @@ fun SettingScreen(
                         tonalElevation = AlertDialogDefaults.TonalElevation
                     ) {
                         Column(modifier = Modifier.padding(24.dp)) {
-                            Text(text = "로그아웃 하시겠습니까?", style = MaterialTheme.typography.titleLarge)
+                            Text(
+                                text = "로그아웃 하시겠습니까?",
+                                style = MaterialTheme.typography.titleLarge
+                            )
                             Spacer(Modifier.height(16.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Absolute.Right
                             ) {
                                 TextButton(
-                                    onClick = {
-                                        openDialog = false
-                                    }
+                                    onClick = { openDialog = false }
                                 ) {
                                     Text("Dismiss")
                                 }

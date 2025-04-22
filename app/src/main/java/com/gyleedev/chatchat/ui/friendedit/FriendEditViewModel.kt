@@ -43,13 +43,15 @@ class FriendEditViewModel @Inject constructor(
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val searchItems = searchQuery.debounce(500).flatMapLatest {
-        getFriendsWithNameUseCase(it)
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        PagingData.empty()
-    )
+    val searchItems = searchQuery
+        .debounce(500)
+        .flatMapLatest {
+            getFriendsWithNameUseCase(it)
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            PagingData.empty()
+        )
 
     fun hideFriend(friend: RelatedUserLocalData) {
         viewModelScope.launch {

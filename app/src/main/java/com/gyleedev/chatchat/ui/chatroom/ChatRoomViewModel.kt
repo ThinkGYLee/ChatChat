@@ -26,7 +26,6 @@ import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
 import com.gyleedev.chatchat.util.NetworkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -60,8 +59,7 @@ class ChatRoomViewModel @Inject constructor(
     private val relatedUserLocalData = MutableStateFlow(RelatedUserLocalData())
 
     private var uid: String? = null
-    private val myUid = getMyUidFromLogInDataUseCase()
-        .onEach { uid = it }
+    private val myUid = getMyUidFromLogInDataUseCase().onEach { uid = it }
 
     private val _messageQuery = MutableStateFlow("")
     private val _chatRoomLocalData = MutableStateFlow(ChatRoomLocalData())
@@ -92,8 +90,6 @@ class ChatRoomViewModel @Inject constructor(
         ChatRoomUiState.Loading
     )
 
-    private var job: Job? = null
-
     init {
         val friendUid = savedStateHandle.get<String>("friend")
         if (friendUid == null) {
@@ -107,21 +103,7 @@ class ChatRoomViewModel @Inject constructor(
             getChatRoomFromLocal()
 
             getMessagesFromRemoteUseCase(_chatRoomLocalData.value).collectLatest { }
-            // connectRemote()
         }
-    }
-
-    fun connectRemote() {
-        if (_chatRoomLocalData.value.rid.isEmpty()) {
-            return
-        }
-        job = viewModelScope.launch {
-            getMessagesFromRemoteUseCase(_chatRoomLocalData.value).collectLatest { }
-        }
-    }
-
-    fun disconnectRemote() {
-        job?.cancel()
     }
 
     private suspend fun getChatRoomFromLocal() {
