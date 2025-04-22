@@ -98,7 +98,7 @@ fun FindUserScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.addProcessComplete.collect { it ->
+        viewModel.addProcessComplete.collect {
             if (it) {
                 onFindComplete()
             } else {
@@ -146,14 +146,12 @@ fun FindUserScreen(
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
         ) {
-            FindUserTextField(idQuery = emailQuery, onReset = {
-                emailQuery.edit {
-                    delete(
-                        0,
-                        emailQuery.text.length
-                    )
+            FindUserTextField(
+                idQuery = emailQuery,
+                onReset = {
+                    emailQuery.edit { delete(0, emailQuery.text.length) }
                 }
-            })
+            )
 
             if (userData.value != null) {
                 FindUserCard(
@@ -264,7 +262,7 @@ fun FindUserCard(
                 previewPlaceholder = painterResource(id = R.drawable.icons8__)
             )
             Text(text = userData.name)
-            TextButton(onClick = onFindComplete ) {
+            TextButton(onClick = onFindComplete) {
                 Text(text = stringResource(R.string.find_user_screen_add_button_text))
             }
         }
