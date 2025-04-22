@@ -92,18 +92,10 @@ fun SignInScreen(
     LaunchedEffect(Unit) {
         viewModel.signInProgress.collect {
             if (it == SignInResult.Success) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.sign_in_success_message),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, context.getString(R.string.sign_in_success_message), Toast.LENGTH_SHORT).show()
                 onSignInComplete()
             } else {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.sign_in_failure_message),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, context.getString(R.string.sign_in_failure_message), Toast.LENGTH_SHORT).show()
             }
         }
     }
