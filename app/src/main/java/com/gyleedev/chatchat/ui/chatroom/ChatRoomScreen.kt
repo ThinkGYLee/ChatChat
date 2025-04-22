@@ -103,7 +103,9 @@ fun ChatRoomScreen(
     val photoUri = chatRoomViewModel.photoUri.collectAsStateWithLifecycle()
 
     val lazyListState = remember {
-        mutableStateOf(LazyListState(firstVisibleItemScrollOffset = messages.itemCount))
+        mutableStateOf(
+            LazyListState(firstVisibleItemScrollOffset = messages.itemCount)
+        )
     }
 
     val uiState by chatRoomViewModel.uiState.collectAsStateWithLifecycle()
@@ -172,18 +174,13 @@ fun ChatRoomScreen(
                     query = query,
                     onSendButtonClick = {
                         chatRoomViewModel.sendMessage()
-                        query.edit {
-                            delete(
-                                0,
-                                query.text.length
-                            )
-                        }
+                        query.edit { delete(0, query.text.length) }
                     }
                 )
             } else {
                 PhotoBottomBar(
                     onCancelButtonClick = { chatRoomViewModel.editPhotoUri("") },
-                    onSendButtonClick = { chatRoomViewModel.sendPhotoMessage() },
+                    onSendButtonClick =  chatRoomViewModel::sendPhotoMessage,
                     uri = photoUri.value,
                     screenWidth = screenWidth
                 )
