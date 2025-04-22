@@ -146,11 +146,13 @@ fun FriendListScreen(
             if (myUserData.value != null) {
                 MyUserData(
                     onClick = {
-                        if (myUserData.value != null) onMyInfoClick(
-                            requireNotNull(
-                                myUserData.value
-                            ).uid
-                        )
+                        if (myUserData.value != null) {
+                            onMyInfoClick(
+                                requireNotNull(
+                                    myUserData.value
+                                ).uid
+                            )
+                        }
                     },
                     userData = requireNotNull(myUserData.value)
                 )

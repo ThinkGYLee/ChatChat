@@ -106,7 +106,6 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
-
     private suspend fun getChatRoomFromLocal() {
         val data = getChatRoomLocalDataByUidUseCase(relatedUserLocalData.value.uid)
         _chatRoomLocalData.emit(data)

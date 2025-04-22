@@ -131,7 +131,7 @@ fun ChatRoomScreen(
         chatRoomViewModel.editMessageQuery(query.text.toString())
     }
 
-    //TODO 보냈을때 내려간다던지로 변경
+    // TODO 보냈을때 내려간다던지로 변경
     LaunchedEffect(messages.itemCount) {
         lazyListState.value.animateScrollToItem(0)
     }
@@ -180,7 +180,7 @@ fun ChatRoomScreen(
             } else {
                 PhotoBottomBar(
                     onCancelButtonClick = { chatRoomViewModel.editPhotoUri("") },
-                    onSendButtonClick =  chatRoomViewModel::sendPhotoMessage,
+                    onSendButtonClick = chatRoomViewModel::sendPhotoMessage,
                     uri = photoUri.value,
                     screenWidth = screenWidth
                 )

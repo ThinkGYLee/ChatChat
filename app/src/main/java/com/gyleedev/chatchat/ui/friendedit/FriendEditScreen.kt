@@ -114,7 +114,8 @@ fun FriendEditScreen(
                     }
                 }
             )
-        }) { innerPadding ->
+        }
+    ) { innerPadding ->
 
         Column(
             modifier = Modifier
