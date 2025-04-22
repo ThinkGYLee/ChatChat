@@ -83,7 +83,6 @@ fun MyInfoEditScreen(
             // photo picker.
             if (uri != null) {
                 viewModel.changePictureUri(uri)
-                Log.d("PhotoPicker", "Selected URI: $uri")
             } else {
                 Log.d("PhotoPicker", "No media selected")
             }
@@ -120,7 +119,7 @@ fun MyInfoEditScreen(
                 },
                 actions = {
                     TextButton(
-                        onClick = { viewModel.updateMyInfo() },
+                        onClick = viewModel::updateMyInfo,
                         enabled = myName.isNotEmpty()
                     ) {
                         Text(stringResource(R.string.action_button_complete_message))
@@ -138,11 +137,9 @@ fun MyInfoEditScreen(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            var imageUrl by rememberSaveable {
-                mutableStateOf("")
-            }
+            var imageUrl by rememberSaveable { mutableStateOf("") }
             LaunchedEffect(myData) {
-                if (myData?.picture?.isNotEmpty() == true) {
+                if (requireNotNull(myData?.picture).isNotEmpty()) {
                     imageUrl = getImageFromFireStore(myPicture).first()
                     viewModel.changePictureUri(imageUrl.toUri())
                 }
@@ -150,9 +147,7 @@ fun MyInfoEditScreen(
 
             Box {
                 GlideImage(
-                    imageModel = {
-                        myPicture.ifBlank { R.drawable.icons8__ }
-                    },
+                    imageModel = { myPicture.ifBlank { R.drawable.icons8__ } },
                     modifier = Modifier
                         .sizeIn(
                             maxWidth = 80.dp,
@@ -177,7 +172,11 @@ fun MyInfoEditScreen(
                         )
                         .align(Alignment.BottomEnd)
                         .clickable {
-                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            pickMedia.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
                         }
                 ) {
                     Icon(
@@ -240,9 +239,7 @@ fun MyEditTextField(
                         color = MaterialTheme.colorScheme.surface,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .onFocusChanged {
-                        alpha = if (it.isFocused) 0.6f else 1f
-                    }
+                    .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                     .padding(horizontal = 16.dp),
                 value = query,
                 onValueChange = onValueChange,
@@ -250,8 +247,7 @@ fun MyEditTextField(
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                 decorationBox = { innerTextField ->
                     Row(
-                        modifier = Modifier
-                            .padding(vertical = 12.dp),
+                        modifier = Modifier.padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(modifier = Modifier.weight(10f)) {
