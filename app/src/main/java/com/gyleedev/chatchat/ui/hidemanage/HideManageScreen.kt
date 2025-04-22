@@ -162,7 +162,7 @@ fun HideManageScreen(
                         LazyColumn {
                             items(
                                 searchItems.itemCount,
-                                key = { searchItems[it]!!.email },
+                                key = { requireNotNull(searchItems[it]).email },
                                 contentType = { 0 }
                             ) {
                                 searchItems[it]?.let { it1 ->
@@ -200,9 +200,7 @@ fun FriendFilterTextField(
                         color = MaterialTheme.colorScheme.surfaceContainer,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .onFocusChanged {
-                        alpha = if (it.isFocused) 0.6f else 1f
-                    }
+                    .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                     .padding(horizontal = 16.dp),
                 value = searchQuery,
                 onValueChange = onValueChange,
@@ -211,8 +209,7 @@ fun FriendFilterTextField(
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                 decorationBox = { innerTextField ->
                     Row(
-                        modifier = Modifier
-                            .padding(vertical = 12.dp),
+                        modifier = Modifier.padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(modifier = Modifier.weight(10f)) {
@@ -250,9 +247,7 @@ fun FriendData(
     relatedUserLocalData: RelatedUserLocalData,
     modifier: Modifier = Modifier
 ) {
-    var imageUrl by rememberSaveable {
-        mutableStateOf("")
-    }
+    var imageUrl by rememberSaveable { mutableStateOf("") }
     LaunchedEffect(relatedUserLocalData) {
         imageUrl = getImageFromFireStore(relatedUserLocalData.picture).first()
     }
@@ -266,12 +261,8 @@ fun FriendData(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             GlideImage(
-                imageModel = {
-                    imageUrl.ifBlank { R.drawable.icons8__ }
-                },
-                imageOptions = ImageOptions(
-                    contentScale = ContentScale.Crop
-                ),
+                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+                imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
                     .size(60.dp)
                     .clip(RoundedCornerShape(20.dp)),
