@@ -109,13 +109,7 @@ fun SignInScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "회원 가입")
-                }
-            )
-        },
+        topBar = { TopAppBar(title = { Text(text = "회원 가입") }) },
         modifier = modifier
     ) { innerPadding ->
         Column(
@@ -125,26 +119,20 @@ fun SignInScreen(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            IdScreen(idQuery = idQuery, idIsAvailable = idIsAvailable.value, onReset = {
-                idQuery.edit {
-                    delete(
-                        0,
-                        idQuery.text.length
-                    )
+            IdScreen(
+                idQuery = idQuery,
+                idIsAvailable = idIsAvailable.value,
+                onReset = {
+                    idQuery.edit { delete(0, idQuery.text.length) }
                 }
-            })
+            )
             Spacer(modifier = Modifier.height(20.dp))
 
             NicknameScreen(
                 nicknameQuery = nicknameQuery,
                 nickNameIsAvailable = nicknameIsAvailable.value,
                 onReset = {
-                    nicknameQuery.edit {
-                        delete(
-                            0,
-                            nicknameQuery.text.length
-                        )
-                    }
+                    nicknameQuery.edit { delete(0, nicknameQuery.text.length) }
                 }
             )
 
@@ -156,28 +144,16 @@ fun SignInScreen(
                 passwordIsAvailable = passwordIsAvailable.value,
                 passwordIsSame = passwordIsSame.value,
                 onPasswordReset = {
-                    passwordQuery.edit {
-                        delete(
-                            0,
-                            passwordQuery.text.length
-                        )
-                    }
+                    passwordQuery.edit { delete(0, passwordQuery.text.length) }
                 },
                 onPasswordCheckReset = {
-                    passwordCheckQuery.edit {
-                        delete(
-                            0,
-                            passwordCheckQuery.text.length
-                        )
-                    }
+                    passwordCheckQuery.edit { delete(0, passwordCheckQuery.text.length) }
                 }
             )
 
             Button(
                 enabled = signInIsAvailable.value,
-                onClick = {
-                    viewModel.signInRequest()
-                },
+                onClick = viewModel::signInRequest,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
@@ -213,17 +189,14 @@ fun IdTextField(
                     color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .onFocusChanged {
-                    alpha = if (it.isFocused) 0.6f else 1f
-                }
+                .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                 .padding(horizontal = 16.dp),
             state = idQuery,
             lineLimits = TextFieldLineLimits.SingleLine,
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
             decorator = { innerTextField ->
                 Row(
-                    modifier = Modifier
-                        .padding(vertical = 12.dp),
+                    modifier = Modifier.padding(vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(modifier = Modifier.weight(10f)) {
@@ -273,17 +246,14 @@ fun NicknameTextField(
                     color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .onFocusChanged {
-                    alpha = if (it.isFocused) 0.6f else 1f
-                }
+                .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                 .padding(horizontal = 16.dp),
             state = nicknameQuery,
             lineLimits = TextFieldLineLimits.SingleLine,
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
             decorator = { innerTextField ->
                 Row(
-                    modifier = Modifier
-                        .padding(vertical = 12.dp),
+                    modifier = Modifier.padding(vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(modifier = Modifier.weight(10f)) {
@@ -334,16 +304,13 @@ fun PasswordTextField(
                     color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .onFocusChanged {
-                    alpha = if (it.isFocused) 0.6f else 1f
-                }
+                .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                 .padding(horizontal = 16.dp),
             state = passwordQuery,
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
             decorator = { innerTextField ->
                 Row(
-                    modifier = Modifier
-                        .padding(vertical = 12.dp),
+                    modifier = Modifier.padding(vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(modifier = Modifier.weight(10f)) {
@@ -386,9 +353,10 @@ fun IdScreen(
     Column(modifier = modifier) {
         Text(text = "이메일을 입력해주세요")
         Spacer(modifier = Modifier.height(16.dp))
-        IdTextField(idQuery = idQuery, onReset = {
-            onReset()
-        })
+        IdTextField(
+            idQuery = idQuery,
+            onReset = onReset
+        )
         Text(text = idComment, style = MaterialTheme.typography.labelMedium, color = Color.Red)
     }
 }
@@ -405,9 +373,10 @@ fun NicknameScreen(
     Column(modifier = modifier) {
         Text(text = "닉네임을 입력해 주세요")
         Spacer(modifier = Modifier.height(16.dp))
-        NicknameTextField(nicknameQuery = nicknameQuery, onReset = {
-            onReset()
-        })
+        NicknameTextField(
+            nicknameQuery = nicknameQuery,
+            onReset = onReset
+        )
         Text(
             text = nicknameComment,
             style = MaterialTheme.typography.labelMedium,
@@ -433,9 +402,11 @@ fun PasswordScreen(
     Column(modifier = modifier) {
         Text(text = "비밀번호를 입력해 주세요")
         Spacer(modifier = Modifier.height(16.dp))
-        PasswordTextField(hint = "비밀번호", passwordQuery = passwordQuery, onReset = {
-            onPasswordReset()
-        })
+        PasswordTextField(
+            hint = "비밀번호",
+            passwordQuery = passwordQuery,
+            onReset = onPasswordReset
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = passwordComment,
@@ -443,9 +414,11 @@ fun PasswordScreen(
             color = Color.Red
         )
         Spacer(modifier = Modifier.height(16.dp))
-        PasswordTextField(hint = "다시 한번 입력하세요", passwordQuery = passwordCheckQuery, onReset = {
-            onPasswordCheckReset()
-        })
+        PasswordTextField(
+            hint = "다시 한번 입력하세요",
+            passwordQuery = passwordCheckQuery,
+            onReset = onPasswordCheckReset
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = passwordCheckComment,
