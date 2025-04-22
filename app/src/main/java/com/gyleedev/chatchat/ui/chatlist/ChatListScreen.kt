@@ -93,7 +93,10 @@ fun ChatListScreen(
                     key = { requireNotNull(chatRoomList[it]).chatRoomLocalData.id },
                     contentType = { 0 }
                 ) { index ->
-                    chatRoomList[index]?.let { ChatRoomItem(onClick = onClick, it) }
+                    ChatRoomItem(
+                        onClick = onClick,
+                        requireNotNull(chatRoomList[index])
+                    )
                 }
             }
         }
@@ -120,7 +123,9 @@ fun ChatRoomItem(
 
     LaunchedEffect(chatRoomDataWithAllRelatedUsersAndMessage) {
         imageUrl =
-            getImageFromFireStore(chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.picture).first()
+            getImageFromFireStore(
+                chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.picture
+            ).first()
     }
 
     Row(
