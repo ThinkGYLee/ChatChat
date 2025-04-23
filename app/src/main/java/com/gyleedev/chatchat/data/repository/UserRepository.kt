@@ -120,6 +120,8 @@ interface UserRepository {
 
     fun getFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
     fun getHideFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
+
+    fun getHideFriendsWithFullTextName(query: String): Flow<PagingData<RelatedUserLocalData>>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -171,10 +173,6 @@ class UserRepositoryImpl @Inject constructor(
                 }
             awaitClose()
         }
-
-    private fun writeUserToLocal(user: UserData) {
-        userDao.insertUser(user.toEntityAsFriend())
-    }
 
     override suspend fun loginRequest(id: String, password: String): Flow<LogInResult> =
         callbackFlow {
@@ -418,7 +416,8 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun getFriendById(uid: String): Flow<RelatedUserLocalData> {
-        return userDao.getUserInfoByUid(uid).map { it.toRelationLocalData() }.flowOn(Dispatchers.IO)
+        return userDao.getUserInfoByUid(uid).map { requireNotNull(it).toRelationLocalData() }
+            .flowOn(Dispatchers.IO)
     }
 
     override suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData {
@@ -554,7 +553,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun updateUserInfoByUid(uid: String) {
         val localEntity = getUserEntityFromLocalByUid(uid)
         val remoteData = getUserInfoFromRemote(uid).first()
-        if (localEntity.toModel() != remoteData) {
+        if (requireNotNull(localEntity).toModel() != remoteData) {
             userDao.updateUser(
                 localEntity.copy(
                     name = remoteData!!.name.ifBlank { localEntity.name },
@@ -565,7 +564,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun getUserEntityFromLocalByUid(uid: String): UserEntity {
+    private suspend fun getUserEntityFromLocalByUid(uid: String): UserEntity? {
         return userDao.getUserInfoByUid(uid).first()
     }
 
@@ -735,6 +734,21 @@ class UserRepositoryImpl @Inject constructor(
             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
             pagingSourceFactory = {
                 userDao.getHideFriendsWithName(searchQuery)
+            }
+        ).flow.map { value ->
+            value.map { entity ->
+                entity.toRelationLocalData()
+            }
+        }
+    }
+
+    //TODO fts4 관련 쿼리문 수정할것
+    override fun getHideFriendsWithFullTextName(query: String): Flow<PagingData<RelatedUserLocalData>> {
+        val searchQuery = "*$query*"
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                userDao.getHideFriendsWithNameFullText(searchQuery)
             }
         ).flow.map { value ->
             value.map { entity ->
