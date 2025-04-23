@@ -5,7 +5,7 @@ import androidx.room.Fts4
 
 @Fts4(contentEntity = UserEntity::class)
 @Entity(tableName = "user_fts")
-class UserFts (
+class UserFts(
     val id: Long,
     val name: String
 )

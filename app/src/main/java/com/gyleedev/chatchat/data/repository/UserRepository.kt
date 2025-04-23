@@ -742,7 +742,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    //TODO fts4 관련 쿼리문 수정할것
+    // TODO fts4 관련 쿼리문 수정할것
     override fun getHideFriendsWithFullTextName(query: String): Flow<PagingData<RelatedUserLocalData>> {
         val searchQuery = "*$query*"
         return Pager(
