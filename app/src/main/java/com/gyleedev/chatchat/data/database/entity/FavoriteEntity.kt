@@ -27,5 +27,5 @@ data class FavoriteEntity(
     @ColumnInfo(name = "favorite_state")
     val favoriteState: Boolean,
     @ColumnInfo(name = "favorite_number")
-    val favoriteNumber: Long? = null,
+    val favoriteNumber: Long? = null
 )

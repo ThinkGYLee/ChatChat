@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserRelationState
 
-//Relations 정보
+// Relations 정보
 // 기본값 설정 안해주면 crash남
 data class RelatedUserRemoteData(
     @SerializedName("email") val email: String = "",
