@@ -9,10 +9,12 @@ import com.gyleedev.chatchat.data.database.dao.UserDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
 import com.gyleedev.chatchat.data.database.entity.MessageEntity
 import com.gyleedev.chatchat.data.database.entity.UserEntity
+import com.gyleedev.chatchat.data.database.entity.UserFts
 
 @Database(
     entities = [
         UserEntity::class,
+        UserFts::class,
         ChatRoomEntity::class,
         MessageEntity::class
     ],
