@@ -29,7 +29,7 @@ interface UserDao {
     fun getLastUser(): UserEntity
 
     @Query("SELECT * FROM user WHERE uid = :uid")
-    fun getUserInfoByUid(uid: String): Flow<UserEntity>
+    fun getUserInfoByUid(uid: String): Flow<UserEntity?>
 
     @Update
     suspend fun updateUser(user: UserEntity)
@@ -57,6 +57,13 @@ interface UserDao {
 
     @Query("SELECT * FROM user WHERE name LIKE :query AND relation = :relation")
     fun getHideFriendsWithName(
+        query: String,
+        relation: UserRelationState = UserRelationState.HIDE
+    ): PagingSource<Int, UserEntity>
+
+    // TODO fts4 관련 쿼리문 수정할것
+    @Query("SELECT * FROM user JOIN user_fts ON (user.id = user_fts.id) WHERE user_fts.name MATCH :query AND relation = :relation")
+    fun getHideFriendsWithNameFullText(
         query: String,
         relation: UserRelationState = UserRelationState.HIDE
     ): PagingSource<Int, UserEntity>
