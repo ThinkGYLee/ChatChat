@@ -16,8 +16,11 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
+import com.gyleedev.chatchat.data.database.dao.FavoriteDao
+import com.gyleedev.chatchat.data.database.dao.UserAndFavoriteDao
 import com.gyleedev.chatchat.data.database.dao.UserDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
+import com.gyleedev.chatchat.data.database.entity.FavoriteEntity
 import com.gyleedev.chatchat.data.database.entity.UserEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toEntityAsFriend
@@ -129,6 +132,8 @@ class UserRepositoryImpl @Inject constructor(
     firebase: Firebase,
     private val auth: FirebaseAuth,
     private val chatRoomDao: ChatRoomDao,
+    private val favoriteDao: FavoriteDao,
+    private val userAndFavoriteDao: UserAndFavoriteDao,
     private val preferenceUtil: PreferenceUtil
 ) : UserRepository {
     val database =
@@ -250,7 +255,8 @@ class UserRepositoryImpl @Inject constructor(
             name = user.name,
             picture = user.picture,
             status = user.status,
-            userRelation = UserRelationState.FRIEND
+            userRelation = UserRelationState.FRIEND,
+            favoriteState = false
         )
         auth.currentUser?.let {
             database.reference.child("relations").child(it.uid).child(user.uid).setValue(relation)
@@ -314,24 +320,53 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
+    // 리모트에서 가져온 관게 리스트를 로컬에 인서트 할 때 사용
+    // list의 아이템별로 로컬에 존재하는 user인지 확인 후에 인서트
+    // 존재하지 않는 유저만 인서트 하기 때문에 favorite 도 함께 생성해서 인서트
+    // Favorite 개수는 count로 먼저 가져와서 user의 favorite state가 true 일때만 숫자++
     override suspend fun insertMyRelationsToLocal(list: List<RelatedUserRemoteData>) {
         withContext(Dispatchers.IO) {
+            var count = getFavoriteCount()
             list.forEach {
                 val localUser = getUserEntityFromLocalByUid(it.uid)
                 if (localUser == null) {
-                    insertUserToLocal(it)
+                    val id = insertUserToLocal(it)
+                    insertFavoriteToLocal(it, id, count.toLong())
+                    if (it.favoriteState) count++
                 }
             }
         }
     }
 
-    private fun insertUserToLocal(user: RelatedUserRemoteData) {
-        userDao.insertUser(user.toRelatedUserLocalData().toEntity())
+    private fun insertUserToLocal(user: RelatedUserRemoteData): Long {
+        return userDao.insertUser(user.toRelatedUserLocalData().toEntity())
     }
 
+    private fun getFavoriteCount(): Int {
+        return favoriteDao.getFavoriteCount()
+    }
+
+    private fun insertFavoriteToLocal(user: RelatedUserRemoteData, id: Long, count: Long) {
+        val favorite = FavoriteEntity(
+            userEntityId = id,
+            favoriteState = user.favoriteState,
+            favoriteNumber = if (user.favoriteState) count + 1L else null
+        )
+        favoriteDao.insertFavorite(favorite)
+    }
+
+    // 검색한 사람을 친구 추가해서 리모트에 올리고 인서트할 때 사용
+    // 내 로컬에 없는 사람을 인서트 하기 때문에 favorite도 함께 인서트한다
+    // 새로 인서트하기 때문에 favorite 관련 항목은 모두 false와 null로
     override suspend fun insertFriendToLocal(user: UserData): Flow<Boolean> = callbackFlow {
         try {
-            userDao.insertUser(user.toEntityAsFriend())
+            val id = userDao.insertUser(user.toEntityAsFriend())
+            val favorite = FavoriteEntity(
+                favoriteState = false,
+                favoriteNumber = null,
+                userEntityId = id
+            )
+            favoriteDao.insertFavorite(favorite)
             trySend(true)
         } catch (e: Exception) {
             trySend(false)

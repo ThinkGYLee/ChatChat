@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.gyleedev.chatchat.data.database.dao.ChatListWithMessageAndFriendDao
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
+import com.gyleedev.chatchat.data.database.dao.FavoriteDao
 import com.gyleedev.chatchat.data.database.dao.MessageDao
+import com.gyleedev.chatchat.data.database.dao.UserAndFavoriteDao
 import com.gyleedev.chatchat.data.database.dao.UserDao
 import dagger.Module
 import dagger.Provides
@@ -46,4 +48,14 @@ object DatabaseModule {
     @Provides
     fun providesChatListWithMessageAndFriendDao(chatDataDatabase: ChatDataDatabase): ChatListWithMessageAndFriendDao =
         chatDataDatabase.chatListWithMessageAndFriendDao()
+
+    @Singleton
+    @Provides
+    fun providesFavoriteDao(chatDataDatabase: ChatDataDatabase): FavoriteDao =
+        chatDataDatabase.favoriteDao()
+
+    @Singleton
+    @Provides
+    fun providesUserAndFavoriteDao(chatDataDatabase: ChatDataDatabase): UserAndFavoriteDao =
+        chatDataDatabase.userAndFavoriteDao()
 }

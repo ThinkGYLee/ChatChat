@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.domain
 
 import com.google.gson.annotations.SerializedName
 
+// User정보
 // 기본값 설정 안해주면 crash남
 data class UserData(
     @SerializedName("email") val email: String = "",

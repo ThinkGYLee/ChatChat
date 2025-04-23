@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserRelationState
 
+// Relations 정보
 // 기본값 설정 안해주면 crash남
 data class RelatedUserRemoteData(
     @SerializedName("email") val email: String = "",
@@ -12,7 +13,7 @@ data class RelatedUserRemoteData(
     @SerializedName("picture") val picture: String = "",
     @SerializedName("status") val status: String = "",
     @SerializedName("userRelation") val userRelation: UserRelationState = UserRelationState.UNKNOWN,
-    @SerializedName("favorite") val favorite: Boolean = false
+    @SerializedName("favoriteState") val favoriteState: Boolean = false
 )
 
 fun RelatedUserRemoteData.toRelatedUserLocalData(): RelatedUserLocalData {
@@ -24,6 +25,6 @@ fun RelatedUserRemoteData.toRelatedUserLocalData(): RelatedUserLocalData {
         picture = picture,
         status = status,
         userRelation = userRelation,
-        favorite = favorite
+        favoriteState = favoriteState
     )
 }
