@@ -316,8 +316,17 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun insertMyRelationsToLocal(list: List<RelatedUserRemoteData>) {
         withContext(Dispatchers.IO) {
-            userDao.insertUsers(list.map { it.toRelatedUserLocalData().toEntity() })
+            list.forEach {
+                val localUser = getUserEntityFromLocalByUid(it.uid)
+                if (localUser == null) {
+                    insertUserToLocal(it)
+                }
+            }
         }
+    }
+
+    private fun insertUserToLocal(user: RelatedUserRemoteData) {
+        userDao.insertUser(user.toRelatedUserLocalData().toEntity())
     }
 
     override suspend fun insertFriendToLocal(user: UserData): Flow<Boolean> = callbackFlow {
@@ -742,7 +751,6 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    // TODO fts4 관련 쿼리문 수정할것
     override fun getHideFriendsWithFullTextName(query: String): Flow<PagingData<RelatedUserLocalData>> {
         val searchQuery = "*$query*"
         return Pager(
