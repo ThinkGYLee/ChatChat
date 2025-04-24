@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -52,10 +50,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
@@ -67,6 +62,7 @@ import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,11 +77,6 @@ fun FriendListScreen(
     modifier: Modifier = Modifier,
     viewModel: FriendListViewModel = hiltViewModel()
 ) {
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        viewModel.fetchMyUserData()
-    }
-
-    val myUserData = viewModel.myUserData.collectAsStateWithLifecycle()
     val items = viewModel.items.collectAsLazyPagingItems()
 
     var openFriendDialog by remember { mutableStateOf(false) }
@@ -98,6 +89,13 @@ fun FriendListScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchJobDone
+            .flowWithLifecycle(lifecycle.lifecycle).collectLatest {
+                items.refresh()
+            }
     }
 
     LaunchedEffect(Unit) {
@@ -137,78 +135,78 @@ fun FriendListScreen(
         },
         modifier = modifier
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .fillMaxSize()
-        ) {
-            if (myUserData.value != null) {
-                MyUserData(
-                    onClick = {
-                        if (myUserData.value != null) {
-                            onMyInfoClick(
-                                requireNotNull(
-                                    myUserData.value
-                                ).uid
-                            )
-                        }
-                    },
-                    userData = requireNotNull(myUserData.value)
-                )
-            }
 
-            Spacer(modifier = Modifier.height(20.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.friend_list_screen_middle_title),
-                    style = MaterialTheme.typography.labelMedium
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = items.itemCount.toString(),
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
-            if (items.itemCount > 0) {
-                LazyColumn(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(vertical = 12.dp)
-                ) {
-                    items(
-                        items.itemCount,
-                        key = { requireNotNull(items[it]).email },
-                        contentType = { 0 }
-                    ) { index ->
-                        val friend = items[index] as RelatedUserLocalData
-                        FriendData(
-                            onClick = { onFriendClick(friend.uid) },
-                            onLongClick = {
-                                dialogRelatedUserLocalData = friend
-                                openFriendDialog = true
-                            },
-                            relatedUserLocalData = friend
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            items(
+                items.itemCount,
+                key = { it },
+                contentType = { 0 }
+            ) { index ->
+                when (items[index]) {
+                    is FriendListUiState.MyData -> {
+                        val myData = items[index] as FriendListUiState.MyData
+                        MyUserData(
+                            onClick = { onMyInfoClick(requireNotNull(myData.myData).uid) },
+                            userData = requireNotNull(myData.myData)
                         )
                     }
+
+                    is FriendListUiState.Title -> {
+                        val titleData = items[index] as FriendListUiState.Title
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 20.dp)
+                        ) {
+                            Text(
+                                text = titleData.text,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+                    }
+
+                    is FriendListUiState.FriendData -> {
+                        val friendData = items[index] as FriendListUiState.FriendData
+                        FriendData(
+                            onClick = { onFriendClick(friendData.friendData.uid) },
+                            onLongClick = {
+                                dialogRelatedUserLocalData = friendData.friendData
+                                openFriendDialog = true
+                            },
+                            relatedUserLocalData = friendData.friendData
+                        )
+                    }
+
+                    is FriendListUiState.FavoriteData -> {
+                        val favoriteData = items[index] as FriendListUiState.FavoriteData
+                        FriendData(
+                            onClick = { onFriendClick(favoriteData.favoriteData.uid) },
+                            onLongClick = {
+                                dialogRelatedUserLocalData = favoriteData.favoriteData
+                                openFriendDialog = true
+                            },
+                            relatedUserLocalData = favoriteData.favoriteData
+                        )
+                    }
+
+                    else -> {}
                 }
             }
-
-            if (openFriendDialog) {
-                FriendDialog(
-                    closeDialog = {
-                        dialogRelatedUserLocalData = null
-                        openFriendDialog = false
-                    },
-                    blockRequest = { viewModel.blockFriend(dialogRelatedUserLocalData) },
-                    deleteRequest = { viewModel.deleteFriend(dialogRelatedUserLocalData) },
-                    hideRequest = { viewModel.hideFriend(dialogRelatedUserLocalData) }
-                )
-            }
         }
+    }
+    if (openFriendDialog) {
+        FriendDialog(
+            closeDialog = {
+                dialogRelatedUserLocalData = null
+                openFriendDialog = false
+            },
+            blockRequest = { viewModel.blockFriend(dialogRelatedUserLocalData) },
+            deleteRequest = { viewModel.deleteFriend(dialogRelatedUserLocalData) },
+            hideRequest = { viewModel.hideFriend(dialogRelatedUserLocalData) }
+        )
     }
 }
 

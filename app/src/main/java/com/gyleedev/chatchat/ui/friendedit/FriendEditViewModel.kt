@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FriendEditViewModel @Inject constructor(
-    private val getFriendsUseCase: GetFriendsUseCase,
+    getFriendsUseCase: GetFriendsUseCase,
     private val getFriendsWithNameUseCase: GetFriendsWithNameUseCase,
     private val hideFriendUseCase: HideFriendUseCase
 ) : BaseViewModel() {

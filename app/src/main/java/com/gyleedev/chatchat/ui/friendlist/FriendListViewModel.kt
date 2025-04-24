@@ -1,61 +1,48 @@
 package com.gyleedev.chatchat.ui.friendlist
 
 import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.usecase.AddMyRelatedUsersUseCase
 import com.gyleedev.chatchat.domain.usecase.BlockFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.DeleteFriendUseCase
+import com.gyleedev.chatchat.domain.usecase.GetFriendListScreenStateUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendsCountUseCase
-import com.gyleedev.chatchat.domain.usecase.GetFriendsUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyRelatedUserListFromRemoteUseCase
-import com.gyleedev.chatchat.domain.usecase.GetMyUserDataUseCase
 import com.gyleedev.chatchat.domain.usecase.HideFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FriendListViewModel @Inject constructor(
-    private val getMyUserDataUseCase: GetMyUserDataUseCase,
-    getFriendsUseCase: GetFriendsUseCase,
     private val getMyRelatedUserListFromRemoteUseCase: GetMyRelatedUserListFromRemoteUseCase,
     private val addMyRelatedUsersUseCase: AddMyRelatedUsersUseCase,
     private val getFriendsCountUseCase: GetFriendsCountUseCase,
     private val deleteFriendUseCase: DeleteFriendUseCase,
     private val hideFriendUseCase: HideFriendUseCase,
+    getFriendListScreenStateUseCase: GetFriendListScreenStateUseCase,
     private val blockFriendUseCase: BlockFriendUseCase
 ) : BaseViewModel() {
 
-    private val _myUserData = MutableStateFlow<UserData?>(null)
-    val myUserData: StateFlow<UserData?> = _myUserData
+    private val _fetchJobDone = MutableSharedFlow<Unit>()
+    val fetchJobDone: SharedFlow<Unit> = _fetchJobDone
 
-    val items = getFriendsUseCase().cachedIn(viewModelScope)
+    val items = getFriendListScreenStateUseCase()
 
     private val _noSuchUserAlert = MutableSharedFlow<Unit>()
     val noSuchUserAlert: SharedFlow<Unit> = _noSuchUserAlert
 
     init {
         viewModelScope.launch {
-            fetchMyUserData()
             if (getFriendsCount() == 0L) {
                 getMyRelatedUsersFromRemote()
             }
-        }
-    }
-
-    fun fetchMyUserData() {
-        viewModelScope.launch {
-            val fetchUserdata = getMyUserDataUseCase().first()
-            _myUserData.emit(fetchUserdata)
+            uiRefresh()
         }
     }
 
@@ -83,6 +70,7 @@ class FriendListViewModel @Inject constructor(
             } else {
                 _noSuchUserAlert.emit(Unit)
             }
+            uiRefresh()
         }
     }
 
@@ -93,6 +81,7 @@ class FriendListViewModel @Inject constructor(
             } else {
                 _noSuchUserAlert.emit(Unit)
             }
+            uiRefresh()
         }
     }
 
@@ -103,6 +92,11 @@ class FriendListViewModel @Inject constructor(
             } else {
                 _noSuchUserAlert.emit(Unit)
             }
+            uiRefresh()
         }
+    }
+
+    private suspend fun uiRefresh() {
+        _fetchJobDone.emit(Unit)
     }
 }
