@@ -15,6 +15,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import com.gyleedev.chatchat.data.database.FriendListPagingSource
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FavoriteDao
 import com.gyleedev.chatchat.data.database.dao.UserAndFavoriteDao
@@ -40,6 +41,7 @@ import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toRemoteData
+import com.gyleedev.chatchat.ui.friendlist.FriendListUiState
 import com.gyleedev.chatchat.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -66,6 +68,7 @@ interface UserRepository {
     suspend fun insertMyRelationsToLocal(list: List<RelatedUserRemoteData>)
     suspend fun insertFriendToLocal(user: UserData): Flow<Boolean>
     fun getFriends(): Flow<PagingData<RelatedUserLocalData>>
+    fun getFavorites(): Flow<PagingData<RelatedUserLocalData>>
     suspend fun getFriendsCount(): Long
     fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
     suspend fun createChatRoomData(): Flow<ChatRoomData?>
@@ -128,6 +131,8 @@ interface UserRepository {
 
     fun getHideFriendsWithFullTextName(query: String): Flow<PagingData<RelatedUserLocalData>>
     fun updateUserAndFavorite(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
+
+    fun getFriendListScreenState(): Flow<PagingData<FriendListUiState>>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -386,6 +391,26 @@ class UserRepositoryImpl @Inject constructor(
         ).flow.map { value ->
             value.map { it.toRelationLocalData() }
         }
+    }
+
+    override fun getFavorites(): Flow<PagingData<RelatedUserLocalData>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                userAndFavoriteDao.getFavoritesPaging()
+            }
+        ).flow.map { value ->
+            value.map { it.toLocalData() }
+        }
+    }
+
+    override fun getFriendListScreenState(): Flow<PagingData<FriendListUiState>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                FriendListPagingSource(userAndFavoriteDao, preferenceUtil)
+            }
+        ).flow.flowOn(Dispatchers.IO)
     }
 
     override suspend fun getFriendsCount(): Long {
