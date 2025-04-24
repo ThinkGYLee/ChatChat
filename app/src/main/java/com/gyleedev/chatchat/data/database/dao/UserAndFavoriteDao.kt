@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.gyleedev.chatchat.data.database.entity.UserAndFavoriteEntity
 import com.gyleedev.chatchat.data.database.entity.UserEntity
 import com.gyleedev.chatchat.domain.UserRelationState
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +37,7 @@ interface UserAndFavoriteDao {
 
     @Transaction
     @Query("SELECT * FROM user WHERE uid = :uid")
-    fun getUserInfoByUid(uid: String): Flow<UserEntity?>
+    fun getUserAndFavoriteByUid(uid: String): Flow<UserAndFavoriteEntity?>
 
     @Transaction
     @Update
