@@ -14,7 +14,10 @@ interface FavoriteDao {
     fun getUsersWithPaging(): PagingSource<Int, FavoriteEntity>
 
     @Query("SELECT * FROM favorite WHERE user_entity_id = :userEntityId")
-    fun getFavoriteByUid(userEntityId: Long): FavoriteEntity
+    fun getFavoriteByUserEntityId(userEntityId: Long): FavoriteEntity
+
+    @Query("SELECT * FROM favorite WHERE favorite_number> :favoriteNumber")
+    fun getFavoritesForSort(favoriteNumber: Long): List<FavoriteEntity>
 
     @Update
     fun updateFavorite(favoriteEntity: FavoriteEntity)
