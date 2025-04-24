@@ -24,6 +24,7 @@ import com.gyleedev.chatchat.data.database.entity.FavoriteEntity
 import com.gyleedev.chatchat.data.database.entity.UserEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toEntityAsFriend
+import com.gyleedev.chatchat.data.database.entity.toLocalData
 import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.data.database.entity.toRelationLocalData
 import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
@@ -81,6 +82,7 @@ interface UserRepository {
     )
 
     fun getFriendById(uid: String): Flow<RelatedUserLocalData>
+    fun getFriendAndFavoriteByUid(uid: String): Flow<RelatedUserLocalData>
 
     suspend fun makeNewChatRoom(rid: String, receiver: String): Long
 
@@ -125,6 +127,7 @@ interface UserRepository {
     fun getHideFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
 
     fun getHideFriendsWithFullTextName(query: String): Flow<PagingData<RelatedUserLocalData>>
+    fun updateUserAndFavorite(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -461,6 +464,12 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getFriendById(uid: String): Flow<RelatedUserLocalData> {
         return userDao.getUserInfoByUid(uid).map { requireNotNull(it).toRelationLocalData() }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getFriendAndFavoriteByUid(uid: String): Flow<RelatedUserLocalData> {
+        return userAndFavoriteDao.getUserAndFavoriteByUid(uid)
+            .map { requireNotNull(it).toLocalData() }
             .flowOn(Dispatchers.IO)
     }
 
@@ -810,6 +819,69 @@ class UserRepositoryImpl @Inject constructor(
             value.map { entity ->
                 entity.toRelationLocalData()
             }
+        }
+    }
+
+    override fun updateUserAndFavorite(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean> =
+        callbackFlow {
+            try {
+                changeRelationRemote(
+                    relatedUserLocalData.copy(favoriteState = !relatedUserLocalData.favoriteState),
+                    relatedUserLocalData.userRelation
+                ).first()
+                changeRelationLocal(
+                    relatedUserLocalData.copy(favoriteState = !relatedUserLocalData.favoriteState),
+                    relatedUserLocalData.userRelation
+                ).first()
+                updateLocalFavoriteByUserEntityId(relatedUserLocalData).first()
+                trySend(true)
+            } catch (e: Exception) {
+                trySend(false)
+            }
+            awaitClose()
+        }.flowOn(Dispatchers.IO)
+
+    private fun getFavoriteByUserEntityId(userEntityId: Long): FavoriteEntity {
+        return favoriteDao.getFavoriteByUserEntityId(userEntityId)
+    }
+
+    private fun updateLocalFavoriteByUserEntityId(relatedUserEntity: RelatedUserLocalData): Flow<Boolean> =
+        callbackFlow {
+            try {
+                val count = getFavoriteCount()
+                val entity = getFavoriteByUserEntityId(relatedUserEntity.id)
+                val updateFavoriteNumber =
+                    if (!entity.favoriteState) {
+                        count.toLong() + 1L
+                    } else {
+                        null
+                    }
+
+                favoriteDao.updateFavorite(
+                    entity.copy(
+                        favoriteState = !entity.favoriteState,
+                        favoriteNumber = updateFavoriteNumber
+                    )
+                )
+                if (updateFavoriteNumber == null) {
+                    entity.favoriteNumber?.let { sortFavorite(it) }
+                }
+                trySend(true)
+            } catch (e: Exception) {
+                println(e)
+                trySend(false)
+            }
+            awaitClose()
+        }.flowOn(Dispatchers.IO)
+
+    private fun sortFavorite(position: Long) {
+        val list = favoriteDao.getFavoritesForSort(position)
+        list.forEach { favoriteEntity ->
+            favoriteDao.updateFavorite(
+                favoriteEntity.copy(
+                    favoriteNumber = requireNotNull(favoriteEntity.favoriteNumber) - 1L
+                )
+            )
         }
     }
 }
