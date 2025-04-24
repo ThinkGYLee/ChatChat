@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.MoreVert
@@ -56,6 +59,11 @@ fun FriendInfoScreen(
     viewModel: FriendInfoViewModel = hiltViewModel()
 ) {
     val friendData by viewModel.relatedUserLocalData.collectAsStateWithLifecycle()
+    val starColor = if (requireNotNull(friendData).favoriteState) {
+        Color.Yellow
+    } else {
+        Color.Transparent
+    }
 
     var dropdownMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -73,6 +81,25 @@ fun FriendInfoScreen(
                     }
                 },
                 actions = {
+                    IconButton(
+                        onClick = { viewModel.updateFavorite() }
+                    ) {
+                        // default size 24dp
+                        Icon(
+                            imageVector = Icons.Default.StarOutline,
+                            contentDescription = null,
+                            tint = Color.Black
+                        )
+
+                        // adjust size 18dp
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = starColor,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
                     IconButton(onClick = { dropdownMenuExpanded = true }) {
                         Icon(
                             imageVector = Icons.Outlined.MoreVert,
