@@ -77,4 +77,8 @@
     <string name="horizontal_divider">|</string>
     <string name="login_box_text">%s 으로 시작하기</string>
     <string name="photo_edit_button_description">사진 편집 버튼</string>
+    <string name="logout_button_text">로그아웃</string>
+    <string name="logout_dialog_message">로그아웃 하시겠습니까?</string>
+    <string name="dialog_dismiss_button_text">취소</string>
+    <string name="dialog_confirm_button_text">확인</string>
 </resources>

@@ -23,8 +23,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.gyleedev.chatchat.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +42,7 @@ fun SettingScreen(
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             Button(onClick = { openDialog = true }) {
-                Text("log out")
+                Text(text = stringResource(R.string.logout_button_text))
             }
         }
         if (openDialog) {
@@ -54,7 +56,7 @@ fun SettingScreen(
                     ) {
                         Column(modifier = Modifier.padding(24.dp)) {
                             Text(
-                                text = "로그아웃 하시겠습니까?",
+                                text = stringResource(R.string.logout_dialog_message),
                                 style = MaterialTheme.typography.titleLarge
                             )
                             Spacer(Modifier.height(16.dp))
@@ -65,7 +67,7 @@ fun SettingScreen(
                                 TextButton(
                                     onClick = { openDialog = false }
                                 ) {
-                                    Text("Dismiss")
+                                    Text(text = stringResource(R.string.dialog_dismiss_button_text))
                                 }
                                 TextButton(
                                     onClick = {
@@ -74,7 +76,7 @@ fun SettingScreen(
                                         onLogoutRequest()
                                     }
                                 ) {
-                                    Text("Confirm")
+                                    Text(text = stringResource(R.string.dialog_confirm_button_text))
                                 }
                             }
                         }
