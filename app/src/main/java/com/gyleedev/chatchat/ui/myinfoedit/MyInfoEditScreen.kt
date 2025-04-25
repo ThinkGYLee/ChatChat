@@ -97,7 +97,8 @@ fun MyInfoEditScreen(
                 } else {
                     Toast.makeText(
                         context,
-                        context.getString(R.string.search_user_failure_message), Toast.LENGTH_SHORT
+                        context.getString(R.string.search_user_failure_message),
+                        Toast.LENGTH_SHORT
                     ).show()
                 }
             }
