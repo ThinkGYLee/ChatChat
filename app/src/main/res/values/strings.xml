@@ -43,8 +43,13 @@
     <string name="login_screen_sign_in_text">회원가입</string>
     <string name="login_box_facebook_text">facebook</string>
     <string name="login_box_google_text">google</string>
-    <string name="login_id_text_field_hint">아이디</string>
-    <string name="login_password_text_field_hint">비밀번호</string>
+    <string name="id_text_field_hint">아이디</string>
+    <string name="nickname_text_field_hint">아이디</string>
+    <string name="password_text_field_hint">비밀번호</string>
+    <string name="password_check_text_field_hint">다시 한번 입력하세요</string>
+    <string name="password_available_text">8자리 이상을 입력해 주세요</string>
+    <string name="password_check_available_text">비밀번호가 일치하지 않습니다</string>
+    <string name="type_password_guide_text">비밀번호를 입력하세요</string>
     <string name="chat_list_screen_chat_type_photo">사진</string>
     <string name="chat_room_photo_bar_text">사진</string>
     <string name="friend_block_button_text">친구 차단</string>
@@ -81,4 +86,6 @@
     <string name="logout_dialog_message">로그아웃 하시겠습니까?</string>
     <string name="dialog_dismiss_button_text">취소</string>
     <string name="dialog_confirm_button_text">확인</string>
+    <string name="signin_screen_title">회원 가입</string>
+    <string name="signin_button_title">회원 가입</string>
 </resources>

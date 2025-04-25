@@ -242,7 +242,7 @@ fun IdTextField(
                     Box(modifier = Modifier.weight(10f)) {
                         if (searchQuery.text.isEmpty()) {
                             Text(
-                                text = stringResource(R.string.login_id_text_field_hint),
+                                text = stringResource(R.string.id_text_field_hint),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color(0xFF848484),
                                 modifier = Modifier
@@ -298,7 +298,7 @@ fun PasswordTextField(
                     Box(modifier = Modifier.weight(10f)) {
                         if (searchQuery.text.isEmpty()) {
                             Text(
-                                text = stringResource(R.string.login_password_text_field_hint),
+                                text = stringResource(R.string.password_text_field_hint),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color(0xFF848484),
                                 modifier = Modifier
