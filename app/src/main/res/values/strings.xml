@@ -68,4 +68,7 @@
     <string name="anonymous_user_text">익명의 유저</string>
     <string name="blank_text"> </string>
     <string name="search_result_no_user_text">존재하지 않는 유저입니다</string>
+    <string name="friend_manage_screen_title">친구 관리</string>
+    <string name="friend_manage_screen_hide_manage_text">숨긴 침구 관리</string>
+    <string name="friend_manage_screen_block_manage_text">차단 친구 관리</string>
 </resources>
