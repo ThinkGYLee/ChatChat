@@ -64,4 +64,7 @@
     <string name="send_button_description">보내기 버튼</string>
     <string name="chat_room_screen_title">%s 님과의 대화</string>
     <string name="media_bar_photo_icon_description">사진 보내기 버튼</string>
+    <string name="more_vertical_button_description">더보기 버튼</string>
+    <string name="anonymous_user_text">익명의 유저</string>
+    <string name="blank_text"> </string>
 </resources>
