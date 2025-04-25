@@ -110,9 +110,9 @@ fun MyInfoScreen(
                 previewPlaceholder = painterResource(id = R.drawable.icons8__)
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Text(text = userData?.name ?: "anonymous")
+            Text(text = userData?.name ?: stringResource(R.string.anonymous_user_text))
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = userData?.status ?: "")
+            Text(text = userData?.status ?: stringResource(R.string.blank_text))
             Spacer(modifier = Modifier.height(60.dp))
             Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Absolute.SpaceEvenly) {
                 Column(
