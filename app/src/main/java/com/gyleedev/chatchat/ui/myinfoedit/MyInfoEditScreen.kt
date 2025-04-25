@@ -97,8 +97,7 @@ fun MyInfoEditScreen(
                 } else {
                     Toast.makeText(
                         context,
-                        context.getString(R.string.search_user_failure_message),
-                        Toast.LENGTH_SHORT
+                        context.getString(R.string.search_user_failure_message), Toast.LENGTH_SHORT
                     ).show()
                 }
             }
@@ -173,15 +172,13 @@ fun MyInfoEditScreen(
                         .align(Alignment.BottomEnd)
                         .clickable {
                             pickMedia.launch(
-                                PickVisualMediaRequest(
-                                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                             )
                         }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = ""
+                        contentDescription = stringResource(R.string.photo_edit_button_description)
                     )
                 }
             }

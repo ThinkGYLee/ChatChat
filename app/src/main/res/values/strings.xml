@@ -76,4 +76,5 @@
     <string name="hide_manage_screen_release_text">해제</string>
     <string name="horizontal_divider">|</string>
     <string name="login_box_text">%s 으로 시작하기</string>
+    <string name="photo_edit_button_description">사진 편집 버튼</string>
 </resources>
