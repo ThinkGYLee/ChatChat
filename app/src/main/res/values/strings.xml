@@ -67,4 +67,5 @@
     <string name="more_vertical_button_description">더보기 버튼</string>
     <string name="anonymous_user_text">익명의 유저</string>
     <string name="blank_text"> </string>
+    <string name="search_result_no_user_text">존재하지 않는 유저입니다</string>
 </resources>
