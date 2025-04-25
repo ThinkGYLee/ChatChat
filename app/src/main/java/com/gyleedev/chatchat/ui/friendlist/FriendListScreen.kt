@@ -101,7 +101,9 @@ fun FriendListScreen(
     LaunchedEffect(Unit) {
         viewModel.noSuchUserAlert
             .flowWithLifecycle(lifecycle.lifecycle)
-            .collect { Toast.makeText(context, "no such user", Toast.LENGTH_SHORT).show() }
+            .collect {
+                Toast.makeText(context, R.string.search_result_no_user_text, Toast.LENGTH_SHORT).show()
+            }
     }
 
     Scaffold(

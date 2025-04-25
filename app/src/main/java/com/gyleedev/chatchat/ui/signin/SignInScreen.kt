@@ -92,16 +92,28 @@ fun SignInScreen(
     LaunchedEffect(Unit) {
         viewModel.signInProgress.collect {
             if (it == SignInResult.Success) {
-                Toast.makeText(context, context.getString(R.string.sign_in_success_message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.sign_in_success_message),
+                    Toast.LENGTH_SHORT
+                ).show()
                 onSignInComplete()
             } else {
-                Toast.makeText(context, context.getString(R.string.sign_in_failure_message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.sign_in_failure_message),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(text = "회원 가입") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(R.string.signin_screen_title)) }
+            )
+        },
         modifier = modifier
     ) { innerPadding ->
         Column(
@@ -154,7 +166,7 @@ fun SignInScreen(
                     )
             ) {
                 Text(
-                    text = "회원 가입",
+                    text = stringResource(R.string.signin_button_title),
                     style = MaterialTheme.typography.bodyLarge,
                     color = ButtonDefaults.buttonColors().contentColor
                 )
@@ -194,7 +206,7 @@ fun IdTextField(
                     Box(modifier = Modifier.weight(10f)) {
                         if (idQuery.text.isEmpty()) {
                             Text(
-                                text = "아이디",
+                                text = stringResource(R.string.id_text_field_hint),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color(0xFF848484),
                                 modifier = Modifier
@@ -251,7 +263,7 @@ fun NicknameTextField(
                     Box(modifier = Modifier.weight(10f)) {
                         if (nicknameQuery.text.isEmpty()) {
                             Text(
-                                text = "닉네임",
+                                text = stringResource(R.string.nickname_text_field_hint),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color(0xFF848484),
                                 modifier = Modifier
@@ -388,14 +400,22 @@ fun PasswordScreen(
     modifier: Modifier = Modifier
 ) {
     val passwordComment =
-        if (passwordIsAvailable || passwordQuery.text.isEmpty()) "" else "8자리 이상을 입력해 주세요"
+        if (passwordIsAvailable || passwordQuery.text.isEmpty()) {
+            stringResource(R.string.blank_text)
+        } else {
+            stringResource(R.string.password_available_text)
+        }
     val passwordCheckComment =
-        if (passwordIsSame || passwordCheckQuery.text.isEmpty()) "" else "비밀번호가 일치하지 않습니다"
+        if (passwordIsSame || passwordCheckQuery.text.isEmpty()) {
+            stringResource(R.string.blank_text)
+        } else {
+            stringResource(R.string.password_check_available_text)
+        }
     Column(modifier = modifier) {
-        Text(text = "비밀번호를 입력해 주세요")
+        Text(text = stringResource(R.string.type_password_guide_text))
         Spacer(modifier = Modifier.height(16.dp))
         PasswordTextField(
-            hint = "비밀번호",
+            hint = stringResource(R.string.password_text_field_hint),
             passwordQuery = passwordQuery,
             onReset = onPasswordReset
         )
@@ -407,7 +427,7 @@ fun PasswordScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         PasswordTextField(
-            hint = "다시 한번 입력하세요",
+            hint = stringResource(R.string.password_check_text_field_hint),
             passwordQuery = passwordCheckQuery,
             onReset = onPasswordCheckReset
         )

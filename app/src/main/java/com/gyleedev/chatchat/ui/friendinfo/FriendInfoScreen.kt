@@ -103,7 +103,7 @@ fun FriendInfoScreen(
                     IconButton(onClick = { dropdownMenuExpanded = true }) {
                         Icon(
                             imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = "more button"
+                            contentDescription = stringResource(R.string.more_vertical_button_description)
                         )
                     }
 
@@ -151,9 +151,9 @@ fun FriendInfoScreen(
                 previewPlaceholder = painterResource(id = R.drawable.icons8__)
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Text(text = friendData?.name ?: "anonymous")
+            Text(text = friendData?.name ?: stringResource(R.string.anonymous_user_text))
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = friendData?.status ?: "")
+            Text(text = friendData?.status ?: stringResource(R.string.blank_text))
             Spacer(modifier = Modifier.height(60.dp))
             Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 Column(

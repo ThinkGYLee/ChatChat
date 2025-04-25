@@ -35,7 +35,7 @@ fun FriendManageScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("친구 관리") },
+                title = { Text(text = stringResource(R.string.friend_manage_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackPressKeyClick) {
                         Icon(
@@ -61,7 +61,7 @@ fun FriendManageScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "숨김 친구 관리",
+                    text = stringResource(R.string.friend_manage_screen_hide_manage_text),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -73,7 +73,7 @@ fun FriendManageScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "차단 친구 관리",
+                    text = stringResource(R.string.friend_manage_screen_block_manage_text),
                     style = MaterialTheme.typography.titleLarge
                 )
             }

@@ -173,15 +173,13 @@ fun MyInfoEditScreen(
                         .align(Alignment.BottomEnd)
                         .clickable {
                             pickMedia.launch(
-                                PickVisualMediaRequest(
-                                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                             )
                         }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = ""
+                        contentDescription = stringResource(R.string.photo_edit_button_description)
                     )
                 }
             }

@@ -149,11 +149,11 @@ fun LoginScreen(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 Text(text = stringResource(R.string.login_screen_find_id_text))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "|")
+                Text(text = stringResource(R.string.horizontal_divider))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = stringResource(R.string.login_screen_find_password_text))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "|")
+                Text(text = stringResource(R.string.horizontal_divider))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.login_screen_sign_in_text),
@@ -206,7 +206,7 @@ fun LoginBox(
             contentDescription = stringResource(R.string.google_icon_description),
             modifier = Modifier.size(24.dp)
         )
-        Text(text = "$name 으로 시작하기")
+        Text(text = stringResource(R.string.login_box_text, name))
         Spacer(modifier = Modifier.width(16.dp))
     }
 }
@@ -242,7 +242,7 @@ fun IdTextField(
                     Box(modifier = Modifier.weight(10f)) {
                         if (searchQuery.text.isEmpty()) {
                             Text(
-                                text = stringResource(R.string.login_id_text_field_hint),
+                                text = stringResource(R.string.id_text_field_hint),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color(0xFF848484),
                                 modifier = Modifier
@@ -298,7 +298,7 @@ fun PasswordTextField(
                     Box(modifier = Modifier.weight(10f)) {
                         if (searchQuery.text.isEmpty()) {
                             Text(
-                                text = stringResource(R.string.login_password_text_field_hint),
+                                text = stringResource(R.string.password_text_field_hint),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color(0xFF848484),
                                 modifier = Modifier

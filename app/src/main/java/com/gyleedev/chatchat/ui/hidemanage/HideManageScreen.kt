@@ -100,7 +100,7 @@ fun HideManageScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "숨김 친구 관리",
+                        text = stringResource(R.string.hide_manage_screen_title),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -132,7 +132,7 @@ fun HideManageScreen(
                 AnimatedVisibility(searchQuery.value.isEmpty()) {
                     Column {
                         Text(
-                            "친구",
+                            text = stringResource(R.string.hide_manage_screen_friend_text),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
                         )
@@ -155,7 +155,7 @@ fun HideManageScreen(
                 AnimatedVisibility(searchQuery.value.isNotEmpty()) {
                     Column {
                         Text(
-                            "검색 결과",
+                            text = stringResource(R.string.search_result_text),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
                         )
@@ -215,7 +215,7 @@ fun FriendFilterTextField(
                         Box(modifier = Modifier.weight(10f)) {
                             if (searchQuery.isEmpty()) {
                                 Text(
-                                    text = "친구 이름",
+                                    text = stringResource(R.string.friend_filter_text_field_text_hint),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = Color(0xFF848484),
                                     modifier = Modifier
@@ -288,7 +288,7 @@ fun FriendData(
             border = BorderStroke(0.5.dp, color = MaterialTheme.colorScheme.onSurface),
             onClick = onHideRequest
         ) {
-            Text("헤제")
+            Text(text = stringResource(R.string.hide_manage_screen_release_text))
         }
     }
 }
