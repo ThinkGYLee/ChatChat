@@ -149,7 +149,14 @@ fun ChatRoomScreen(
         topBar = {
             if (uiState is ChatRoomUiState.Success) {
                 TopAppBar(
-                    title = { Text(text = "${(uiState as ChatRoomUiState.Success).userName} 님과의 대화") },
+                    title = {
+                        Text(
+                            text = stringResource(
+                                R.string.chat_room_screen_title,
+                                (uiState as ChatRoomUiState.Success).userName
+                            )
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = onBackPressKeyClick) {
                             Icon(
@@ -417,14 +424,20 @@ fun PhotoBottomBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onCancelButtonClick) {
-                Icon(imageVector = Icons.Filled.Close, contentDescription = "")
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = stringResource(R.string.close_button_description)
+                )
             }
             Text(
                 text = stringResource(R.string.chat_room_photo_bar_text),
                 fontWeight = FontWeight.SemiBold
             )
             IconButton(onClick = onSendButtonClick) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "")
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    contentDescription = stringResource(R.string.send_button_description)
+                )
             }
         }
         HorizontalDivider()
@@ -474,7 +487,10 @@ fun MediaBar(
 ) {
     Row(modifier.padding(start = 8.dp)) {
         IconButton(onClick = onPhotoButtonClick) {
-            Icon(imageVector = Icons.Filled.Image, contentDescription = "")
+            Icon(
+                imageVector = Icons.Filled.Image,
+                contentDescription = stringResource(R.string.media_bar_photo_icon_description)
+            )
         }
     }
 }
