@@ -133,7 +133,7 @@ fun FriendEditScreen(
                 AnimatedVisibility(searchQuery.value.isEmpty()) {
                     Column {
                         Text(
-                            "친구",
+                            text = stringResource(R.string.block_manage_screen_friend_text),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
                         )
@@ -156,13 +156,13 @@ fun FriendEditScreen(
                 AnimatedVisibility(searchQuery.value.isNotEmpty()) {
                     Column {
                         Text(
-                            "검색 결과",
+                            text = stringResource(R.string.search_result_text),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
                         )
                         LazyColumn {
                             items(
-                                searchItems.itemCount,
+                                count = searchItems.itemCount,
                                 key = { requireNotNull(searchItems[it]).email },
                                 contentType = { 0 }
                             ) {
@@ -290,7 +290,7 @@ fun FriendData(
             border = BorderStroke(0.5.dp, color = MaterialTheme.colorScheme.onSurface),
             onClick = onHideRequest
         ) {
-            Text("숨김")
+            Text(text = stringResource(R.string.friend_edit_screen_hide_text))
         }
     }
 }
