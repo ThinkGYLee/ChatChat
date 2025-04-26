@@ -88,4 +88,14 @@
     <string name="dialog_confirm_button_text">확인</string>
     <string name="signin_screen_title">회원 가입</string>
     <string name="signin_button_title">회원 가입</string>
+    <string name="unblock_icon_description">차단 해제 아이콘</string>
+    <string name="unblock_icon_text">차단 해제</string>
+    <string name="report_icon_description">신고 아이콘</string>
+    <string name="report_icon_text">신고</string>
+    <string name="add_friend_icon_description">친구 추가 아이콘</string>
+    <string name="add_friend_icon_text">추가</string>
+    <string name="block_icon_description">차단 아이콘</string>
+    <string name="block_icon_text">차단</string>
+    <string name="chat_room_not_friend_text_up">친구가 아닌 사용자입니다.</string>
+    <string name="chat_room_not_friend_text_down">의심스러운 사용자인 경우 차단하고 신고해 주세요.</string>
 </resources>

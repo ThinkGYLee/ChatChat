@@ -14,6 +14,8 @@ import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.UserRelationState
+import com.gyleedev.chatchat.domain.usecase.BlockFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.CancelMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomLocalDataByUidUseCase
@@ -23,6 +25,7 @@ import com.gyleedev.chatchat.domain.usecase.GetMessagesFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyUidFromLogInDataUseCase
 import com.gyleedev.chatchat.domain.usecase.ResendMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
+import com.gyleedev.chatchat.domain.usecase.UserToFriendUseCase
 import com.gyleedev.chatchat.util.NetworkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,6 +56,8 @@ class ChatRoomViewModel @Inject constructor(
     private val getNetworkState: NetworkManager,
     private val resendMessageUseCase: ResendMessageUseCase,
     private val cancelMessageUseCase: CancelMessageUseCase,
+    private val userToFriendUseCase: UserToFriendUseCase,
+    private val blockFriendUseCase: BlockFriendUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -79,7 +84,8 @@ class ChatRoomViewModel @Inject constructor(
         if (uid != null) {
             ChatRoomUiState.Success(
                 userName = friendData.name,
-                uid = uid
+                uid = uid,
+                relationState = friendData.userRelation
             )
         } else {
             ChatRoomUiState.Loading
@@ -199,6 +205,27 @@ class ChatRoomViewModel @Inject constructor(
             MessageType.Link
         } else {
             MessageType.Text
+        }
+    }
+
+    fun blockUser() {
+        viewModelScope.launch {
+            blockFriendUseCase(relatedUserLocalData.value)
+            val changedData = relatedUserLocalData.value.copy(
+                userRelation = UserRelationState.BLOCKED,
+                favoriteState = false
+            )
+            relatedUserLocalData.emit(changedData)
+        }
+    }
+
+    fun userToFriend() {
+        viewModelScope.launch {
+            userToFriendUseCase(relatedUserLocalData.value)
+            val changedData = relatedUserLocalData.value.copy(
+                userRelation = UserRelationState.FRIEND
+            )
+            relatedUserLocalData.emit(changedData)
         }
     }
 }

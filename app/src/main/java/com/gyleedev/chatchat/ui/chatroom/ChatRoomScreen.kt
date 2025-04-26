@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldState
@@ -35,8 +37,12 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.PersonAddAlt
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.RemoveCircleOutline
+import androidx.compose.material.icons.outlined.ReportProblem
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -47,6 +53,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -77,6 +84,7 @@ import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.UrlMetaData
+import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
 import com.gyleedev.chatchat.util.detectUrl
 import com.gyleedev.chatchat.util.getImageFromFireStore
@@ -91,7 +99,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatRoomScreen(
     onBackPressKeyClick: () -> Unit,
@@ -148,23 +155,14 @@ fun ChatRoomScreen(
         modifier = modifier,
         topBar = {
             if (uiState is ChatRoomUiState.Success) {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(
-                                R.string.chat_room_screen_title,
-                                (uiState as ChatRoomUiState.Success).userName
-                            )
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBackPressKeyClick) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
-                            )
-                        }
-                    }
+                val uiStateCast = uiState as ChatRoomUiState.Success
+                ChatRoomTopBar(
+                    onUnblockClick = chatRoomViewModel::userToFriend,
+                    onBlockClick = chatRoomViewModel::blockUser,
+                    onAddFriendClick = chatRoomViewModel::userToFriend,
+                    onBackPressKeyClick = onBackPressKeyClick,
+                    state = uiStateCast.relationState,
+                    name = uiStateCast.userName
                 )
             }
         },
@@ -549,6 +547,197 @@ fun CommentBottomBar(
 fun CommentBarPreview() {
     ChatChatTheme {
         CommentBottomBar(onClick = {}, query = TextFieldState())
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChatRoomTopBar(
+    onUnblockClick: () -> Unit,
+    onBlockClick: () -> Unit,
+    onAddFriendClick: () -> Unit,
+    onBackPressKeyClick: () -> Unit,
+    state: UserRelationState,
+    name: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = stringResource(
+                        R.string.chat_room_screen_title,
+                        name
+                    )
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = onBackPressKeyClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+        when (state) {
+            UserRelationState.BLOCKED -> {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .sizeIn(minWidth = 80.dp, minHeight = 80.dp)
+                            .clip(CircleShape)
+                            .clickable { onUnblockClick() },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.RemoveCircleOutline,
+                            contentDescription = stringResource(R.string.unblock_icon_description),
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.unblock_icon_text),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .sizeIn(minWidth = 80.dp, minHeight = 80.dp)
+                            .clip(CircleShape)
+                            .clickable {},
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.ReportProblem,
+                            contentDescription = stringResource(R.string.report_icon_description),
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.report_icon_text),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+            }
+
+            UserRelationState.ME -> {
+            }
+
+            UserRelationState.UNKNOWN -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = TopAppBarDefaults.topAppBarColors().containerColor)
+                ) {
+                    Row {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = stringResource(R.string.chat_room_not_friend_text_up),
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                            Text(
+                                text = stringResource(R.string.chat_room_not_friend_text_down),
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .sizeIn(minWidth = 80.dp, minHeight = 80.dp)
+                                .clip(CircleShape)
+                                .clickable { onAddFriendClick() },
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.PersonAddAlt,
+                                contentDescription = stringResource(R.string.add_friend_icon_description),
+                                modifier = Modifier.size(40.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.add_friend_icon_text),
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .sizeIn(minWidth = 80.dp, minHeight = 80.dp)
+                                .clip(CircleShape)
+                                .clickable { onBlockClick() },
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Block,
+                                contentDescription = stringResource(R.string.block_icon_description),
+                                modifier = Modifier.size(40.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.block_icon_text),
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .sizeIn(minWidth = 80.dp, minHeight = 80.dp)
+                                .clip(CircleShape)
+                                .clickable {},
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.ReportProblem,
+                                contentDescription = stringResource(R.string.report_icon_description),
+                                modifier = Modifier.size(40.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.report_icon_text),
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+                    }
+                }
+            }
+
+            else -> {}
+        }
+    }
+}
+
+@Preview
+@Composable
+fun ChatRoomTopBarPreview() {
+    MaterialTheme {
+        ChatRoomTopBar(
+            onBackPressKeyClick = {},
+            state = UserRelationState.UNKNOWN,
+            name = "abcd",
+            onUnblockClick = {},
+            onBlockClick = {},
+            onAddFriendClick = {}
+        )
     }
 }
 
