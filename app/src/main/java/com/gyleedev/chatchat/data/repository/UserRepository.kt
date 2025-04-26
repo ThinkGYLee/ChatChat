@@ -775,6 +775,8 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    // remote의 relations에 정보를 넣고 성공 실패로 local에 넣을지 결정
+    // remote에 유저가 존재하는지는 확인할 필요 없음 있던 없던 덮어 씀
     override suspend fun userToFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
         return try {
             val relatedUser = relatedUserLocalData.copy(userRelation = UserRelationState.FRIEND)
