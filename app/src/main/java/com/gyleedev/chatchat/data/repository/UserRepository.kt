@@ -113,15 +113,9 @@ interface UserRepository {
     suspend fun resetChatRoomData()
     fun setMyUserInformation(userData: UserData)
     suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
-    suspend fun changeRelationRemote(
-        relatedUserLocalData: RelatedUserLocalData,
-        relation: UserRelationState
-    ): Flow<Boolean>
+    suspend fun changeRelatedUserRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
 
-    suspend fun changeRelationLocal(
-        relatedUserLocalData: RelatedUserLocalData,
-        relation: UserRelationState
-    ): Flow<ChangeRelationResult>
+    suspend fun changeRelatedUserLocal(relatedUserLocalData: RelatedUserLocalData): Flow<ChangeRelationResult>
 
     suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
     suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
@@ -684,10 +678,13 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
         return try {
-            val relation = UserRelationState.UNKNOWN
-            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
+            val relatedUser = relatedUserLocalData.copy(
+                userRelation = UserRelationState.UNKNOWN,
+                favoriteState = false
+            )
+            val remoteRequest = changeRelatedUserRemote(relatedUser).first()
             if (remoteRequest) {
-                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
+                val localRequest = changeRelatedUserLocal(relatedUser).first()
                 if (localRequest == ChangeRelationResult.SUCCESS) {
                     ChangeRelationResult.SUCCESS
                 } else {
@@ -701,15 +698,15 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun changeRelationLocal(
-        relatedUserLocalData: RelatedUserLocalData,
-        relation: UserRelationState
+    override suspend fun changeRelatedUserLocal(
+        relatedUserLocalData: RelatedUserLocalData
     ): Flow<ChangeRelationResult> =
         callbackFlow {
             try {
-                userDao.updateUser(
-                    relatedUserLocalData.toEntity().copy(relation = relation)
-                )
+                userDao.updateUser(relatedUserLocalData.toEntity())
+                if (!relatedUserLocalData.favoriteState) {
+                    updateLocalFavoriteWithRelatedUserLocalData(relatedUserLocalData)
+                }
                 trySend(ChangeRelationResult.SUCCESS)
             } catch (e: Exception) {
                 trySend(ChangeRelationResult.FAILURE)
@@ -717,17 +714,14 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    override suspend fun changeRelationRemote(
-        relatedUserLocalData: RelatedUserLocalData,
-        relation: UserRelationState
+    override suspend fun changeRelatedUserRemote(
+        relatedUserLocalData: RelatedUserLocalData
     ): Flow<Boolean> =
         callbackFlow {
             auth.currentUser?.uid?.let {
                 database.reference.child("relations").child(it).child(relatedUserLocalData.uid)
                     .setValue(
-                        relatedUserLocalData.toRemoteData().copy(
-                            userRelation = relation
-                        )
+                        relatedUserLocalData.toRemoteData()
                     ).addOnSuccessListener {
                         trySend(true)
                     }.addOnFailureListener {
@@ -739,10 +733,13 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
         return try {
-            val relation = UserRelationState.HIDE
-            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
+            val relatedUser = relatedUserLocalData.copy(
+                userRelation = UserRelationState.HIDE,
+                favoriteState = false
+            )
+            val remoteRequest = changeRelatedUserRemote(relatedUser).first()
             if (remoteRequest) {
-                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
+                val localRequest = changeRelatedUserLocal(relatedUser).first()
                 if (localRequest == ChangeRelationResult.SUCCESS) {
                     ChangeRelationResult.SUCCESS
                 } else {
@@ -758,10 +755,13 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
         return try {
-            val relation = UserRelationState.BLOCKED
-            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
+            val relatedUser = relatedUserLocalData.copy(
+                userRelation = UserRelationState.BLOCKED,
+                favoriteState = false
+            )
+            val remoteRequest = changeRelatedUserRemote(relatedUser).first()
             if (remoteRequest) {
-                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
+                val localRequest = changeRelatedUserLocal(relatedUser).first()
                 if (localRequest == ChangeRelationResult.SUCCESS) {
                     ChangeRelationResult.SUCCESS
                 } else {
@@ -777,10 +777,10 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun userToFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
         return try {
-            val relation = UserRelationState.FRIEND
-            val remoteRequest = changeRelationRemote(relatedUserLocalData, relation).first()
+            val relatedUser = relatedUserLocalData.copy(userRelation = UserRelationState.FRIEND)
+            val remoteRequest = changeRelatedUserRemote(relatedUser).first()
             if (remoteRequest) {
-                val localRequest = changeRelationLocal(relatedUserLocalData, relation).first()
+                val localRequest = changeRelatedUserLocal(relatedUser).first()
                 if (localRequest == ChangeRelationResult.SUCCESS) {
                     ChangeRelationResult.SUCCESS
                 } else {
@@ -880,15 +880,13 @@ class UserRepositoryImpl @Inject constructor(
     override fun updateUserAndFavorite(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean> =
         callbackFlow {
             try {
-                changeRelationRemote(
-                    relatedUserLocalData.copy(favoriteState = !relatedUserLocalData.favoriteState),
-                    relatedUserLocalData.userRelation
+                changeRelatedUserRemote(
+                    relatedUserLocalData.copy(favoriteState = !relatedUserLocalData.favoriteState)
                 ).first()
-                changeRelationLocal(
-                    relatedUserLocalData.copy(favoriteState = !relatedUserLocalData.favoriteState),
-                    relatedUserLocalData.userRelation
+                changeRelatedUserLocal(
+                    relatedUserLocalData.copy(favoriteState = !relatedUserLocalData.favoriteState)
                 ).first()
-                updateLocalFavoriteByUserEntityId(relatedUserLocalData).first()
+                updateLocalFavoriteWithRelatedUserLocalData(relatedUserLocalData).first()
                 trySend(true)
             } catch (e: Exception) {
                 trySend(false)
@@ -900,7 +898,7 @@ class UserRepositoryImpl @Inject constructor(
         return favoriteDao.getFavoriteByUserEntityId(userEntityId)
     }
 
-    private fun updateLocalFavoriteByUserEntityId(relatedUserEntity: RelatedUserLocalData): Flow<Boolean> =
+    private fun updateLocalFavoriteWithRelatedUserLocalData(relatedUserEntity: RelatedUserLocalData): Flow<Boolean> =
         callbackFlow {
             try {
                 val count = getFavoriteCount()
