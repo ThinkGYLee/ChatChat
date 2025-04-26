@@ -79,7 +79,8 @@ class ChatRoomViewModel @Inject constructor(
         if (uid != null) {
             ChatRoomUiState.Success(
                 userName = friendData.name,
-                uid = uid
+                uid = uid,
+                relationState = friendData.userRelation
             )
         } else {
             ChatRoomUiState.Loading
