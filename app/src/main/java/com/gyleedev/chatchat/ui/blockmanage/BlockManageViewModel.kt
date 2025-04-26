@@ -5,8 +5,8 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.usecase.GetHideFriendsUseCase
-import com.gyleedev.chatchat.domain.usecase.GetHideFriendsWithNameUseCase
+import com.gyleedev.chatchat.domain.usecase.GetBlockedFriendsUseCase
+import com.gyleedev.chatchat.domain.usecase.GetBlockedFriendsWithNameUseCase
 import com.gyleedev.chatchat.domain.usecase.UserToFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,9 +23,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BlockManageViewModel @Inject constructor(
-    private val getHideFriendsUseCase: GetHideFriendsUseCase,
+    getBlockedFriendsUseCase: GetBlockedFriendsUseCase,
     private val userToFriendUseCase: UserToFriendUseCase,
-    private val getHideFriendsWithNameUseCase: GetHideFriendsWithNameUseCase
+    private val getBlockedFriendsWithNameUseCase: GetBlockedFriendsWithNameUseCase
 ) : BaseViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -34,7 +34,7 @@ class BlockManageViewModel @Inject constructor(
     private val _searchFailure = MutableSharedFlow<Unit>()
     val searchFailure: SharedFlow<Unit> = _searchFailure
 
-    val items = getHideFriendsUseCase().cachedIn(viewModelScope)
+    val items = getBlockedFriendsUseCase().cachedIn(viewModelScope)
 
     fun editSearchQuery(query: String) {
         viewModelScope.launch {
@@ -44,7 +44,7 @@ class BlockManageViewModel @Inject constructor(
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val searchItems = searchQuery.debounce(500).flatMapLatest {
-        getHideFriendsWithNameUseCase(it)
+        getBlockedFriendsWithNameUseCase(it)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
