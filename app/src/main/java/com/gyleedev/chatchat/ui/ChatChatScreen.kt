@@ -29,6 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.gyleedev.chatchat.ui.blockmanage.BlockManageScreen
 import com.gyleedev.chatchat.ui.chatlist.ChatListScreen
 import com.gyleedev.chatchat.ui.chatroom.ChatRoomScreen
 import com.gyleedev.chatchat.ui.finduser.FindUserScreen
@@ -295,7 +296,7 @@ fun ChatChatScreen(
             ) {
                 FriendManageScreen(
                     onBackPressKeyClick = { navController.navigateUp() },
-                    onBlockedClick = {},
+                    onBlockedClick = { navController.navigate(BottomNavItem.MANAGEBLOCKED.screenRoute) },
                     onHideClick = { navController.navigate(BottomNavItem.MANAGEHIDE.screenRoute) }
                 )
             }
@@ -304,6 +305,14 @@ fun ChatChatScreen(
                 route = BottomNavItem.MANAGEHIDE.screenRoute
             ) {
                 HideManageScreen(
+                    onBackPressKeyClick = { navController.navigateUp() }
+                )
+            }
+
+            composable(
+                route = BottomNavItem.MANAGEBLOCKED.screenRoute
+            ) {
+                BlockManageScreen(
                     onBackPressKeyClick = { navController.navigateUp() }
                 )
             }
