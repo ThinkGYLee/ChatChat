@@ -110,9 +110,9 @@ fun FriendInfoScreen(
                     FriendDropDownMenu(
                         dropdownMenuExpanded = dropdownMenuExpanded,
                         onDismiss = { dropdownMenuExpanded = false },
-                        blockRequest = {},
+                        blockRequest = { viewModel.blockFriend() },
                         deleteRequest = { viewModel.deleteFriend() },
-                        hideRequest = {}
+                        hideRequest = { viewModel.hideFriend() }
                     )
                 }
             )

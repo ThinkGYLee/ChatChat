@@ -52,6 +52,18 @@ class FriendInfoViewModel @Inject constructor(
         }
     }
 
+    fun hideFriend() {
+        viewModelScope.launch {
+            hideFriendUseCase(_relatedUserLocalData.value)
+        }
+    }
+
+    fun blockFriend() {
+        viewModelScope.launch {
+            blockFriendUseCase(_relatedUserLocalData.value)
+        }
+    }
+
     fun updateFavorite() {
         viewModelScope.launch {
             updateFavoriteByUserEntityIdUseCase(_relatedUserLocalData.value)
