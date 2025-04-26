@@ -43,6 +43,9 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE relation = :userRelationState")
     fun getHideUsersPaging(userRelationState: UserRelationState = UserRelationState.HIDE): PagingSource<Int, UserEntity>
 
+    @Query("SELECT * FROM user WHERE relation = :userRelationState")
+    fun getBlockedUsersPaging(userRelationState: UserRelationState = UserRelationState.BLOCKED): PagingSource<Int, UserEntity>
+
     @Query("SELECT COUNT(*) FROM user WHERE relation = :userRelationState")
     fun getFriendsCount(userRelationState: UserRelationState = UserRelationState.FRIEND): Long
 
@@ -59,6 +62,12 @@ interface UserDao {
     fun getHideFriendsWithName(
         query: String,
         relation: UserRelationState = UserRelationState.HIDE
+    ): PagingSource<Int, UserEntity>
+
+    @Query("SELECT * FROM user WHERE name LIKE :query AND relation = :relation")
+    fun getBlockedFriendsWithName(
+        query: String,
+        relation: UserRelationState = UserRelationState.BLOCKED
     ): PagingSource<Int, UserEntity>
 
     // TODO fts4 관련 쿼리문 수정할것
