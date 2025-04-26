@@ -494,7 +494,6 @@ fun UniversalBar(
             screenWidth = screenWidth
         )
     }
-
 }
 
 @Composable
