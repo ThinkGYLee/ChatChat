@@ -86,7 +86,6 @@ import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.UrlMetaData
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
-import com.gyleedev.chatchat.util.detectUrl
 import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.gyleedev.chatchat.util.getMedaData
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -167,27 +166,34 @@ fun ChatRoomScreen(
             }
         },
         bottomBar = {
-            if (photoUri.value.isEmpty()) {
+            if (
+                uiState is ChatRoomUiState.Success &&
+                (uiState as ChatRoomUiState.Success).relationState == UserRelationState.BLOCKED
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(text = stringResource(R.string.chat_room_blocked_user_bottom_bar_text))
+                }
+            } else {
                 UniversalBar(
                     onPhotoButtonClick = {
                         pickMedia.launch(
-                            PickVisualMediaRequest(
-                                ActivityResultContracts.PickVisualMedia.ImageOnly
-                            )
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
                     },
                     query = query,
-                    onSendButtonClick = {
+                    onTextSendButtonClick = {
                         chatRoomViewModel.sendMessage()
                         query.edit { delete(0, query.text.length) }
-                    }
-                )
-            } else {
-                PhotoBottomBar(
-                    onCancelButtonClick = { chatRoomViewModel.editPhotoUri("") },
-                    onSendButtonClick = chatRoomViewModel::sendPhotoMessage,
-                    uri = photoUri.value,
-                    screenWidth = screenWidth
+                    },
+                    onPhotoSendButtonClick = chatRoomViewModel::sendPhotoMessage,
+                    onCancelClick = { chatRoomViewModel.editPhotoUri("") },
+                    screenWidth = screenWidth,
+                    photoUri = photoUri.value
                 )
             }
         }
@@ -337,7 +343,6 @@ fun LinkBubble(
             color = backgroundColor,
             shape = backgroundShape
         ) {
-            println(detectUrl(messageData.comment))
             Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
         }
     }
@@ -465,15 +470,28 @@ fun PhotoBottomBar(
 @Composable
 fun UniversalBar(
     onPhotoButtonClick: () -> Unit,
-    onSendButtonClick: () -> Unit,
+    onTextSendButtonClick: () -> Unit,
+    onPhotoSendButtonClick: () -> Unit,
+    onCancelClick: () -> Unit,
+    screenWidth: Int,
     query: TextFieldState,
+    photoUri: String,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
-        MediaBar(onPhotoButtonClick = onPhotoButtonClick)
-        CommentBottomBar(
-            onClick = onSendButtonClick,
-            query = query
+    if (photoUri.isEmpty()) {
+        Column(modifier = modifier) {
+            MediaBar(onPhotoButtonClick = onPhotoButtonClick)
+            CommentBottomBar(
+                onClick = onTextSendButtonClick,
+                query = query
+            )
+        }
+    } else {
+        PhotoBottomBar(
+            onCancelButtonClick = onCancelClick,
+            onSendButtonClick = onPhotoSendButtonClick,
+            uri = photoUri,
+            screenWidth = screenWidth
         )
     }
 }
