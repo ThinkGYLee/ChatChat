@@ -142,10 +142,10 @@ fun BlockManageScreen(
                                 key = { requireNotNull(items[it]).email },
                                 contentType = { 0 }
                             ) {
-                                items[it]?.let { it1 ->
+                                items[it]?.let { userData ->
                                     FriendData(
-                                        relatedUserLocalData = it1,
-                                        onHideRequest = { viewModel.userToFriend(it1) }
+                                        relatedUserLocalData = userData,
+                                        unBlockRequest = { viewModel.userToFriend(userData) }
                                     )
                                 }
                             }
@@ -165,10 +165,10 @@ fun BlockManageScreen(
                                 key = { requireNotNull(searchItems[it]).email },
                                 contentType = { 0 }
                             ) {
-                                searchItems[it]?.let { it1 ->
+                                searchItems[it]?.let { userData ->
                                     FriendData(
-                                        relatedUserLocalData = it1,
-                                        onHideRequest = { viewModel.userToFriend(it1) }
+                                        relatedUserLocalData = userData,
+                                        unBlockRequest = { viewModel.userToFriend(userData) }
                                     )
                                 }
                             }
@@ -243,7 +243,7 @@ fun FriendFilterTextField(
 
 @Composable
 fun FriendData(
-    onHideRequest: () -> Unit,
+    unBlockRequest: () -> Unit,
     relatedUserLocalData: RelatedUserLocalData,
     modifier: Modifier = Modifier
 ) {
@@ -289,7 +289,7 @@ fun FriendData(
                 0.5.dp,
                 color = MaterialTheme.colorScheme.onSurface
             ),
-            onClick = onHideRequest
+            onClick = unBlockRequest
         ) {
             Text(text = stringResource(R.string.block_manage_screen_unblock_text))
         }
@@ -310,7 +310,7 @@ fun FriendDataPreview() {
                 uid = "",
                 userRelation = UserRelationState.FRIEND
             ),
-            onHideRequest = {}
+            unBlockRequest = {}
         )
     }
 }
