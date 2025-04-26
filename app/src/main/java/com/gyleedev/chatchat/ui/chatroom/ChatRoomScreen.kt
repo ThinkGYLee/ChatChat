@@ -599,11 +599,14 @@ fun ChatRoomTopBar(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
-                            Icons.Outlined.RemoveCircleOutline,
-                            contentDescription = "",
+                            imageVector = Icons.Outlined.RemoveCircleOutline,
+                            contentDescription = stringResource(R.string.unblock_icon_description),
                             modifier = Modifier.size(40.dp)
                         )
-                        Text("차단 해제", style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            text = stringResource(R.string.unblock_icon_text),
+                            style = MaterialTheme.typography.labelMedium
+                        )
                     }
 
                     Column(
@@ -615,11 +618,14 @@ fun ChatRoomTopBar(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
-                            Icons.Outlined.ReportProblem,
-                            contentDescription = "",
+                            imageVector = Icons.Outlined.ReportProblem,
+                            contentDescription = stringResource(R.string.report_icon_description),
                             modifier = Modifier.size(40.dp)
                         )
-                        Text("신고", style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            text = stringResource(R.string.report_icon_text),
+                            style = MaterialTheme.typography.labelMedium
+                        )
                     }
                 }
             }
@@ -638,9 +644,12 @@ fun ChatRoomTopBar(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("친구가 아닌 사용자입니다.", style = MaterialTheme.typography.labelMedium)
                             Text(
-                                "의심스러운 사용자인 경우 차단하고 신고해 주세요.",
+                                text = stringResource(R.string.chat_room_not_friend_text_up),
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                            Text(
+                                text = stringResource(R.string.chat_room_not_friend_text_down),
                                 style = MaterialTheme.typography.labelMedium
                             )
                         }
@@ -661,11 +670,14 @@ fun ChatRoomTopBar(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                Icons.Outlined.PersonAddAlt,
-                                contentDescription = "",
+                                imageVector = Icons.Outlined.PersonAddAlt,
+                                contentDescription = stringResource(R.string.add_friend_icon_description),
                                 modifier = Modifier.size(40.dp)
                             )
-                            Text("추가", style = MaterialTheme.typography.labelMedium)
+                            Text(
+                                text = stringResource(R.string.add_friend_icon_text),
+                                style = MaterialTheme.typography.labelMedium
+                            )
                         }
 
                         Column(
@@ -677,11 +689,14 @@ fun ChatRoomTopBar(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                Icons.Outlined.Block,
-                                contentDescription = "",
+                                imageVector = Icons.Outlined.Block,
+                                contentDescription = stringResource(R.string.block_icon_description),
                                 modifier = Modifier.size(40.dp)
                             )
-                            Text("차단", style = MaterialTheme.typography.labelMedium)
+                            Text(
+                                text = stringResource(R.string.block_icon_text),
+                                style = MaterialTheme.typography.labelMedium
+                            )
                         }
 
                         Column(
@@ -693,11 +708,14 @@ fun ChatRoomTopBar(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                Icons.Outlined.ReportProblem,
-                                contentDescription = "",
+                                imageVector = Icons.Outlined.ReportProblem,
+                                contentDescription = stringResource(R.string.report_icon_description),
                                 modifier = Modifier.size(40.dp)
                             )
-                            Text("신고", style = MaterialTheme.typography.labelMedium)
+                            Text(
+                                text = stringResource(R.string.report_icon_text),
+                                style = MaterialTheme.typography.labelMedium
+                            )
                         }
                     }
                 }
