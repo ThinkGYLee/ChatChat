@@ -78,6 +78,7 @@ interface UserRepository {
     )
 
     fun getHideFriends(): Flow<PagingData<RelatedUserLocalData>>
+    fun getBlockedFriends(): Flow<PagingData<RelatedUserLocalData>>
 
     suspend fun createFriendUserChatRoom(
         relatedUserLocalData: RelatedUserLocalData,
@@ -128,6 +129,7 @@ interface UserRepository {
 
     fun getFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
     fun getHideFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
+    fun getBlockedFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
 
     fun getHideFriendsWithFullTextName(query: String): Flow<PagingData<RelatedUserLocalData>>
     fun updateUserAndFavorite(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
@@ -806,12 +808,27 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    // TODO FTS 서치로 바꿀준비
     override fun getHideFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>> {
         val searchQuery = "%$query%"
         return Pager(
             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
             pagingSourceFactory = {
                 userDao.getHideFriendsWithName(searchQuery)
+            }
+        ).flow.map { value ->
+            value.map { entity ->
+                entity.toRelationLocalData()
+            }
+        }
+    }
+
+    override fun getBlockedFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>> {
+        val searchQuery = "%$query%"
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                userDao.getBlockedFriendsWithName(searchQuery)
             }
         ).flow.map { value ->
             value.map { entity ->
@@ -839,6 +856,19 @@ class UserRepositoryImpl @Inject constructor(
             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
             pagingSourceFactory = {
                 userDao.getHideUsersPaging()
+            }
+        ).flow.map { value ->
+            value.map { entity ->
+                entity.toRelationLocalData()
+            }
+        }
+    }
+
+    override fun getBlockedFriends(): Flow<PagingData<RelatedUserLocalData>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                userDao.getBlockedUsersPaging()
             }
         ).flow.map { value ->
             value.map { entity ->
