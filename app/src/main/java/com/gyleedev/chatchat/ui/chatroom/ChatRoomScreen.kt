@@ -37,6 +37,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.PersonAddAlt
 import androidx.compose.material.icons.outlined.Refresh
@@ -156,6 +157,9 @@ fun ChatRoomScreen(
             if (uiState is ChatRoomUiState.Success) {
                 val uiStateCast = uiState as ChatRoomUiState.Success
                 ChatRoomTopBar(
+                    onUnblockClick = chatRoomViewModel::userToFriend,
+                    onBlockClick = chatRoomViewModel::blockUser,
+                    onAddFriendClick = chatRoomViewModel::userToFriend,
                     onBackPressKeyClick = onBackPressKeyClick,
                     state = uiStateCast.relationState,
                     name = uiStateCast.userName
@@ -549,6 +553,9 @@ fun CommentBarPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatRoomTopBar(
+    onUnblockClick: () -> Unit,
+    onBlockClick: () -> Unit,
+    onAddFriendClick: () -> Unit,
     onBackPressKeyClick: () -> Unit,
     state: UserRelationState,
     name: String,
@@ -587,7 +594,7 @@ fun ChatRoomTopBar(
                         modifier = Modifier
                             .sizeIn(minWidth = 80.dp, minHeight = 80.dp)
                             .clip(CircleShape)
-                            .clickable {},
+                            .clickable { onUnblockClick() },
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -649,7 +656,7 @@ fun ChatRoomTopBar(
                             modifier = Modifier
                                 .sizeIn(minWidth = 80.dp, minHeight = 80.dp)
                                 .clip(CircleShape)
-                                .clickable {},
+                                .clickable { onAddFriendClick() },
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
@@ -665,16 +672,16 @@ fun ChatRoomTopBar(
                             modifier = Modifier
                                 .sizeIn(minWidth = 80.dp, minHeight = 80.dp)
                                 .clip(CircleShape)
-                                .clickable {},
+                                .clickable { onBlockClick() },
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                Icons.Outlined.RemoveCircleOutline,
+                                Icons.Outlined.Block,
                                 contentDescription = "",
                                 modifier = Modifier.size(40.dp)
                             )
-                            Text("차단 해제", style = MaterialTheme.typography.labelMedium)
+                            Text("차단", style = MaterialTheme.typography.labelMedium)
                         }
 
                         Column(
@@ -708,7 +715,10 @@ fun ChatRoomTopBarPreview() {
         ChatRoomTopBar(
             onBackPressKeyClick = {},
             state = UserRelationState.UNKNOWN,
-            name = "abcd"
+            name = "abcd",
+            onUnblockClick = {},
+            onBlockClick = {},
+            onAddFriendClick = {}
         )
     }
 }
