@@ -95,7 +95,6 @@ fun FriendEditScreen(
     }
 
     Scaffold(
-        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
@@ -114,65 +113,71 @@ fun FriendEditScreen(
                     }
                 }
             )
-        }
+        },
+        modifier = modifier
     ) { innerPadding ->
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            FriendFilterTextField(
-                searchQuery = searchQuery.value,
-                onReset = { viewModel.editSearchQuery("") },
-                onValueChange = viewModel::editSearchQuery
-            )
-            Spacer(modifier = Modifier.height(20.dp))
+        if (items.itemCount > 0) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                item {
+                    FriendFilterTextField(
+                        searchQuery = searchQuery.value,
+                        onReset = { viewModel.editSearchQuery("") },
+                        onValueChange = viewModel::editSearchQuery
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
 
-            if (items.itemCount > 0) {
-                AnimatedVisibility(searchQuery.value.isEmpty()) {
-                    Column {
+                item {
+                    AnimatedVisibility(searchQuery.value.isEmpty()) {
                         Text(
                             text = stringResource(R.string.friend_edit_screen_friend_text),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
                         )
-                        LazyColumn {
-                            items(
-                                items.itemCount,
-                                key = { requireNotNull(items[it]).email },
-                                contentType = { 0 }
-                            ) {
-                                items[it]?.let { userData ->
-                                    FriendData(
-                                        relatedUserLocalData = userData,
-                                        onHideRequest = { viewModel.hideFriend(userData) }
-                                    )
-                                }
-                            }
+                    }
+                }
+
+                items(
+                    items.itemCount,
+                    key = { "${requireNotNull(items[it]).id}+friendItem" },
+                    contentType = { 0 }
+                ) {
+                    AnimatedVisibility(searchQuery.value.isEmpty()) {
+                        items[it]?.let { userData ->
+                            FriendData(
+                                relatedUserLocalData = userData,
+                                onHideRequest = { viewModel.hideFriend(userData) }
+                            )
                         }
                     }
                 }
-                AnimatedVisibility(searchQuery.value.isNotEmpty()) {
-                    Column {
+
+                item {
+                    AnimatedVisibility(searchQuery.value.isNotEmpty()) {
                         Text(
                             text = stringResource(R.string.search_result_text),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
                         )
-                        LazyColumn {
-                            items(
-                                count = searchItems.itemCount,
-                                key = { requireNotNull(searchItems[it]).email },
-                                contentType = { 0 }
-                            ) {
-                                searchItems[it]?.let { userData ->
-                                    FriendData(
-                                        relatedUserLocalData = userData,
-                                        onHideRequest = { viewModel.hideFriend(userData) }
-                                    )
-                                }
-                            }
+                    }
+                }
+
+                items(
+                    count = searchItems.itemCount,
+                    key = { "${requireNotNull(searchItems[it]).id}+searchItem" },
+                    contentType = { 0 }
+                ) {
+                    AnimatedVisibility(searchQuery.value.isNotEmpty()) {
+                        searchItems[it]?.let { userData ->
+                            FriendData(
+                                relatedUserLocalData = userData,
+                                onHideRequest = { viewModel.hideFriend(userData) }
+                            )
                         }
                     }
                 }
@@ -209,7 +214,6 @@ fun FriendFilterTextField(
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                 decorationBox = { innerTextField ->
-
                     Row(
                         modifier = Modifier.padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
