@@ -133,7 +133,7 @@ fun FriendEditScreen(
                 AnimatedVisibility(searchQuery.value.isEmpty()) {
                     Column {
                         Text(
-                            text = stringResource(R.string.block_manage_screen_friend_text),
+                            text = stringResource(R.string.friend_edit_screen_friend_text),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
                         )
@@ -217,7 +217,7 @@ fun FriendFilterTextField(
                         Box(modifier = Modifier.weight(10f)) {
                             if (searchQuery.isEmpty()) {
                                 Text(
-                                    text = stringResource(R.string.find_user_text_field_hint),
+                                    text = stringResource(R.string.friend_edit_screen_text_field_hint),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = Color(0xFF848484),
                                     modifier = Modifier
