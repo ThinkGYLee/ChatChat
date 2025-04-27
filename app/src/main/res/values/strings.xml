@@ -63,6 +63,7 @@
     <string name="friend_filter_text_field_text_hint">친구 이름</string>
     <string name="friend_edit_screen_hide_text">숨김</string>
     <string name="friend_edit_screen_friend_text">친구</string>
+    <string name="friend_edit_screen_text_field_hint">친구 이름</string>
     <string name="send_button_description">보내기 버튼</string>
     <string name="chat_room_screen_title">%s 님과의 대화</string>
     <string name="media_bar_photo_icon_description">사진 보내기 버튼</string>
