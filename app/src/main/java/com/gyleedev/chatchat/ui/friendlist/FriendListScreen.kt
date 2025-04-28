@@ -77,7 +77,7 @@ fun FriendListScreen(
     modifier: Modifier = Modifier,
     viewModel: FriendListViewModel = hiltViewModel()
 ) {
-    val items = viewModel.items.collectAsLazyPagingItems()
+    val items = viewModel.updatedItem.collectAsLazyPagingItems()
 
     var openFriendDialog by remember { mutableStateOf(false) }
     var dialogRelatedUserLocalData by remember { mutableStateOf<RelatedUserLocalData?>(null) }
