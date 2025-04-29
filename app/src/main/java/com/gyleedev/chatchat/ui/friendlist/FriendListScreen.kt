@@ -1,6 +1,7 @@
 package com.gyleedev.chatchat.ui.friendlist
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -50,7 +51,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
@@ -62,7 +66,6 @@ import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,25 +80,22 @@ fun FriendListScreen(
     modifier: Modifier = Modifier,
     viewModel: FriendListViewModel = hiltViewModel()
 ) {
-    val items = viewModel.updatedItem.collectAsLazyPagingItems()
-
     var openFriendDialog by remember { mutableStateOf(false) }
     var dialogRelatedUserLocalData by remember { mutableStateOf<RelatedUserLocalData?>(null) }
     val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
-
+    val friends = viewModel.getFriends.collectAsLazyPagingItems()
+    val favorites = viewModel.getFavorites.collectAsLazyPagingItems()
+    val myData by viewModel.myUserData.collectAsStateWithLifecycle()
     var dropdownMenuExpanded by rememberSaveable { mutableStateOf(false) }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.getMyUserFromPreference()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
         }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchJobDone
-            .flowWithLifecycle(lifecycle.lifecycle).collectLatest {
-                items.refresh()
-            }
     }
 
     LaunchedEffect(Unit) {
@@ -143,62 +143,78 @@ fun FriendListScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            items(
-                items.itemCount,
-                key = { it },
-                contentType = { 0 }
-            ) { index ->
-                when (items[index]) {
-                    is FriendListUiState.MyData -> {
-                        val myData = items[index] as FriendListUiState.MyData
-                        MyUserData(
-                            onClick = { onMyInfoClick(requireNotNull(myData.myData).uid) },
-                            userData = requireNotNull(myData.myData)
+
+            item {
+                MyUserData(
+                    onClick = {
+                        onMyInfoClick(requireNotNull(myData).uid)
+                    },
+                    userData = requireNotNull(myData)
+                )
+            }
+
+            item {
+                AnimatedVisibility(favorites.itemCount > 0) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    ) {
+                        Text(
+                            text = "즐겨찾기 ${favorites.itemCount}",
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
-
-                    is FriendListUiState.Title -> {
-                        val titleData = items[index] as FriendListUiState.Title
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 20.dp)
-                        ) {
-                            Text(
-                                text = titleData.text,
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        }
-                    }
-
-                    is FriendListUiState.FriendData -> {
-                        val friendData = items[index] as FriendListUiState.FriendData
-                        FriendData(
-                            onClick = { onFriendClick(friendData.friendData.uid) },
-                            onLongClick = {
-                                dialogRelatedUserLocalData = friendData.friendData
-                                openFriendDialog = true
-                            },
-                            relatedUserLocalData = friendData.friendData
-                        )
-                    }
-
-                    is FriendListUiState.FavoriteData -> {
-                        val favoriteData = items[index] as FriendListUiState.FavoriteData
-                        FriendData(
-                            onClick = { onFriendClick(favoriteData.favoriteData.uid) },
-                            onLongClick = {
-                                dialogRelatedUserLocalData = favoriteData.favoriteData
-                                openFriendDialog = true
-                            },
-                            relatedUserLocalData = favoriteData.favoriteData
-                        )
-                    }
-
-                    else -> {}
                 }
+            }
+
+            items(
+                count = favorites.itemCount,
+                key = { "${requireNotNull(favorites[it]).id}+favorites" },
+                contentType = { 0 }
+            ) {
+                AnimatedVisibility(favorites.itemCount > 0) {
+                    FriendData(
+                        onClick = { onFriendClick(requireNotNull(favorites[it]).uid) },
+                        onLongClick = {
+                            dialogRelatedUserLocalData = favorites[it]
+                            openFriendDialog = true
+                        },
+                        relatedUserLocalData = requireNotNull(favorites[it]),
+                        modifier = Modifier.animateItem()
+                    )
+                }
+            }
+
+            item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                ) {
+                    Text(
+                        text = "친구 ${friends.itemCount}",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            }
+
+            items(
+                count = friends.itemCount,
+                key = { "${requireNotNull(friends[it]).id}+friends" },
+                contentType = { 0 }
+            ) {
+                FriendData(
+                    onClick = { onFriendClick(requireNotNull(friends[it]).uid) },
+                    onLongClick = {
+                        dialogRelatedUserLocalData = friends[it]
+                        openFriendDialog = true
+                    },
+                    relatedUserLocalData = requireNotNull(friends[it]),
+                    modifier = Modifier.animateItem()
+                )
             }
         }
     }
+
     if (openFriendDialog) {
         FriendDialog(
             closeDialog = {
