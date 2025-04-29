@@ -5,8 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-class GetMyUserDataUseCase @Inject constructor(
+class GetMyDataFromRemoteUseCase @Inject constructor(
     private val repository: UserRepository
 ) {
-    suspend operator fun invoke() = repository.getMyUserInformation().flowOn(Dispatchers.IO)
+    suspend operator fun invoke() = repository.getMyDataFromRemote().flowOn(Dispatchers.IO)
 }

@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.UserData
-import com.gyleedev.chatchat.domain.usecase.GetMyUserDataUseCase
+import com.gyleedev.chatchat.domain.usecase.GetMyDataFromRemoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyInfoViewModel @Inject constructor(
-    private val getMyUserDataUseCase: GetMyUserDataUseCase,
+    private val getMyDataFromRemoteUseCase: GetMyDataFromRemoteUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
     private val _userData = MutableStateFlow(UserData())
@@ -23,7 +23,7 @@ class MyInfoViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val userUid = savedStateHandle.get<String>("myInfo")
-            val myUserData = getMyUserDataUseCase().first()
+            val myUserData = getMyDataFromRemoteUseCase().first()
             if (myUserData != null && userUid != null) {
                 if (userUid == myUserData.uid) {
                     _userData.emit(myUserData)
@@ -34,7 +34,7 @@ class MyInfoViewModel @Inject constructor(
 
     fun updateUser() {
         viewModelScope.launch {
-            val myUserData = getMyUserDataUseCase().first()
+            val myUserData = getMyDataFromRemoteUseCase().first()
             if (myUserData != null) {
                 _userData.emit(myUserData)
             }
