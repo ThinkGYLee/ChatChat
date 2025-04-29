@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.gyleedev.chatchat.domain.UserData
 import dagger.hilt.android.qualifiers.ApplicationContext
 
@@ -20,19 +21,10 @@ class PreferenceUtil(@ApplicationContext context: Context) {
         )
     }
     fun setMyData(user: UserData) {
-        myDataPreference.edit().putString("Email", user.email).apply()
-        myDataPreference.edit().putString("Name", user.name).apply()
-        myDataPreference.edit().putString("Uid", user.uid).apply()
-        myDataPreference.edit().putString("Picture", user.picture).apply()
-        myDataPreference.edit().putString("Status", user.status).apply()
-    }
-
-    fun isKeyExist(): Boolean {
-        return myDataPreference.getString("Token", "").let {
-            !it.isNullOrEmpty()
-        }
-    }
-
-    fun deleteKey() {
+        myDataPreference.edit { putString("Email", user.email) }
+        myDataPreference.edit { putString("Name", user.name) }
+        myDataPreference.edit { putString("Uid", user.uid) }
+        myDataPreference.edit { putString("Picture", user.picture) }
+        myDataPreference.edit { putString("Status", user.status) }
     }
 }
