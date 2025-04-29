@@ -56,22 +56,12 @@ interface UserAndFavoriteDao {
     fun getFavoritesPaging(favoriteState: Boolean = true): PagingSource<Int, UserAndFavoriteEntity>
 
     @Transaction
-    @Query("SELECT * FROM user where favoriteState = :favoriteState")
-    fun getFavorites(favoriteState: Boolean = true): List<UserAndFavoriteEntity>
-
-    @Transaction
     @Query("SELECT * FROM user WHERE relation = :userRelationState")
     fun getHideUsersPaging(userRelationState: UserRelationState = UserRelationState.HIDE): PagingSource<Int, UserEntity>
 
     @Transaction
     @Query("SELECT COUNT(*) FROM user WHERE relation = :userRelationState")
-    fun getFriendsCount(userRelationState: UserRelationState = UserRelationState.FRIEND): Long
-
-    /**
-     * 아이템 10개씩 호출
-     */
-    @Query("SELECT * FROM user WHERE relation = :userRelationState  LIMIT 10 OFFSET (:page-1)*10")
-    fun getFriendsAndFavoritesWithPage(page: Int, userRelationState: UserRelationState = UserRelationState.FRIEND): List<UserAndFavoriteEntity>
+    suspend fun getFriendsCount(userRelationState: UserRelationState = UserRelationState.FRIEND): Long
 
     @Transaction
     @Query("SELECT * FROM user")
