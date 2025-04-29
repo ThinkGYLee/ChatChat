@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.UserData
-import com.gyleedev.chatchat.domain.usecase.GetMyUserDataUseCase
+import com.gyleedev.chatchat.domain.usecase.GetMyDataFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.UpdateMyInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyInfoEditViewModel @Inject constructor(
-    private val getMyUserDataUseCase: GetMyUserDataUseCase,
+    private val getMyDataFromRemoteUseCase: GetMyDataFromRemoteUseCase,
     private val updateMyInfoUseCase: UpdateMyInfoUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
@@ -40,7 +40,7 @@ class MyInfoEditViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val userUid = savedStateHandle.get<String>("myInfo")
-            val myUserData = getMyUserDataUseCase().first()
+            val myUserData = getMyDataFromRemoteUseCase().first()
             if (myUserData != null && userUid != null) {
                 if (userUid == myUserData.uid) {
                     _myUserData.emit(myUserData)
