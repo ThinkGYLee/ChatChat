@@ -15,7 +15,6 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.gyleedev.chatchat.data.database.FriendListPagingSource
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FavoriteDao
 import com.gyleedev.chatchat.data.database.dao.UserAndFavoriteDao
@@ -41,7 +40,6 @@ import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toRemoteData
-import com.gyleedev.chatchat.ui.friendlist.FriendListUiState
 import com.gyleedev.chatchat.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -62,7 +60,7 @@ interface UserRepository {
     suspend fun searchUser(email: String): Flow<UserData?>
     fun fetchUserExists(): Boolean
     suspend fun writeUserToRemote(user: UserData): Flow<SignInResult>
-    suspend fun getMyUserInformation(): Flow<UserData?>
+    suspend fun getMyDataFromRemote(): Flow<UserData?>
     suspend fun addFriendToRemote(user: UserData): Flow<Boolean>
     suspend fun getMyRelatedUserListFromRemote(): Flow<List<RelatedUserRemoteData>?>
     suspend fun insertMyRelationsToLocal(list: List<RelatedUserRemoteData>)
@@ -127,8 +125,7 @@ interface UserRepository {
 
     fun getHideFriendsWithFullTextName(query: String): Flow<PagingData<RelatedUserLocalData>>
     fun updateUserAndFavorite(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
-
-    fun getFriendListScreenState(): Flow<PagingData<FriendListUiState>>
+    fun getMyUserDataFromPreference(): UserData
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -223,7 +220,7 @@ class UserRepositoryImpl @Inject constructor(
         return auth.currentUser != null
     }
 
-    override suspend fun getMyUserInformation(): Flow<UserData?> = callbackFlow {
+    override suspend fun getMyDataFromRemote(): Flow<UserData?> = callbackFlow {
         val myData = preferenceUtil.getMyData()
         if (myData.uid != "default uid" && auth.currentUser != null) {
             trySend(myData)
@@ -250,6 +247,10 @@ class UserRepositoryImpl @Inject constructor(
             })
         }
         awaitClose()
+    }
+
+    override fun getMyUserDataFromPreference(): UserData {
+        return preferenceUtil.getMyData()
     }
 
     override suspend fun addFriendToRemote(user: UserData): Flow<Boolean> = callbackFlow {
@@ -386,7 +387,7 @@ class UserRepositoryImpl @Inject constructor(
             }
         ).flow.map { value ->
             value.map { it.toRelationLocalData() }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     override fun getFavorites(): Flow<PagingData<RelatedUserLocalData>> {
@@ -397,16 +398,7 @@ class UserRepositoryImpl @Inject constructor(
             }
         ).flow.map { value ->
             value.map { it.toLocalData() }
-        }
-    }
-
-    override fun getFriendListScreenState(): Flow<PagingData<FriendListUiState>> {
-        return Pager(
-            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-            pagingSourceFactory = {
-                FriendListPagingSource(userAndFavoriteDao, preferenceUtil)
-            }
-        ).flow.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO)
     }
 
     override suspend fun getFriendsCount(): Long {
