@@ -2,22 +2,25 @@ package com.gyleedev.chatchat.ui.friendlist
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import androidx.paging.filter
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.usecase.AddMyRelatedUsersUseCase
 import com.gyleedev.chatchat.domain.usecase.BlockFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.DeleteFriendUseCase
-import com.gyleedev.chatchat.domain.usecase.GetFriendListScreenStateUseCase
+import com.gyleedev.chatchat.domain.usecase.GetFavoritesUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendsCountUseCase
+import com.gyleedev.chatchat.domain.usecase.GetFriendsUseCase
+import com.gyleedev.chatchat.domain.usecase.GetMyDataFromPreferenceUseCase
+import com.gyleedev.chatchat.domain.usecase.GetMyDataFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyRelatedUserListFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.HideFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,38 +32,51 @@ class FriendListViewModel @Inject constructor(
     private val getFriendsCountUseCase: GetFriendsCountUseCase,
     private val deleteFriendUseCase: DeleteFriendUseCase,
     private val hideFriendUseCase: HideFriendUseCase,
-    getFriendListScreenStateUseCase: GetFriendListScreenStateUseCase,
-    private val blockFriendUseCase: BlockFriendUseCase
+    private val blockFriendUseCase: BlockFriendUseCase,
+    getFriendsUseCase: GetFriendsUseCase,
+    getFavoritesUseCase: GetFavoritesUseCase,
+    private val getMyDataFromRemoteUseCase: GetMyDataFromRemoteUseCase,
+    private val getMyDataFromPreferenceUseCase: GetMyDataFromPreferenceUseCase
 ) : BaseViewModel() {
-
-    private val _fetchJobDone = MutableSharedFlow<Unit>()
-    val fetchJobDone: SharedFlow<Unit> = _fetchJobDone
 
     private val _noSuchUserAlert = MutableSharedFlow<Unit>()
     val noSuchUserAlert: SharedFlow<Unit> = _noSuchUserAlert
 
     private val notFriend = MutableStateFlow<List<Long>>(listOf())
 
-    private val items = getFriendListScreenStateUseCase().cachedIn(viewModelScope)
+    // 친구 페이징 아이템
+    val getFriends = getFriendsUseCase().cachedIn(viewModelScope)
 
-    val updatedItem = combine(items, notFriend) { all, notFriends ->
-        all.filter {
-            it is FriendListUiState.Title ||
-                it is FriendListUiState.MyData ||
-                it is FriendListUiState.Loading ||
-                (it is FriendListUiState.FriendData && it.friendData.id !in notFriends) ||
-                (it is FriendListUiState.FavoriteData && it.favoriteData.id !in notFriends)
-        }
-    }
+    // 즐겨찾기 페이징 아이템
+    val getFavorites = getFavoritesUseCase().cachedIn(viewModelScope)
 
+    //내 정보
+    private val _myUserData = MutableStateFlow<UserData?>(UserData())
+    val myUserData: StateFlow<UserData?> = _myUserData
+
+
+    //뷰모델 만들어질 때 친구 수가 0이라면 remote를 확인한 후 내 데이터를 가져온다.
     init {
         viewModelScope.launch {
             if (getFriendsCount() == 0L) {
                 getMyRelatedUsersFromRemote()
             }
-            uiRefresh()
+            getMyUserData()
         }
     }
+
+    // preference에 내 정보 있나 확인하고 없으면 remote 에서 땡김
+    private suspend fun getMyUserData() {
+        _myUserData.emit(getMyDataFromRemoteUseCase().first())
+    }
+
+    // preference에서 내 정보 가져오기
+    fun getMyUserFromPreference() {
+        viewModelScope.launch {
+            _myUserData.emit(getMyDataFromPreferenceUseCase())
+        }
+    }
+
 
     private suspend fun getFriendsCount(): Long {
         return getFriendsCountUseCase()
@@ -117,9 +133,5 @@ class FriendListViewModel @Inject constructor(
         val updateList = mutableListOf(id)
         updateList.addAll(list)
         notFriend.emit(updateList)
-    }
-
-    private suspend fun uiRefresh() {
-        _fetchJobDone.emit(Unit)
     }
 }
