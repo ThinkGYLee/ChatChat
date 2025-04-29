@@ -143,7 +143,6 @@ fun FriendListScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-
             item {
                 MyUserData(
                     onClick = {

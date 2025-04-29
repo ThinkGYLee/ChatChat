@@ -50,12 +50,11 @@ class FriendListViewModel @Inject constructor(
     // 즐겨찾기 페이징 아이템
     val getFavorites = getFavoritesUseCase().cachedIn(viewModelScope)
 
-    //내 정보
+    // 내 정보
     private val _myUserData = MutableStateFlow<UserData?>(UserData())
     val myUserData: StateFlow<UserData?> = _myUserData
 
-
-    //뷰모델 만들어질 때 친구 수가 0이라면 remote를 확인한 후 내 데이터를 가져온다.
+    // 뷰모델 만들어질 때 친구 수가 0이라면 remote를 확인한 후 내 데이터를 가져온다.
     init {
         viewModelScope.launch {
             if (getFriendsCount() == 0L) {
@@ -76,7 +75,6 @@ class FriendListViewModel @Inject constructor(
             _myUserData.emit(getMyDataFromPreferenceUseCase())
         }
     }
-
 
     private suspend fun getFriendsCount(): Long {
         return getFriendsCountUseCase()
