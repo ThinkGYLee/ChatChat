@@ -17,6 +17,7 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -346,7 +347,7 @@ fun BottomNavigation(
                     )
                 },
                 selected = currentRoute == item.screenRoute,
-                alwaysShowLabel = false,
+                alwaysShowLabel = true,
                 onClick = {
                     navController.navigate(item.screenRoute) {
                         // 시작 스크린 제외한 모든 스택을 pop 하여 백스택이 많이 쌓이는 것을 방지
@@ -361,7 +362,16 @@ fun BottomNavigation(
                 },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = NavigationBarDefaults.containerColor
-                )
+                ),
+                label = {
+                    val label = when (item.screenRoute) {
+                        FRIENDLIST -> { "친구" }
+                        CHATLIST -> { "채팅" }
+                        SETTING -> { "설정" }
+                        else -> { "" }
+                    }
+                    Text(text = label)
+                }
             )
         }
     }
