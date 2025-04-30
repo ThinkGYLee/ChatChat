@@ -149,22 +149,24 @@ fun FriendListScreen(
                 .padding(innerPadding)
         ) {
             item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp)
-                ) {
-                    MyUserData(
-                        onClick = {
-                            onMyInfoClick(requireNotNull(myData).uid)
-                        },
-                        userData = requireNotNull(myData)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 20.dp),
-                        thickness = 0.3.dp
-                    )
+                AnimatedVisibility(myData != null) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp)
+                    ) {
+                        MyUserData(
+                            onClick = {
+                                onMyInfoClick(requireNotNull(myData).uid)
+                            },
+                            userData = requireNotNull(myData)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                            thickness = 0.3.dp
+                        )
+                    }
                 }
             }
 
@@ -216,17 +218,19 @@ fun FriendListScreen(
             }
 
             item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(
-                        vertical = 8.dp,
-                        horizontal = 20.dp
-                    )
-                ) {
-                    Text(
-                        text = "친구 ${friends.itemCount}",
-                        style = MaterialTheme.typography.labelMedium
-                    )
+                AnimatedVisibility(friends.itemCount > 0) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(
+                            vertical = 8.dp,
+                            horizontal = 20.dp
+                        )
+                    ) {
+                        Text(
+                            text = "친구 ${friends.itemCount}",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
                 }
             }
 
@@ -235,15 +239,17 @@ fun FriendListScreen(
                 key = { "${requireNotNull(friends[it]).id}+friends" },
                 contentType = { 0 }
             ) {
-                FriendData(
-                    onClick = { onFriendClick(requireNotNull(friends[it]).uid) },
-                    onLongClick = {
-                        dialogRelatedUserLocalData = friends[it]
-                        openFriendDialog = true
-                    },
-                    relatedUserLocalData = requireNotNull(friends[it]),
-                    modifier = Modifier.animateItem()
-                )
+                AnimatedVisibility(friends.itemCount > 0) {
+                    FriendData(
+                        onClick = { onFriendClick(requireNotNull(friends[it]).uid) },
+                        onLongClick = {
+                            dialogRelatedUserLocalData = friends[it]
+                            openFriendDialog = true
+                        },
+                        relatedUserLocalData = requireNotNull(friends[it]),
+                        modifier = Modifier.animateItem()
+                    )
+                }
             }
         }
     }
