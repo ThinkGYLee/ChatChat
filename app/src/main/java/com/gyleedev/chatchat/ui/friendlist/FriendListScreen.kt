@@ -36,7 +36,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,6 +53,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -262,7 +262,10 @@ fun FriendListScreen(
             },
             blockRequest = { viewModel.blockFriend(dialogRelatedUserLocalData) },
             deleteRequest = { viewModel.deleteFriend(dialogRelatedUserLocalData) },
-            hideRequest = { viewModel.hideFriend(dialogRelatedUserLocalData) }
+            hideRequest = { viewModel.hideFriend(dialogRelatedUserLocalData) },
+            updateFavorite = { viewModel.updateFavorite(dialogRelatedUserLocalData) },
+            name = requireNotNull(dialogRelatedUserLocalData).name,
+            favoriteState = requireNotNull(dialogRelatedUserLocalData).favoriteState
         )
     }
 }
@@ -380,6 +383,9 @@ fun FriendData(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendDialog(
+    name: String,
+    favoriteState: Boolean,
+    updateFavorite: () -> Unit,
     blockRequest: () -> Unit,
     deleteRequest: () -> Unit,
     hideRequest: () -> Unit,
@@ -395,35 +401,63 @@ fun FriendDialog(
                 tonalElevation = AlertDialogDefaults.TonalElevation
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(vertical = 24.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    TextButton(
-                        onClick = {
-                            blockRequest()
-                            closeDialog()
-                        }
-                    ) {
-                        Text(stringResource(R.string.friend_block_button_text))
-                    }
-                    HorizontalDivider()
-                    TextButton(
-                        onClick = {
-                            deleteRequest()
-                            closeDialog()
-                        }
-                    ) {
-                        Text(stringResource(R.string.friend_delete_button_text))
-                    }
-                    HorizontalDivider()
-                    TextButton(
-                        onClick = {
-                            hideRequest()
-                            closeDialog()
-                        }
-                    ) {
-                        Text(stringResource(R.string.friend_hide_button_text))
-                    }
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(
+                            if (favoriteState) {
+                                R.string.remove_favorite_button_text
+                            } else {
+                                R.string.add_favorite_button_text
+                            }
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                updateFavorite()
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.friend_block_button_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                blockRequest()
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+
+                    Text(
+                        text = stringResource(R.string.friend_delete_button_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                deleteRequest()
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.friend_hide_button_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                hideRequest()
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
                 }
             }
         },
