@@ -172,7 +172,9 @@ fun FriendListScreen(
                 AnimatedVisibility(favorites.itemCount > 0) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 20.dp)
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 8.dp)
                     ) {
                         Text(
                             text = "즐겨찾기 ${favorites.itemCount}",
@@ -191,7 +193,6 @@ fun FriendListScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp)
                     ) {
                         FriendData(
                             onClick = { onFriendClick(requireNotNull(favorites[it]).uid) },
@@ -202,8 +203,9 @@ fun FriendListScreen(
                             relatedUserLocalData = requireNotNull(favorites[it]),
                             modifier = Modifier.animateItem()
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+
                         if (it == favorites.itemCount - 1) {
+                            Spacer(modifier = Modifier.height(8.dp))
                             HorizontalDivider(
                                 modifier = Modifier.padding(horizontal = 20.dp),
                                 thickness = 0.3.dp
