@@ -123,7 +123,6 @@ class FriendListViewModel @Inject constructor(
         }
     }
 
-
     fun updateFavorite(relatedUserLocalData: RelatedUserLocalData?) {
         viewModelScope.launch {
             if (relatedUserLocalData != null) {
