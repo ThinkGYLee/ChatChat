@@ -16,6 +16,7 @@ import com.gyleedev.chatchat.domain.usecase.GetMyDataFromPreferenceUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyDataFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.GetMyRelatedUserListFromRemoteUseCase
 import com.gyleedev.chatchat.domain.usecase.HideFriendUseCase
+import com.gyleedev.chatchat.domain.usecase.UpdateFavoriteByUserEntityIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,13 +37,12 @@ class FriendListViewModel @Inject constructor(
     getFriendsUseCase: GetFriendsUseCase,
     getFavoritesUseCase: GetFavoritesUseCase,
     private val getMyDataFromRemoteUseCase: GetMyDataFromRemoteUseCase,
-    private val getMyDataFromPreferenceUseCase: GetMyDataFromPreferenceUseCase
+    private val getMyDataFromPreferenceUseCase: GetMyDataFromPreferenceUseCase,
+    private val updateFavoriteByUserEntityIdUseCase: UpdateFavoriteByUserEntityIdUseCase
 ) : BaseViewModel() {
 
     private val _noSuchUserAlert = MutableSharedFlow<Unit>()
     val noSuchUserAlert: SharedFlow<Unit> = _noSuchUserAlert
-
-    private val notFriend = MutableStateFlow<List<Long>>(listOf())
 
     // 친구 페이징 아이템
     val getFriends = getFriendsUseCase().cachedIn(viewModelScope)
@@ -97,7 +97,6 @@ class FriendListViewModel @Inject constructor(
         viewModelScope.launch {
             if (relatedUserLocalData != null) {
                 deleteFriendUseCase(relatedUserLocalData)
-                updateNotFriend(relatedUserLocalData.id)
             } else {
                 _noSuchUserAlert.emit(Unit)
             }
@@ -108,7 +107,6 @@ class FriendListViewModel @Inject constructor(
         viewModelScope.launch {
             if (relatedUserLocalData != null) {
                 hideFriendUseCase(relatedUserLocalData)
-                updateNotFriend(relatedUserLocalData.id)
             } else {
                 _noSuchUserAlert.emit(Unit)
             }
@@ -119,17 +117,19 @@ class FriendListViewModel @Inject constructor(
         viewModelScope.launch {
             if (relatedUserLocalData != null) {
                 blockFriendUseCase(relatedUserLocalData)
-                updateNotFriend(relatedUserLocalData.id)
             } else {
                 _noSuchUserAlert.emit(Unit)
             }
         }
     }
 
-    private suspend fun updateNotFriend(id: Long) {
-        val list = notFriend.value
-        val updateList = mutableListOf(id)
-        updateList.addAll(list)
-        notFriend.emit(updateList)
+    fun updateFavorite(relatedUserLocalData: RelatedUserLocalData?) {
+        viewModelScope.launch {
+            if (relatedUserLocalData != null) {
+                updateFavoriteByUserEntityIdUseCase(relatedUserLocalData)
+            } else {
+                _noSuchUserAlert.emit(Unit)
+            }
+        }
     }
 }

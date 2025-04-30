@@ -3,14 +3,18 @@ package com.gyleedev.chatchat.ui.friendlist
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,7 +22,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
@@ -32,7 +36,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,8 +50,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -113,7 +118,7 @@ fun FriendListScreen(
                 actions = {
                     IconButton(onClick = onFindUserButtonClick) {
                         Icon(
-                            imageVector = Icons.Outlined.Add,
+                            imageVector = Icons.Outlined.PersonAdd,
                             contentDescription = stringResource(R.string.add_friend_button_description)
                         )
                     }
@@ -144,19 +149,34 @@ fun FriendListScreen(
                 .padding(innerPadding)
         ) {
             item {
-                MyUserData(
-                    onClick = {
-                        onMyInfoClick(requireNotNull(myData).uid)
-                    },
-                    userData = requireNotNull(myData)
-                )
+                AnimatedVisibility(myData != null) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp)
+                    ) {
+                        MyUserData(
+                            onClick = {
+                                onMyInfoClick(requireNotNull(myData).uid)
+                            },
+                            userData = requireNotNull(myData)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                            thickness = 0.3.dp
+                        )
+                    }
+                }
             }
 
             item {
                 AnimatedVisibility(favorites.itemCount > 0) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 20.dp)
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 8.dp)
                     ) {
                         Text(
                             text = "즐겨찾기 ${favorites.itemCount}",
@@ -172,27 +192,45 @@ fun FriendListScreen(
                 contentType = { 0 }
             ) {
                 AnimatedVisibility(favorites.itemCount > 0) {
-                    FriendData(
-                        onClick = { onFriendClick(requireNotNull(favorites[it]).uid) },
-                        onLongClick = {
-                            dialogRelatedUserLocalData = favorites[it]
-                            openFriendDialog = true
-                        },
-                        relatedUserLocalData = requireNotNull(favorites[it]),
-                        modifier = Modifier.animateItem()
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        FriendData(
+                            onClick = { onFriendClick(requireNotNull(favorites[it]).uid) },
+                            onLongClick = {
+                                dialogRelatedUserLocalData = favorites[it]
+                                openFriendDialog = true
+                            },
+                            relatedUserLocalData = requireNotNull(favorites[it]),
+                            modifier = Modifier.animateItem()
+                        )
+
+                        if (it == favorites.itemCount - 1) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 20.dp),
+                                thickness = 0.3.dp
+                            )
+                        }
+                    }
                 }
             }
 
             item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                ) {
-                    Text(
-                        text = "친구 ${friends.itemCount}",
-                        style = MaterialTheme.typography.labelMedium
-                    )
+                AnimatedVisibility(friends.itemCount > 0) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(
+                            vertical = 8.dp,
+                            horizontal = 20.dp
+                        )
+                    ) {
+                        Text(
+                            text = "친구 ${friends.itemCount}",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
                 }
             }
 
@@ -201,15 +239,17 @@ fun FriendListScreen(
                 key = { "${requireNotNull(friends[it]).id}+friends" },
                 contentType = { 0 }
             ) {
-                FriendData(
-                    onClick = { onFriendClick(requireNotNull(friends[it]).uid) },
-                    onLongClick = {
-                        dialogRelatedUserLocalData = friends[it]
-                        openFriendDialog = true
-                    },
-                    relatedUserLocalData = requireNotNull(friends[it]),
-                    modifier = Modifier.animateItem()
-                )
+                AnimatedVisibility(friends.itemCount > 0) {
+                    FriendData(
+                        onClick = { onFriendClick(requireNotNull(friends[it]).uid) },
+                        onLongClick = {
+                            dialogRelatedUserLocalData = friends[it]
+                            openFriendDialog = true
+                        },
+                        relatedUserLocalData = requireNotNull(friends[it]),
+                        modifier = Modifier.animateItem()
+                    )
+                }
             }
         }
     }
@@ -222,7 +262,10 @@ fun FriendListScreen(
             },
             blockRequest = { viewModel.blockFriend(dialogRelatedUserLocalData) },
             deleteRequest = { viewModel.deleteFriend(dialogRelatedUserLocalData) },
-            hideRequest = { viewModel.hideFriend(dialogRelatedUserLocalData) }
+            hideRequest = { viewModel.hideFriend(dialogRelatedUserLocalData) },
+            updateFavorite = { viewModel.updateFavorite(dialogRelatedUserLocalData) },
+            name = requireNotNull(dialogRelatedUserLocalData).name,
+            favoriteState = requireNotNull(dialogRelatedUserLocalData).favoriteState
         )
     }
 }
@@ -244,11 +287,17 @@ fun MyUserData(
         verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(
-            imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+            imageModel = { imageUrl.ifBlank { R.drawable.baseline_person_24 } },
             imageOptions = ImageOptions(contentScale = ContentScale.Crop),
             modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(20.dp)),
+                .size(56.dp)
+                .border(
+                    width = 0.01.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = RoundedCornerShape(20.dp)
+                )
+                .clip(RoundedCornerShape(20.dp))
+                .background(color = colorResource(R.color.avatar_background)),
             component = rememberImageComponent {
                 +ShimmerPlugin(
                     Shimmer.Flash(
@@ -257,7 +306,7 @@ fun MyUserData(
                     )
                 )
             },
-            previewPlaceholder = painterResource(id = R.drawable.icons8__)
+            previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
         )
         Spacer(modifier = Modifier.width(20.dp))
         Column(verticalArrangement = Arrangement.Center) {
@@ -294,22 +343,30 @@ fun FriendData(
             .padding(vertical = 8.dp, horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        GlideImage(
-            imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
-            imageOptions = ImageOptions(contentScale = ContentScale.Crop),
-            modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(20.dp)),
-            component = rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray
+        Box(modifier = Modifier.wrapContentSize()) {
+            GlideImage(
+                imageModel = { imageUrl.ifBlank { R.drawable.baseline_person_24 } },
+                imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+                modifier = Modifier
+                    .size(40.dp)
+                    .border(
+                        width = 0.01.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = RoundedCornerShape(16.dp)
                     )
-                )
-            },
-            previewPlaceholder = painterResource(id = R.drawable.icons8__)
-        )
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(color = colorResource(R.color.avatar_background)),
+                component = rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray
+                        )
+                    )
+                },
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+            )
+        }
         Spacer(modifier = Modifier.width(20.dp))
         Column(horizontalAlignment = Alignment.Start) {
             Text(text = relatedUserLocalData.name, style = MaterialTheme.typography.bodyMedium)
@@ -326,6 +383,9 @@ fun FriendData(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendDialog(
+    name: String,
+    favoriteState: Boolean,
+    updateFavorite: () -> Unit,
     blockRequest: () -> Unit,
     deleteRequest: () -> Unit,
     hideRequest: () -> Unit,
@@ -341,35 +401,63 @@ fun FriendDialog(
                 tonalElevation = AlertDialogDefaults.TonalElevation
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(vertical = 24.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    TextButton(
-                        onClick = {
-                            blockRequest()
-                            closeDialog()
-                        }
-                    ) {
-                        Text(stringResource(R.string.friend_block_button_text))
-                    }
-                    HorizontalDivider()
-                    TextButton(
-                        onClick = {
-                            deleteRequest()
-                            closeDialog()
-                        }
-                    ) {
-                        Text(stringResource(R.string.friend_delete_button_text))
-                    }
-                    HorizontalDivider()
-                    TextButton(
-                        onClick = {
-                            hideRequest()
-                            closeDialog()
-                        }
-                    ) {
-                        Text(stringResource(R.string.friend_hide_button_text))
-                    }
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(
+                            if (favoriteState) {
+                                R.string.remove_favorite_button_text
+                            } else {
+                                R.string.add_favorite_button_text
+                            }
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                updateFavorite()
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.friend_block_button_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                blockRequest()
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+
+                    Text(
+                        text = stringResource(R.string.friend_delete_button_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                deleteRequest()
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.friend_hide_button_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                hideRequest()
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
                 }
             }
         },

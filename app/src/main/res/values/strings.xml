@@ -55,6 +55,8 @@
     <string name="friend_block_button_text">친구 차단</string>
     <string name="friend_hide_button_text">친구 숨김</string>
     <string name="friend_delete_button_text">친구 삭제</string>
+    <string name="add_favorite_button_text">즐겨찾기에 추가</string>
+    <string name="remove_favorite_button_text">즐겨찾기에서 제거</string>
     <string name="edit_button_text">편집</string>
     <string name="manage_friend_button_text">친구 관리</string>
     <string name="entire_setting_button_text">전체 설정</string>
