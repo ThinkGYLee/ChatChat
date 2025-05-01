@@ -398,7 +398,8 @@ fun FriendDialog(
             Surface(
                 modifier = Modifier.wrapContentSize(),
                 shape = MaterialTheme.shapes.medium,
-                tonalElevation = AlertDialogDefaults.TonalElevation
+                tonalElevation = AlertDialogDefaults.TonalElevation,
+                color = AlertDialogDefaults.containerColor
             ) {
                 Column(
                     modifier = Modifier.padding(vertical = 24.dp),
