@@ -146,7 +146,7 @@ fun ChatRoomItem(
                 imageModel = { imageUrl.ifBlank { R.drawable.baseline_person_24 } },
                 imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(48.dp)
                     .border(
                         width = 0.01.dp,
                         color = MaterialTheme.colorScheme.outlineVariant,
@@ -182,7 +182,8 @@ fun ChatRoomItem(
                 ZoneId.of("Asia/Seoul")
             ).format(
                 DateTimeFormatter.ofPattern("MM-dd")
-            )
+            ),
+            style = MaterialTheme.typography.labelMedium
         )
     }
 }
