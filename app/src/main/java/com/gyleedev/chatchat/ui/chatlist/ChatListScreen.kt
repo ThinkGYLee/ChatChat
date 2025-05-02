@@ -135,10 +135,10 @@ fun ChatRoomItem(
     Row(
         modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
             .clickable {
                 onClick(chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.uid)
-            },
+            }
+            .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
         Row(Modifier) {
