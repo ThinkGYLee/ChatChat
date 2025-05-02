@@ -2,6 +2,8 @@ package com.gyleedev.chatchat.ui.chatlist
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,8 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -30,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -131,19 +135,25 @@ fun ChatRoomItem(
     Row(
         modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
             .clickable {
                 onClick(chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.uid)
-            },
+            }
+            .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
         Row(Modifier) {
             GlideImage(
-                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+                imageModel = { imageUrl.ifBlank { R.drawable.baseline_person_24 } },
                 imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(20.dp)),
+                    .size(48.dp)
+                    .border(
+                        width = 0.01.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape
+                    )
+                    .clip(CircleShape)
+                    .background(color = colorResource(R.color.avatar_background)),
                 component = rememberImageComponent {
                     +ShimmerPlugin(
                         Shimmer.Flash(
@@ -152,16 +162,17 @@ fun ChatRoomItem(
                         )
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.icons8__)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
             )
             Spacer(modifier = Modifier.width(20.dp))
             Column {
                 Text(
                     text = chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.name,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(text = text)
+                Text(text = text, style = MaterialTheme.typography.labelMedium, maxLines = 2)
             }
         }
 
@@ -171,7 +182,8 @@ fun ChatRoomItem(
                 ZoneId.of("Asia/Seoul")
             ).format(
                 DateTimeFormatter.ofPattern("MM-dd")
-            )
+            ),
+            style = MaterialTheme.typography.labelMedium
         )
     }
 }
