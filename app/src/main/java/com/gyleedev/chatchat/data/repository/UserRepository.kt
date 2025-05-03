@@ -28,6 +28,7 @@ import com.gyleedev.chatchat.data.database.entity.toLocalData
 import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.data.database.entity.toRelationLocalData
 import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
+import com.gyleedev.chatchat.data.model.toBlockedUser
 import com.gyleedev.chatchat.data.model.toRelatedUserLocalData
 import com.gyleedev.chatchat.domain.ChangeRelationResult
 import com.gyleedev.chatchat.domain.ChatRoomData
@@ -126,6 +127,8 @@ interface UserRepository {
     fun getHideFriendsWithFullTextName(query: String): Flow<PagingData<RelatedUserLocalData>>
     fun updateUserAndFavorite(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
     fun getMyUserDataFromPreference(): UserData
+
+    fun updateBlockedUserToRemote(relatedUserLocalData: RelatedUserLocalData)
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -929,6 +932,23 @@ class UserRepositoryImpl @Inject constructor(
                     favoriteNumber = requireNotNull(favoriteEntity.favoriteNumber) - 1L
                 )
             )
+        }
+    }
+
+    override fun updateBlockedUserToRemote(relatedUserLocalData: RelatedUserLocalData) {
+        callbackFlow {
+            auth.currentUser?.let {
+                database.reference.child("blocked").child(it.uid)
+                    .setValue(relatedUserLocalData.toBlockedUser())
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            trySend("")
+                        } else {
+                            trySend("")
+                        }
+                    }
+                awaitClose()
+            }
         }
     }
 }
