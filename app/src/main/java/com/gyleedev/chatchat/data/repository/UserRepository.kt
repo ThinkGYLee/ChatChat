@@ -28,7 +28,6 @@ import com.gyleedev.chatchat.data.database.entity.toLocalData
 import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.data.database.entity.toRelationLocalData
 import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
-import com.gyleedev.chatchat.data.model.toBlockedUser
 import com.gyleedev.chatchat.data.model.toRelatedUserLocalData
 import com.gyleedev.chatchat.domain.ChangeRelationResult
 import com.gyleedev.chatchat.domain.ChatRoomData
@@ -40,6 +39,7 @@ import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.UserRelationState
+import com.gyleedev.chatchat.domain.toBlockedUser
 import com.gyleedev.chatchat.domain.toRemoteData
 import com.gyleedev.chatchat.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
@@ -935,20 +935,20 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    // Block 한 유저의 Uid에 내 정보를 인서트
     override fun updateBlockedUserToRemote(relatedUserLocalData: RelatedUserLocalData) {
         callbackFlow {
-            auth.currentUser?.let {
-                database.reference.child("blocked").child(it.uid)
-                    .setValue(relatedUserLocalData.toBlockedUser())
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            trySend("")
-                        } else {
-                            trySend("")
-                        }
+            val myData = getMyUserDataFromPreference()
+            database.reference.child("blocked").child(relatedUserLocalData.uid)
+                .setValue(myData.toBlockedUser())
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend("")
+                    } else {
+                        trySend("")
                     }
-                awaitClose()
-            }
+                }
+            awaitClose()
         }
     }
 }
