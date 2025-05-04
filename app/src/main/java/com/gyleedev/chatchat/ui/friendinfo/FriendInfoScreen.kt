@@ -87,8 +87,7 @@ fun FriendInfoScreen(
                         // default size 24dp
                         Icon(
                             imageVector = Icons.Default.StarOutline,
-                            contentDescription = null,
-                            tint = Color.Black
+                            contentDescription = null
                         )
 
                         // adjust size 18dp
