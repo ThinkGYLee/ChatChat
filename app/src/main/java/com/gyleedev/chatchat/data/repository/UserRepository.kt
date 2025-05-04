@@ -34,6 +34,7 @@ import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.ChatRoomDataWithRelatedUsers
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.LogInResult
+import com.gyleedev.chatchat.domain.ProcessResult
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
@@ -128,7 +129,7 @@ interface UserRepository {
     fun updateUserAndFavorite(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
     fun getMyUserDataFromPreference(): UserData
 
-    fun updateBlockedUserToRemote(relatedUserLocalData: RelatedUserLocalData)
+    fun updateBlockedUserToRemote(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -936,19 +937,19 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     // Block 한 유저의 Uid에 내 정보를 인서트
-    override fun updateBlockedUserToRemote(relatedUserLocalData: RelatedUserLocalData) {
+    override fun updateBlockedUserToRemote(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult> =
         callbackFlow {
             val myData = getMyUserDataFromPreference()
             database.reference.child("blocked").child(relatedUserLocalData.uid)
                 .setValue(myData.toBlockedUser())
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        trySend("")
+                        trySend(ProcessResult.Success)
                     } else {
-                        trySend("")
+                        trySend(ProcessResult.Failure)
                     }
                 }
             awaitClose()
         }
-    }
+
 }
