@@ -117,7 +117,7 @@ interface UserRepository {
     suspend fun changeRelatedUserLocal(relatedUserLocalData: RelatedUserLocalData): Flow<ChangeRelationResult>
 
     suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
-    suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
+    suspend fun blockUserRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
     suspend fun userToFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
 
     fun getFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
@@ -748,7 +748,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
+    override suspend fun blockUserRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
         return try {
             val relatedUser = relatedUserLocalData.copy(
                 userRelation = UserRelationState.BLOCKED,
