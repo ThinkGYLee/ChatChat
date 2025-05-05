@@ -60,7 +60,6 @@ interface UserRepository {
     fun getUsersFromLocal(): List<UserData>
     suspend fun signInUser(id: String, password: String, nickname: String): Flow<UserData?>
     suspend fun loginRequest(id: String, password: String): Flow<LogInResult>
-    suspend fun searchUser(email: String): Flow<UserData?>
     fun fetchUserExists(): Boolean
     suspend fun writeUserToRemote(user: UserData): Flow<SignInResult>
     suspend fun getMyDataFromRemote(): Flow<UserData?>
@@ -131,6 +130,9 @@ interface UserRepository {
     fun getMyUserDataFromPreference(): UserData
 
     fun addUserToRemoteBlockedEntity(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult>
+
+    suspend fun searchUserRequest(email: String): Flow<UserData?>
+    suspend fun searchUser(email: String): Flow<UserData?>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -196,6 +198,23 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
+    //유저 검색 플로우
+    //내가 상대에게 블락됐는지 확인
+    //문제 없으면 유저 정보 가져와서 리턴
+    //문제 있으면 null 리턴
+    override suspend fun searchUserRequest(email: String): Flow<UserData?> =
+        callbackFlow {
+            val checkBlockState = checkUserBlockState(email).first()
+            if(checkBlockState == ProcessResult.Success) {
+                val result = searchUser(email).first()
+                trySend(result)
+            } else {
+                trySend(null)
+            }
+            awaitClose()
+        }
+
+    //리모트에서 유저 검색 기능
     override suspend fun searchUser(email: String): Flow<UserData?> = callbackFlow {
         val query =
             database.reference.child(
@@ -983,11 +1002,11 @@ class UserRepositoryImpl @Inject constructor(
         }
 
     //user를 검색할 때 검색 대상의 block 리스트에 내 정보가 있나 확인
-    private fun checkUserBlockState(searchUser: RelatedUserLocalData): Flow<ProcessResult> =
+    private fun checkUserBlockState(email: String): Flow<ProcessResult> =
         callbackFlow {
             val myData = getMyUserDataFromPreference()
             database.reference.child("blocked").child(myData.uid).orderByChild("email")
-                .equalTo(searchUser.email)
+                .equalTo(email)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.value != null) {
