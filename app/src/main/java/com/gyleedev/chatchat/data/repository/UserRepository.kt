@@ -775,11 +775,19 @@ class UserRepositoryImpl @Inject constructor(
 
     // remote의 relations에 정보를 넣고 성공 실패로 local에 넣을지 결정
     // remote에 유저가 존재하는지는 확인할 필요 없음 있던 없던 덮어 씀
+    // 유저 상태가 블락된 유저일 때 먼저 서치불가 정보를 해제가 성공하면 relations 변경으로
     override suspend fun userToFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
-        return try {
+        try {
             val relatedUser = relatedUserLocalData.copy(userRelation = UserRelationState.FRIEND)
-            val remoteRequest = changeRelatedUserRemote(relatedUser).first()
-            if (remoteRequest == ProcessResult.Success) {
+            if (relatedUserLocalData.userRelation == UserRelationState.BLOCKED) {
+                val deleteFromBlocked =
+                    deleteUserFromRemoteBlockedEntity(relatedUserLocalData).first()
+                if (deleteFromBlocked == ProcessResult.Failure) {
+                    return ChangeRelationResult.FAILURE
+                }
+            }
+            val remoteChangeUserRelationRequest = changeRelatedUserRemote(relatedUser).first()
+            return if (remoteChangeUserRelationRequest == ProcessResult.Success) {
                 val localRequest = changeRelatedUserLocal(relatedUser).first()
                 if (localRequest == ChangeRelationResult.SUCCESS) {
                     ChangeRelationResult.SUCCESS
@@ -790,7 +798,7 @@ class UserRepositoryImpl @Inject constructor(
                 ChangeRelationResult.FAILURE
             }
         } catch (e: Exception) {
-            ChangeRelationResult.FAILURE
+            return ChangeRelationResult.FAILURE
         }
     }
 
