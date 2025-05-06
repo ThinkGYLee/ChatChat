@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.domain.usecase
 
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.LogInState
+import com.gyleedev.chatchat.domain.SearchUserResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -21,10 +22,10 @@ class LoginProcessUseCase @Inject constructor(
                 )
             } else {
                 val searchUser = getUserDataUseCase(id).first()
-                if (searchUser != null) {
-                    setMyUserInformationUseCase(searchUser)
+                if (searchUser is SearchUserResult.Success) {
+                    setMyUserInformationUseCase(searchUser.user)
                     LogInState.Success(
-                        userData = searchUser
+                        userData = searchUser.user
                     )
                 } else {
                     LogInState.Failure(
