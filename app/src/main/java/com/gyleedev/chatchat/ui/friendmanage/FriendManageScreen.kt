@@ -29,8 +29,7 @@ fun FriendManageScreen(
     onBlockedClick: () -> Unit,
     onHideClick: () -> Unit,
     onBackPressKeyClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: FriendManageViewModel = hiltViewModel()
+    modifier: Modifier = Modifier
 ) {
     Scaffold(
         topBar = {
