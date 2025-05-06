@@ -12,7 +12,7 @@ class GetUserDataUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(email: String): Flow<UserData?> {
         return withContext(Dispatchers.IO) {
-            repository.searchUser(email)
+            repository.searchUserRequest(email)
         }
     }
 }
