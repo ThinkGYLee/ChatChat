@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.ui.finduser
 
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
+import com.gyleedev.chatchat.domain.SearchUserResult
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.usecase.AddFriendRequestUseCase
 import com.gyleedev.chatchat.domain.usecase.GetUserDataUseCase
@@ -51,10 +52,11 @@ class FindUserViewModel @Inject constructor(
     fun fetchUserData() {
         viewModelScope.launch {
             val fetchUserdata = getUserDataUseCase(_emailQuery.value).first()
-            if (fetchUserdata == null) {
+            if (fetchUserdata is SearchUserResult.Failure) {
                 _searchFailure.emit(Unit)
             } else {
-                _userData.emit(fetchUserdata)
+                val userData = fetchUserdata as SearchUserResult.Success
+                _userData.emit(userData.user)
             }
         }
     }
