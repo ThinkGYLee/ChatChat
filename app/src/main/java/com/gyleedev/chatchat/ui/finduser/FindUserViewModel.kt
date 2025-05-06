@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,13 +50,11 @@ class FindUserViewModel @Inject constructor(
 
     fun fetchUserData() {
         viewModelScope.launch {
-            val fetchUserdata = getUserDataUseCase(_emailQuery.value)
-            fetchUserdata.collect { value ->
-                if (value == null) {
-                    _searchFailure.emit(Unit)
-                } else {
-                    _userData.emit(value)
-                }
+            val fetchUserdata = getUserDataUseCase(_emailQuery.value).first()
+            if (fetchUserdata == null) {
+                _searchFailure.emit(Unit)
+            } else {
+                _userData.emit(fetchUserdata)
             }
         }
     }
