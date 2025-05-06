@@ -37,6 +37,7 @@ import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.ProcessResult
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.SearchUserResult
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
@@ -131,7 +132,7 @@ interface UserRepository {
 
     fun addUserToRemoteBlockedEntity(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult>
 
-    suspend fun searchUserRequest(email: String): Flow<UserData?>
+    suspend fun searchUserRequest(email: String): Flow<SearchUserResult>
     suspend fun searchUser(email: String): Flow<UserData?>
 }
 
@@ -202,14 +203,23 @@ class UserRepositoryImpl @Inject constructor(
     //내가 상대에게 블락됐는지 확인
     //문제 없으면 유저 정보 가져와서 리턴
     //문제 있으면 null 리턴
-    override suspend fun searchUserRequest(email: String): Flow<UserData?> =
+    override suspend fun searchUserRequest(email: String): Flow<SearchUserResult> =
         callbackFlow {
+            val myData = getMyUserDataFromPreference()
+            if(email == myData.email) {
+                trySend(SearchUserResult.Failure(message = "this is my email"))
+            }
             val checkBlockState = checkUserBlockState(email).first()
             if(checkBlockState == ProcessResult.Failure) {
                 val result = searchUser(email).first()
-                trySend(result)
+                if(result != null) {
+                    trySend(SearchUserResult.Success(user = result))
+                } else {
+                    trySend(SearchUserResult.Failure(message = "no such user"))
+                }
+
             } else {
-                trySend(null)
+                trySend(SearchUserResult.Failure(message = "no such user"))
             }
             awaitClose()
         }
