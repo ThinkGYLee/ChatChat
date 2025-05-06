@@ -205,7 +205,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun searchUserRequest(email: String): Flow<UserData?> =
         callbackFlow {
             val checkBlockState = checkUserBlockState(email).first()
-            if(checkBlockState == ProcessResult.Success) {
+            if(checkBlockState == ProcessResult.Failure) {
                 val result = searchUser(email).first()
                 trySend(result)
             } else {
