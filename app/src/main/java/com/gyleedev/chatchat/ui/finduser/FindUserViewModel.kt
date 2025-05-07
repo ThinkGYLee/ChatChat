@@ -2,9 +2,11 @@ package com.gyleedev.chatchat.ui.finduser
 
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
+import com.gyleedev.chatchat.domain.ChangeRelationResult
 import com.gyleedev.chatchat.domain.SearchUserResult
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.usecase.AddFriendRequestUseCase
+import com.gyleedev.chatchat.domain.usecase.BlockUnknownUserUseCase
 import com.gyleedev.chatchat.domain.usecase.GetUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class FindUserViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
-    private val addFriendRequestUseCase: AddFriendRequestUseCase
+    private val addFriendRequestUseCase: AddFriendRequestUseCase,
+    private val blockUnknownUserUseCase: BlockUnknownUserUseCase
 ) : BaseViewModel() {
 
     private val _emailQuery = MutableStateFlow("")
@@ -32,8 +35,8 @@ class FindUserViewModel @Inject constructor(
     private val _searchFailure = MutableSharedFlow<Unit>()
     val searchFailure: SharedFlow<Unit> = _searchFailure
 
-    private val _addProcessComplete = MutableSharedFlow<Boolean>()
-    val addProcessComplete: SharedFlow<Boolean> = _addProcessComplete
+    private val _userProcessComplete = MutableSharedFlow<FindProcessState>()
+    val userProcessComplete: SharedFlow<FindProcessState> = _userProcessComplete
 
     fun editEmail(email: String) {
         viewModelScope.launch {
@@ -53,7 +56,7 @@ class FindUserViewModel @Inject constructor(
         viewModelScope.launch {
             val fetchUserdata = getUserDataUseCase(_emailQuery.value).first()
             if (fetchUserdata is SearchUserResult.Failure) {
-                _searchFailure.emit(Unit)
+                _userProcessComplete.emit(FindProcessState.SearchFailure)
             } else {
                 val userData = fetchUserdata as SearchUserResult.Success
                 _userData.emit(userData.user)
@@ -63,9 +66,22 @@ class FindUserViewModel @Inject constructor(
 
     fun addFriend() {
         viewModelScope.launch {
-            val request = userData.value?.let { addFriendRequestUseCase(it) }
-            request?.collect { value ->
-                _addProcessComplete.emit(value)
+            val request = userData.value?.let { addFriendRequestUseCase(it).first() }
+            if (request == true) {
+                _userProcessComplete.emit(FindProcessState.Complete)
+            } else {
+                _userProcessComplete.emit(FindProcessState.AddFailure)
+            }
+        }
+    }
+
+    fun blockFriend() {
+        viewModelScope.launch {
+            val request = userData.value?.let { blockUnknownUserUseCase(it) }
+            if (request == ChangeRelationResult.SUCCESS) {
+                _userProcessComplete.emit(FindProcessState.Complete)
+            } else {
+                _userProcessComplete.emit(FindProcessState.BlockFailure)
             }
         }
     }
