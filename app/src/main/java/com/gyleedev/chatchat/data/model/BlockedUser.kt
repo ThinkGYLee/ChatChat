@@ -8,7 +8,7 @@ data class BlockedUser(
 )
 
 fun RelatedUserLocalData.toBlockedUser(): BlockedUser {
-    return BlockedUser (
+    return BlockedUser(
         uid = uid,
         email = email
     )
