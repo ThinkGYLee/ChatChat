@@ -119,7 +119,7 @@ interface UserRepository {
     suspend fun changeRelatedUserLocal(relatedUserLocalData: RelatedUserLocalData): Flow<ChangeRelationResult>
 
     suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
-    suspend fun blockUserRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
+    suspend fun blockRelatedUserRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
     suspend fun userToFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
 
     fun getFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
@@ -206,13 +206,13 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun searchUserRequest(email: String): Flow<SearchUserResult> =
         callbackFlow {
             val myData = getMyUserDataFromPreference()
-            if(email == myData.email) {
+            if (email == myData.email) {
                 trySend(SearchUserResult.Failure(message = "this is my email"))
             }
             val checkBlockState = checkUserBlockState(email).first()
-            if(checkBlockState == ProcessResult.Failure) {
+            if (checkBlockState == ProcessResult.Failure) {
                 val result = searchUser(email).first()
-                if(result != null) {
+                if (result != null) {
                     trySend(SearchUserResult.Success(user = result))
                 } else {
                     trySend(SearchUserResult.Failure(message = "no such user"))
@@ -779,7 +779,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun blockUserRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
+    override suspend fun blockRelatedUserRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
         return try {
             val relatedUser = relatedUserLocalData.copy(
                 userRelation = UserRelationState.BLOCKED,
