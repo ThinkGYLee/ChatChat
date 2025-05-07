@@ -15,7 +15,7 @@ import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserRelationState
-import com.gyleedev.chatchat.domain.usecase.BlockUserUseCase
+import com.gyleedev.chatchat.domain.usecase.BlockRelatedUserUseCase
 import com.gyleedev.chatchat.domain.usecase.CancelMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomLocalDataByUidUseCase
@@ -57,7 +57,7 @@ class ChatRoomViewModel @Inject constructor(
     private val resendMessageUseCase: ResendMessageUseCase,
     private val cancelMessageUseCase: CancelMessageUseCase,
     private val userToFriendUseCase: UserToFriendUseCase,
-    private val blockUserUseCase: BlockUserUseCase,
+    private val blockRelatedUserUseCase: BlockRelatedUserUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -210,7 +210,7 @@ class ChatRoomViewModel @Inject constructor(
 
     fun blockUser() {
         viewModelScope.launch {
-            blockUserUseCase(relatedUserLocalData.value)
+            blockRelatedUserUseCase(relatedUserLocalData.value)
             val changedData = relatedUserLocalData.value.copy(
                 userRelation = UserRelationState.BLOCKED,
                 favoriteState = false

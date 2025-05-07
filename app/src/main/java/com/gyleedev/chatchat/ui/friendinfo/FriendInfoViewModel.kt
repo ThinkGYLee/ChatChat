@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.usecase.BlockUserUseCase
+import com.gyleedev.chatchat.domain.usecase.BlockRelatedUserUseCase
 import com.gyleedev.chatchat.domain.usecase.DeleteFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.GetRelatedUserAndFavoriteDataUseCase
 import com.gyleedev.chatchat.domain.usecase.HideFriendUseCase
@@ -23,7 +23,7 @@ class FriendInfoViewModel @Inject constructor(
     private val updateFriendInfoUseCase: UpdateFriendInfoUseCase,
     private val deleteFriendUseCase: DeleteFriendUseCase,
     private val hideFriendUseCase: HideFriendUseCase,
-    private val blockUserUseCase: BlockUserUseCase,
+    private val blockRelatedUserUseCase: BlockRelatedUserUseCase,
     private val updateFavoriteByUserEntityIdUseCase: UpdateFavoriteByUserEntityIdUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
@@ -60,7 +60,7 @@ class FriendInfoViewModel @Inject constructor(
 
     fun blockFriend() {
         viewModelScope.launch {
-            blockUserUseCase(_relatedUserLocalData.value)
+            blockRelatedUserUseCase(_relatedUserLocalData.value)
         }
     }
 

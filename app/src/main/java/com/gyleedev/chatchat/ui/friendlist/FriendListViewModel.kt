@@ -7,7 +7,7 @@ import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.usecase.AddMyRelatedUsersUseCase
-import com.gyleedev.chatchat.domain.usecase.BlockUserUseCase
+import com.gyleedev.chatchat.domain.usecase.BlockRelatedUserUseCase
 import com.gyleedev.chatchat.domain.usecase.DeleteFriendUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFavoritesUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendsCountUseCase
@@ -33,7 +33,7 @@ class FriendListViewModel @Inject constructor(
     private val getFriendsCountUseCase: GetFriendsCountUseCase,
     private val deleteFriendUseCase: DeleteFriendUseCase,
     private val hideFriendUseCase: HideFriendUseCase,
-    private val blockUserUseCase: BlockUserUseCase,
+    private val blockRelatedUserUseCase: BlockRelatedUserUseCase,
     getFriendsUseCase: GetFriendsUseCase,
     getFavoritesUseCase: GetFavoritesUseCase,
     private val getMyDataFromRemoteUseCase: GetMyDataFromRemoteUseCase,
@@ -116,7 +116,7 @@ class FriendListViewModel @Inject constructor(
     fun blockFriend(relatedUserLocalData: RelatedUserLocalData?) {
         viewModelScope.launch {
             if (relatedUserLocalData != null) {
-                blockUserUseCase(relatedUserLocalData)
+                blockRelatedUserUseCase(relatedUserLocalData)
             } else {
                 _noSuchUserAlert.emit(Unit)
             }
