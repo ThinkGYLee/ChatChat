@@ -76,7 +76,7 @@ import kotlinx.coroutines.flow.first
 @Composable
 fun FindUserScreen(
     onBackPressKeyClick: () -> Unit,
-    onFindComplete: () -> Unit,
+    onProcessComplete: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FindUserViewModel = hiltViewModel()
 ) {
@@ -104,17 +104,39 @@ fun FindUserScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.addProcessComplete.collect {
-            if (it) {
-                onFindComplete()
-            } else {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.add_user_failure_message),
-                    Toast.LENGTH_SHORT
-                ).show()
+        viewModel.userProcessComplete
+            .flowWithLifecycle(lifecycle.lifecycle)
+            .collect { processState ->
+                when (processState) {
+                    FindProcessState.Complete -> {
+                        onProcessComplete()
+                    }
+
+                    FindProcessState.AddFailure -> {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.add_user_failure_message),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    FindProcessState.SearchFailure -> {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.search_user_failure_message),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    FindProcessState.BlockFailure -> {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.block_user_failure_message),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
-        }
     }
 
     Scaffold(modifier = modifier, topBar = {
@@ -161,7 +183,8 @@ fun FindUserScreen(
 
             if (userData.value != null) {
                 FindUserCard(
-                    onFindComplete = viewModel::addFriend,
+                    onAddAsFriend = viewModel::addFriend,
+                    onBlockUser = viewModel::blockFriend,
                     userData = requireNotNull(userData.value)
                 )
             }
@@ -232,7 +255,8 @@ fun FindUserTextField(
 
 @Composable
 fun FindUserCard(
-    onFindComplete: () -> Unit,
+    onAddAsFriend: () -> Unit,
+    onBlockUser: () -> Unit,
     userData: UserData,
     modifier: Modifier = Modifier
 ) {
@@ -276,11 +300,11 @@ fun FindUserCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                OutlinedButton(onClick = {}) {
+                OutlinedButton(onClick = onBlockUser) {
                     Text("친구 차단")
                 }
                 Spacer(modifier = Modifier.width(20.dp))
-                Button(onClick = onFindComplete) {
+                Button(onClick = onAddAsFriend) {
                     Text(text = stringResource(R.string.find_user_screen_add_button_text))
                 }
             }
@@ -292,6 +316,6 @@ fun FindUserCard(
 @Preview
 fun FindUserScreenPreview() {
     MaterialTheme {
-        FindUserScreen(onFindComplete = {}, onBackPressKeyClick = {})
+        FindUserScreen(onProcessComplete = {}, onBackPressKeyClick = {})
     }
 }
