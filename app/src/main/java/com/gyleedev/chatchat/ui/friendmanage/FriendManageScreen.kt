@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.gyleedev.chatchat.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,8 +28,7 @@ fun FriendManageScreen(
     onBlockedClick: () -> Unit,
     onHideClick: () -> Unit,
     onBackPressKeyClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: FriendManageViewModel = hiltViewModel()
+    modifier: Modifier = Modifier
 ) {
     Scaffold(
         topBar = {

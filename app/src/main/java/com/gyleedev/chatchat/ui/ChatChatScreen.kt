@@ -213,7 +213,7 @@ fun ChatChatScreen(
 
             composable(route = BottomNavItem.FINDUSER.screenRoute) {
                 FindUserScreen(
-                    onFindComplete = {
+                    onProcessComplete = {
                         navController.navigate(BottomNavItem.FRIENDLIST.screenRoute) {
                             popUpTo(
                                 BottomNavItem.FRIENDLIST.screenRoute

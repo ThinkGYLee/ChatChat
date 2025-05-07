@@ -3,6 +3,7 @@ package com.gyleedev.chatchat.ui.finduser
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,12 +25,15 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -47,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -70,7 +76,7 @@ import kotlinx.coroutines.flow.first
 @Composable
 fun FindUserScreen(
     onBackPressKeyClick: () -> Unit,
-    onFindComplete: () -> Unit,
+    onProcessComplete: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FindUserViewModel = hiltViewModel()
 ) {
@@ -98,17 +104,39 @@ fun FindUserScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.addProcessComplete.collect {
-            if (it) {
-                onFindComplete()
-            } else {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.add_user_failure_message),
-                    Toast.LENGTH_SHORT
-                ).show()
+        viewModel.userProcessComplete
+            .flowWithLifecycle(lifecycle.lifecycle)
+            .collect { processState ->
+                when (processState) {
+                    FindProcessState.Complete -> {
+                        onProcessComplete()
+                    }
+
+                    FindProcessState.AddFailure -> {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.add_user_failure_message),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    FindProcessState.SearchFailure -> {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.search_user_failure_message),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    FindProcessState.BlockFailure -> {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.block_user_failure_message),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
-        }
     }
 
     Scaffold(modifier = modifier, topBar = {
@@ -155,7 +183,8 @@ fun FindUserScreen(
 
             if (userData.value != null) {
                 FindUserCard(
-                    onFindComplete = viewModel::addFriend,
+                    onAddAsFriend = viewModel::addFriend,
+                    onBlockUser = viewModel::blockFriend,
                     userData = requireNotNull(userData.value)
                 )
             }
@@ -226,31 +255,34 @@ fun FindUserTextField(
 
 @Composable
 fun FindUserCard(
-    onFindComplete: () -> Unit,
+    onAddAsFriend: () -> Unit,
+    onBlockUser: () -> Unit,
     userData: UserData,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .padding(20.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 20.dp),
+                .padding(vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             var imageUrl by rememberSaveable { mutableStateOf("") }
             LaunchedEffect(userData) { imageUrl = getImageFromFireStore(userData.picture).first() }
             GlideImage(
-                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+                imageModel = { imageUrl.ifBlank { R.drawable.baseline_person_24 } },
                 modifier = Modifier
-                    .sizeIn(
-                        maxWidth = 80.dp,
-                        maxHeight = 80.dp
+                    .size(
+                        width = 80.dp,
+                        height = 80.dp
                     )
-                    .clip(RoundedCornerShape(20.dp)),
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(color = colorResource(R.color.avatar_background)),
                 component = rememberImageComponent {
                     +ShimmerPlugin(
                         Shimmer.Flash(
@@ -259,11 +291,22 @@ fun FindUserCard(
                         )
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.icons8__)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
             )
+            Spacer(modifier = Modifier.height(12.dp))
             Text(text = userData.name)
-            TextButton(onClick = onFindComplete) {
-                Text(text = stringResource(R.string.find_user_screen_add_button_text))
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                OutlinedButton(onClick = onBlockUser) {
+                    Text("친구 차단")
+                }
+                Spacer(modifier = Modifier.width(20.dp))
+                Button(onClick = onAddAsFriend) {
+                    Text(text = stringResource(R.string.find_user_screen_add_button_text))
+                }
             }
         }
     }
@@ -273,6 +316,6 @@ fun FindUserCard(
 @Preview
 fun FindUserScreenPreview() {
     MaterialTheme {
-        FindUserScreen(onFindComplete = {}, onBackPressKeyClick = {})
+        FindUserScreen(onProcessComplete = {}, onBackPressKeyClick = {})
     }
 }

@@ -27,6 +27,7 @@ import com.gyleedev.chatchat.data.database.entity.toEntityAsFriend
 import com.gyleedev.chatchat.data.database.entity.toLocalData
 import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.data.database.entity.toRelationLocalData
+import com.gyleedev.chatchat.data.model.BlockedUser
 import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
 import com.gyleedev.chatchat.data.model.toRelatedUserLocalData
 import com.gyleedev.chatchat.domain.ChangeRelationResult
@@ -34,11 +35,14 @@ import com.gyleedev.chatchat.domain.ChatRoomData
 import com.gyleedev.chatchat.domain.ChatRoomDataWithRelatedUsers
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.LogInResult
+import com.gyleedev.chatchat.domain.ProcessResult
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.SearchUserResult
 import com.gyleedev.chatchat.domain.SignInResult
 import com.gyleedev.chatchat.domain.UserChatRoomData
 import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.UserRelationState
+import com.gyleedev.chatchat.domain.toBlockedUser
 import com.gyleedev.chatchat.domain.toRemoteData
 import com.gyleedev.chatchat.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
@@ -57,11 +61,14 @@ interface UserRepository {
     fun getUsersFromLocal(): List<UserData>
     suspend fun signInUser(id: String, password: String, nickname: String): Flow<UserData?>
     suspend fun loginRequest(id: String, password: String): Flow<LogInResult>
-    suspend fun searchUser(email: String): Flow<UserData?>
     fun fetchUserExists(): Boolean
     suspend fun writeUserToRemote(user: UserData): Flow<SignInResult>
     suspend fun getMyDataFromRemote(): Flow<UserData?>
-    suspend fun addFriendToRemote(user: UserData): Flow<Boolean>
+    suspend fun addRelatedUserToRemote(
+        user: UserData,
+        userRelation: UserRelationState = UserRelationState.FRIEND
+    ): Flow<Boolean>
+
     suspend fun getMyRelatedUserListFromRemote(): Flow<List<RelatedUserRemoteData>?>
     suspend fun insertMyRelationsToLocal(list: List<RelatedUserRemoteData>)
     suspend fun insertFriendToLocal(user: UserData): Flow<Boolean>
@@ -111,12 +118,13 @@ interface UserRepository {
     suspend fun resetChatRoomData()
     fun setMyUserInformation(userData: UserData)
     suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
-    suspend fun changeRelatedUserRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
+    suspend fun changeRelatedUserRemote(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult>
 
     suspend fun changeRelatedUserLocal(relatedUserLocalData: RelatedUserLocalData): Flow<ChangeRelationResult>
 
     suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
-    suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
+    suspend fun blockRelatedUserRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
+    suspend fun blockUnknownUserRequest(userData: UserData): ChangeRelationResult
     suspend fun userToFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
 
     fun getFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
@@ -126,6 +134,11 @@ interface UserRepository {
     fun getHideFriendsWithFullTextName(query: String): Flow<PagingData<RelatedUserLocalData>>
     fun updateUserAndFavorite(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
     fun getMyUserDataFromPreference(): UserData
+
+    fun addUserToRemoteBlockedEntity(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult>
+
+    suspend fun searchUserRequest(email: String): Flow<SearchUserResult>
+    suspend fun searchUser(email: String): Flow<UserData?>
 }
 
 class UserRepositoryImpl @Inject constructor(
@@ -191,6 +204,31 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
+    // 유저 검색 플로우
+    // 내가 상대에게 블락됐는지 확인
+    // 문제 없으면 유저 정보 가져와서 리턴
+    // 문제 있으면 null 리턴
+    override suspend fun searchUserRequest(email: String): Flow<SearchUserResult> =
+        callbackFlow {
+            val myData = getMyUserDataFromPreference()
+            if (email == myData.email) {
+                trySend(SearchUserResult.Failure(message = "this is my email"))
+            }
+            val checkBlockState = checkUserBlockState(email).first()
+            if (checkBlockState == ProcessResult.Failure) {
+                val result = searchUser(email).first()
+                if (result != null) {
+                    trySend(SearchUserResult.Success(user = result))
+                } else {
+                    trySend(SearchUserResult.Failure(message = "no such user"))
+                }
+            } else {
+                trySend(SearchUserResult.Failure(message = "no such user"))
+            }
+            awaitClose()
+        }
+
+    // 리모트에서 유저 검색 기능
     override suspend fun searchUser(email: String): Flow<UserData?> = callbackFlow {
         val query =
             database.reference.child(
@@ -253,14 +291,17 @@ class UserRepositoryImpl @Inject constructor(
         return preferenceUtil.getMyData()
     }
 
-    override suspend fun addFriendToRemote(user: UserData): Flow<Boolean> = callbackFlow {
+    override suspend fun addRelatedUserToRemote(
+        user: UserData,
+        userRelation: UserRelationState
+    ): Flow<Boolean> = callbackFlow {
         val relation = RelatedUserRemoteData(
             uid = user.uid,
             email = user.email,
             name = user.name,
             picture = user.picture,
             status = user.status,
-            userRelation = UserRelationState.FRIEND,
+            userRelation = userRelation,
             favoriteState = false
         )
         auth.currentUser?.let {
@@ -675,7 +716,7 @@ class UserRepositoryImpl @Inject constructor(
                 favoriteState = false
             )
             val remoteRequest = changeRelatedUserRemote(relatedUser).first()
-            if (remoteRequest) {
+            if (remoteRequest == ProcessResult.Success) {
                 val localRequest = changeRelatedUserLocal(relatedUser).first()
                 if (localRequest == ChangeRelationResult.SUCCESS) {
                     ChangeRelationResult.SUCCESS
@@ -708,16 +749,16 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun changeRelatedUserRemote(
         relatedUserLocalData: RelatedUserLocalData
-    ): Flow<Boolean> =
+    ): Flow<ProcessResult> =
         callbackFlow {
             auth.currentUser?.uid?.let {
                 database.reference.child("relations").child(it).child(relatedUserLocalData.uid)
                     .setValue(
                         relatedUserLocalData.toRemoteData()
                     ).addOnSuccessListener {
-                        trySend(true)
+                        trySend(ProcessResult.Success)
                     }.addOnFailureListener {
-                        trySend(false)
+                        trySend(ProcessResult.Failure)
                     }
             }
             awaitClose()
@@ -730,7 +771,7 @@ class UserRepositoryImpl @Inject constructor(
                 favoriteState = false
             )
             val remoteRequest = changeRelatedUserRemote(relatedUser).first()
-            if (remoteRequest) {
+            if (remoteRequest == ProcessResult.Success) {
                 val localRequest = changeRelatedUserLocal(relatedUser).first()
                 if (localRequest == ChangeRelationResult.SUCCESS) {
                     ChangeRelationResult.SUCCESS
@@ -745,14 +786,15 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun blockFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
+    override suspend fun blockRelatedUserRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
         return try {
             val relatedUser = relatedUserLocalData.copy(
                 userRelation = UserRelationState.BLOCKED,
                 favoriteState = false
             )
-            val remoteRequest = changeRelatedUserRemote(relatedUser).first()
-            if (remoteRequest) {
+            val changeRelationRemoteRequest = changeRelatedUserRemote(relatedUser).first()
+            val updateBlockStatusRemote = addUserToRemoteBlockedEntity(relatedUser).first()
+            if (changeRelationRemoteRequest == ProcessResult.Success && updateBlockStatusRemote == ProcessResult.Success) {
                 val localRequest = changeRelatedUserLocal(relatedUser).first()
                 if (localRequest == ChangeRelationResult.SUCCESS) {
                     ChangeRelationResult.SUCCESS
@@ -767,13 +809,48 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    // 로컬에서 나랑 관련이 있었나 확인
+    // 있었으면 그 정보 바탕으로 블락 절차
+    // 없었으면 리모트에 관계에 추가, 블락드에 추가, 로컬에 추가
+    override suspend fun blockUnknownUserRequest(userData: UserData): ChangeRelationResult {
+        val isUserExistsLocal = getUserEntityFromLocalByUid(userData.uid)
+        if (isUserExistsLocal == null) {
+            val uploadData = RelatedUserRemoteData(
+                uid = userData.uid,
+                email = userData.email,
+                status = userData.status,
+                favoriteState = false,
+                picture = userData.picture,
+                userRelation = UserRelationState.BLOCKED
+            )
+            val remoteAddRequest = addRelatedUserToRemote(user = userData, userRelation = UserRelationState.BLOCKED).first()
+            val localRequest = insertUserToLocal(uploadData)
+            val addBlockRequest = addUserToRemoteBlockedEntity(uploadData.toRelatedUserLocalData().copy(id = localRequest)).first()
+            return if (remoteAddRequest && addBlockRequest == ProcessResult.Success) {
+                ChangeRelationResult.SUCCESS
+            } else {
+                ChangeRelationResult.FAILURE
+            }
+        } else {
+            return blockRelatedUserRequest(isUserExistsLocal.toRelationLocalData())
+        }
+    }
+
     // remote의 relations에 정보를 넣고 성공 실패로 local에 넣을지 결정
     // remote에 유저가 존재하는지는 확인할 필요 없음 있던 없던 덮어 씀
+    // 유저 상태가 블락된 유저일 때 먼저 서치불가 정보를 해제가 성공하면 relations 변경으로
     override suspend fun userToFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
-        return try {
+        try {
             val relatedUser = relatedUserLocalData.copy(userRelation = UserRelationState.FRIEND)
-            val remoteRequest = changeRelatedUserRemote(relatedUser).first()
-            if (remoteRequest) {
+            if (relatedUserLocalData.userRelation == UserRelationState.BLOCKED) {
+                val deleteFromBlocked =
+                    deleteUserFromRemoteBlockedEntity(relatedUserLocalData).first()
+                if (deleteFromBlocked == ProcessResult.Failure) {
+                    return ChangeRelationResult.FAILURE
+                }
+            }
+            val remoteChangeUserRelationRequest = changeRelatedUserRemote(relatedUser).first()
+            return if (remoteChangeUserRelationRequest == ProcessResult.Success) {
                 val localRequest = changeRelatedUserLocal(relatedUser).first()
                 if (localRequest == ChangeRelationResult.SUCCESS) {
                     ChangeRelationResult.SUCCESS
@@ -784,7 +861,7 @@ class UserRepositoryImpl @Inject constructor(
                 ChangeRelationResult.FAILURE
             }
         } catch (e: Exception) {
-            ChangeRelationResult.FAILURE
+            return ChangeRelationResult.FAILURE
         }
     }
 
@@ -931,4 +1008,68 @@ class UserRepositoryImpl @Inject constructor(
             )
         }
     }
+
+    /*
+    Block 관련 설명
+    내가 상대를 차단하면 상대의 Blocked 테이블에 내 정보를 추가한다.
+    내가 검색할 때 상대의 정보를 직접 검색하는 대신 나의 테이블만 확인하고 상대가 나를 차단했는지 여부 확인 후 정보 가져오기
+    * */
+
+    // Block 할 때 상대의 검색불가 목록에 내 정보 추가
+    override fun addUserToRemoteBlockedEntity(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult> =
+        callbackFlow {
+            val myData = getMyUserDataFromPreference()
+            database.reference.child("blocked").child(relatedUserLocalData.uid).child(myData.uid)
+                .setValue(myData.toBlockedUser())
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(ProcessResult.Success)
+                    } else {
+                        trySend(ProcessResult.Failure)
+                    }
+                }
+            awaitClose()
+        }
+
+    // Block을 풀 때 상대방의 검색불가 목록에서 내 정보 제거
+    private fun deleteUserFromRemoteBlockedEntity(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult> =
+        callbackFlow {
+            val myData = getMyUserDataFromPreference()
+            database.reference.child("blocked")
+                .child(relatedUserLocalData.uid).child(myData.uid).removeValue()
+                .addOnSuccessListener {
+                    trySend(ProcessResult.Success)
+                }.addOnFailureListener {
+                    trySend(ProcessResult.Failure)
+                }
+            awaitClose()
+        }
+
+    // user를 검색할 때 검색 대상의 block 리스트에 내 정보가 있나 확인
+    private fun checkUserBlockState(email: String): Flow<ProcessResult> =
+        callbackFlow {
+            val myData = getMyUserDataFromPreference()
+            database.reference.child("blocked").child(myData.uid).orderByChild("email")
+                .equalTo(email)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.value != null) {
+                            for (ds in snapshot.children) {
+                                val snap = ds.getValue(BlockedUser::class.java)
+                                if (snap != null) {
+                                    trySend(ProcessResult.Success)
+                                }
+                            }
+                        } else {
+                            trySend(ProcessResult.Failure)
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        println(error)
+                        trySend(ProcessResult.Failure)
+                    }
+                })
+            awaitClose()
+        }
 }
