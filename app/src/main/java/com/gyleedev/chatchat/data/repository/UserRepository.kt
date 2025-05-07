@@ -64,7 +64,11 @@ interface UserRepository {
     fun fetchUserExists(): Boolean
     suspend fun writeUserToRemote(user: UserData): Flow<SignInResult>
     suspend fun getMyDataFromRemote(): Flow<UserData?>
-    suspend fun addFriendToRemote(user: UserData): Flow<Boolean>
+    suspend fun addRelatedUserToRemote(
+        user: UserData,
+        userRelation: UserRelationState = UserRelationState.FRIEND
+    ): Flow<Boolean>
+
     suspend fun getMyRelatedUserListFromRemote(): Flow<List<RelatedUserRemoteData>?>
     suspend fun insertMyRelationsToLocal(list: List<RelatedUserRemoteData>)
     suspend fun insertFriendToLocal(user: UserData): Flow<Boolean>
@@ -120,6 +124,7 @@ interface UserRepository {
 
     suspend fun hideFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
     suspend fun blockRelatedUserRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
+    suspend fun blockUnknownUserRequest(userData: UserData): ChangeRelationResult
     suspend fun userToFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult
 
     fun getFriendsWithName(query: String): Flow<PagingData<RelatedUserLocalData>>
@@ -199,10 +204,10 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    //유저 검색 플로우
-    //내가 상대에게 블락됐는지 확인
-    //문제 없으면 유저 정보 가져와서 리턴
-    //문제 있으면 null 리턴
+    // 유저 검색 플로우
+    // 내가 상대에게 블락됐는지 확인
+    // 문제 없으면 유저 정보 가져와서 리턴
+    // 문제 있으면 null 리턴
     override suspend fun searchUserRequest(email: String): Flow<SearchUserResult> =
         callbackFlow {
             val myData = getMyUserDataFromPreference()
@@ -217,14 +222,13 @@ class UserRepositoryImpl @Inject constructor(
                 } else {
                     trySend(SearchUserResult.Failure(message = "no such user"))
                 }
-
             } else {
                 trySend(SearchUserResult.Failure(message = "no such user"))
             }
             awaitClose()
         }
 
-    //리모트에서 유저 검색 기능
+    // 리모트에서 유저 검색 기능
     override suspend fun searchUser(email: String): Flow<UserData?> = callbackFlow {
         val query =
             database.reference.child(
@@ -287,14 +291,17 @@ class UserRepositoryImpl @Inject constructor(
         return preferenceUtil.getMyData()
     }
 
-    override suspend fun addFriendToRemote(user: UserData): Flow<Boolean> = callbackFlow {
+    override suspend fun addRelatedUserToRemote(
+        user: UserData,
+        userRelation: UserRelationState
+    ): Flow<Boolean> = callbackFlow {
         val relation = RelatedUserRemoteData(
             uid = user.uid,
             email = user.email,
             name = user.name,
             picture = user.picture,
             status = user.status,
-            userRelation = UserRelationState.FRIEND,
+            userRelation = userRelation,
             favoriteState = false
         )
         auth.currentUser?.let {
@@ -802,6 +809,33 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    // 로컬에서 나랑 관련이 있었나 확인
+    // 있었으면 그 정보 바탕으로 블락 절차
+    // 없었으면 리모트에 관계에 추가, 블락드에 추가, 로컬에 추가
+    override suspend fun blockUnknownUserRequest(userData: UserData): ChangeRelationResult {
+        val isUserExistsLocal = getUserEntityFromLocalByUid(userData.uid)
+        if (isUserExistsLocal == null) {
+            val uploadData = RelatedUserRemoteData(
+                uid = userData.uid,
+                email = userData.email,
+                status = userData.status,
+                favoriteState = false,
+                picture = userData.picture,
+                userRelation = UserRelationState.BLOCKED
+            )
+            val remoteAddRequest = addRelatedUserToRemote(user = userData, userRelation = UserRelationState.BLOCKED).first()
+            val localRequest = insertUserToLocal(uploadData)
+            val addBlockRequest = addUserToRemoteBlockedEntity(uploadData.toRelatedUserLocalData().copy(id = localRequest)).first()
+            return if (remoteAddRequest && addBlockRequest == ProcessResult.Success) {
+                ChangeRelationResult.SUCCESS
+            } else {
+                ChangeRelationResult.FAILURE
+            }
+        } else {
+            return blockRelatedUserRequest(isUserExistsLocal.toRelationLocalData())
+        }
+    }
+
     // remote의 relations에 정보를 넣고 성공 실패로 local에 넣을지 결정
     // remote에 유저가 존재하는지는 확인할 필요 없음 있던 없던 덮어 씀
     // 유저 상태가 블락된 유저일 때 먼저 서치불가 정보를 해제가 성공하면 relations 변경으로
@@ -997,7 +1031,7 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    //Block을 풀 때 상대방의 검색불가 목록에서 내 정보 제거
+    // Block을 풀 때 상대방의 검색불가 목록에서 내 정보 제거
     private fun deleteUserFromRemoteBlockedEntity(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult> =
         callbackFlow {
             val myData = getMyUserDataFromPreference()
@@ -1011,7 +1045,7 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    //user를 검색할 때 검색 대상의 block 리스트에 내 정보가 있나 확인
+    // user를 검색할 때 검색 대상의 block 리스트에 내 정보가 있나 확인
     private fun checkUserBlockState(email: String): Flow<ProcessResult> =
         callbackFlow {
             val myData = getMyUserDataFromPreference()
