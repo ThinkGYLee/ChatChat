@@ -9,5 +9,5 @@ class AddFriendToRemoteUseCase @Inject constructor(
     private val repository: UserRepository
 ) {
     suspend operator fun invoke(userData: UserData): Flow<Boolean> =
-        repository.addFriendToRemote(userData)
+        repository.addRelatedUserToRemote(userData)
 }
