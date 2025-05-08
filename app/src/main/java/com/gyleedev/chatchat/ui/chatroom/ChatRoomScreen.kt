@@ -66,8 +66,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -107,6 +107,7 @@ fun ChatRoomScreen(
     val query = rememberTextFieldState()
     val messages = chatRoomViewModel.messages.collectAsLazyPagingItems()
     val photoUri = chatRoomViewModel.photoUri.collectAsStateWithLifecycle()
+    chatRoomViewModel.messagesCallback.collectAsStateWithLifecycle()
 
     val lazyListState = remember {
         mutableStateOf(
@@ -119,8 +120,7 @@ fun ChatRoomScreen(
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
 
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp
+    val screenWidth = LocalWindowInfo.current.containerSize.width
 
     val pickMedia =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->

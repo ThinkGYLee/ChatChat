@@ -21,6 +21,7 @@ import com.gyleedev.chatchat.data.database.entity.toUpdateEntity
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
+import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toRemoteModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -39,7 +40,11 @@ interface MessageRepository {
     fun insertMessageToRemote(message: MessageData): Flow<MessageSendState>
     suspend fun updateMessageState(messageId: Long, roomId: Long, message: MessageData)
 
-    fun getMessageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?>
+    fun getMessageListener(
+        chatRoom: ChatRoomLocalData,
+        userRelationState: UserRelationState
+    ): Flow<MessageData?>
+
     suspend fun getLastMessage(chatRoomId: String): MessageEntity?
 
     fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
@@ -99,10 +104,13 @@ class MessageRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun getMessageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?> {
+    override fun getMessageListener(
+        chatRoom: ChatRoomLocalData,
+        userRelationState: UserRelationState
+    ): Flow<MessageData?> {
         return messageListener(chatRoom)
             .onEach { messageData ->
-                if (messageData != null) {
+                if (messageData != null && userRelationState != UserRelationState.BLOCKED) {
                     insertMessage(messageData, chatRoom.id)
                 }
             }.flowOn(Dispatchers.IO)

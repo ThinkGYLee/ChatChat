@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -44,6 +43,7 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ChatRoomViewModel @Inject constructor(
     getMyUidFromLogInDataUseCase: GetMyUidFromLogInDataUseCase,
@@ -60,9 +60,7 @@ class ChatRoomViewModel @Inject constructor(
     private val blockRelatedUserUseCase: BlockRelatedUserUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
-
     private val relatedUserLocalData = MutableStateFlow(RelatedUserLocalData())
-
     private var uid: String? = null
     private val myUid = getMyUidFromLogInDataUseCase().onEach { uid = it }
 
@@ -96,24 +94,30 @@ class ChatRoomViewModel @Inject constructor(
         ChatRoomUiState.Loading
     )
 
+    val messagesCallback = relatedUserLocalData.flatMapLatest {
+        getMessagesFromRemoteUseCase(_chatRoomLocalData.value, it.userRelation)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        MessageData()
+    )
+
     init {
-        val friendUid = savedStateHandle.get<String>("friend")
-        if (friendUid == null) {
+        val passedFriendUid = savedStateHandle.get<String>("friend")
+        if (passedFriendUid == null) {
             // TODO 화면 종료 처리
             throw Exception("예외 처리 에러 말고 단거로")
         }
         viewModelScope.launch {
-            val friend = getFriendDataUseCase(friendUid).first()
+            val friend = getFriendDataUseCase(passedFriendUid).first()
             relatedUserLocalData.emit(friend)
             getChatRoomDataUseCase(friend)
-            getChatRoomFromLocal()
-
-            getMessagesFromRemoteUseCase(_chatRoomLocalData.value).collectLatest { }
+            getChatRoomFromLocal(friend)
         }
     }
 
-    private suspend fun getChatRoomFromLocal() {
-        val data = getChatRoomLocalDataByUidUseCase(relatedUserLocalData.value.uid)
+    private suspend fun getChatRoomFromLocal(relatedUserLocalData: RelatedUserLocalData) {
+        val data = getChatRoomLocalDataByUidUseCase(relatedUserLocalData.uid)
         _chatRoomLocalData.emit(data)
     }
 
