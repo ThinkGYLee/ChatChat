@@ -56,6 +56,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -113,6 +114,7 @@ fun ChatRoomScreen(
     val photoUri = chatRoomViewModel.photoUri.collectAsStateWithLifecycle()
     chatRoomViewModel.messagesCallback.collectAsStateWithLifecycle()
     var openMessageDialog by remember { mutableStateOf(false) }
+    var openDeleteDialog by remember { mutableStateOf(false) }
     var dialogMessageData by remember { mutableStateOf<MessageData?>(null) }
 
     val lazyListState = remember {
@@ -263,16 +265,27 @@ fun ChatRoomScreen(
         if (openMessageDialog) {
             MessageDialog(
                 closeDialog = {
-                    dialogMessageData = null
                     openMessageDialog = false
                 },
                 onCopy = { },
                 onPartialCopy = { },
                 onReply = { },
+                openDeleteDialog = {
+                    openDeleteDialog = true
+                },
+                resetDialogData = { dialogMessageData = null }
+            )
+        }
+
+        if (openDeleteDialog) {
+            DeleteDialog(
+                isMessageMine = requireNotNull(dialogMessageData).writer == (uiState as ChatRoomUiState.Success).uid,
+                closeDialog = { openDeleteDialog = false },
                 onDelete = {
                     dialogMessageData?.let {
                         chatRoomViewModel.deleteMessage(it)
                     }
+                    dialogMessageData = null
                 }
             )
         }
@@ -837,7 +850,8 @@ fun MessageDialog(
     onCopy: () -> Unit,
     onPartialCopy: () -> Unit,
     onReply: () -> Unit,
-    onDelete: () -> Unit,
+    openDeleteDialog: () -> Unit,
+    resetDialogData: () -> Unit,
     closeDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -860,6 +874,7 @@ fun MessageDialog(
                             .fillMaxWidth()
                             .clickable {
                                 onCopy()
+                                resetDialogData()
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp, vertical = 8.dp)
@@ -871,6 +886,7 @@ fun MessageDialog(
                             .fillMaxWidth()
                             .clickable {
                                 onPartialCopy()
+                                resetDialogData()
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp, vertical = 8.dp)
@@ -881,6 +897,7 @@ fun MessageDialog(
                             .fillMaxWidth()
                             .clickable {
                                 onReply()
+                                resetDialogData()
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp, vertical = 8.dp)
@@ -890,11 +907,75 @@ fun MessageDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                onDelete()
+                                openDeleteDialog()
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp, vertical = 8.dp)
                     )
+                }
+            }
+        },
+        modifier = modifier.wrapContentSize()
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DeleteDialog(
+    isMessageMine: Boolean,
+    closeDialog: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    BasicAlertDialog(
+        onDismissRequest = closeDialog,
+        content = {
+            Surface(
+                modifier = Modifier.wrapContentSize(),
+                shape = MaterialTheme.shapes.medium,
+                tonalElevation = AlertDialogDefaults.TonalElevation,
+                color = AlertDialogDefaults.containerColor
+            ) {
+                Column(
+                    modifier = Modifier.padding(vertical = 24.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = if (isMessageMine) {
+                            stringResource(R.string.delete_message_dialog_my_message_header)
+                        } else {
+                            stringResource(R.string.delete_message_dialog_other_message_header)
+                        },
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.delete_message_dialog_text),
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Absolute.Right
+                    ) {
+                        TextButton(
+                            onClick = {
+                                closeDialog()
+                            }
+                        ) {
+                            Text(text = stringResource(R.string.dialog_dismiss_button_text))
+                        }
+                        TextButton(
+                            onClick = {
+                                onDelete()
+                                closeDialog()
+                            }
+                        ) {
+                            Text(text = stringResource(R.string.dialog_delete_button_text))
+                        }
+                    }
                 }
             }
         },
