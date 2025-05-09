@@ -115,7 +115,7 @@ fun ChatRoomScreen(
     chatRoomViewModel.messagesCallback.collectAsStateWithLifecycle()
     var openMessageDialog by remember { mutableStateOf(false) }
     var openDeleteDialog by remember { mutableStateOf(false) }
-    var dialogMessageData by remember { mutableStateOf<MessageData?>(null) }
+    var selectedMessageData by remember { mutableStateOf<SelectedMessageState>(SelectedMessageState.NotSelected) }
 
     val lazyListState = remember {
         mutableStateOf(
@@ -174,35 +174,38 @@ fun ChatRoomScreen(
             }
         },
         bottomBar = {
-            if (
-                uiState is ChatRoomUiState.Success &&
-                (uiState as ChatRoomUiState.Success).relationState == UserRelationState.BLOCKED
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 20.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(text = stringResource(R.string.chat_room_blocked_user_bottom_bar_text))
+            if (uiState is ChatRoomUiState.Success) {
+                if ((uiState as ChatRoomUiState.Success).relationState == UserRelationState.BLOCKED) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 20.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(text = stringResource(R.string.chat_room_blocked_user_bottom_bar_text))
+                    }
+                } else {
+                    UniversalBar(
+                        onPhotoButtonClick = {
+                            pickMedia.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        },
+                        query = query,
+                        onTextSendButtonClick = {
+                            chatRoomViewModel.sendMessage()
+                            query.edit { delete(0, query.text.length) }
+                            selectedMessageData = SelectedMessageState.NotSelected
+                        },
+                        onPhotoSendButtonClick = chatRoomViewModel::sendPhotoMessage,
+                        onCancelClick = { chatRoomViewModel.editPhotoUri("") },
+                        selectedMessageData = selectedMessageData,
+                        replyEnd = { selectedMessageData = SelectedMessageState.NotSelected },
+                        screenWidth = screenWidth,
+                        photoUri = photoUri.value,
+                        uiState = uiState as ChatRoomUiState.Success
+                    )
                 }
-            } else {
-                UniversalBar(
-                    onPhotoButtonClick = {
-                        pickMedia.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
-                    },
-                    query = query,
-                    onTextSendButtonClick = {
-                        chatRoomViewModel.sendMessage()
-                        query.edit { delete(0, query.text.length) }
-                    },
-                    onPhotoSendButtonClick = chatRoomViewModel::sendPhotoMessage,
-                    onCancelClick = { chatRoomViewModel.editPhotoUri("") },
-                    screenWidth = screenWidth,
-                    photoUri = photoUri.value
-                )
             }
         }
     ) { innerPadding ->
@@ -230,7 +233,8 @@ fun ChatRoomScreen(
                                         resend = { chatRoomViewModel.resendMessage(messageData) },
                                         cancel = { chatRoomViewModel.cancelMessage(messageData) },
                                         onLongClick = {
-                                            dialogMessageData = messageData
+                                            selectedMessageData =
+                                                SelectedMessageState.Selected(messageData)
                                             openMessageDialog = true
                                         }
                                     )
@@ -269,23 +273,26 @@ fun ChatRoomScreen(
                 },
                 onCopy = { },
                 onPartialCopy = { },
-                onReply = { },
+                onReply = {
+                    val messageData =
+                        (selectedMessageData as SelectedMessageState.Selected).messageData
+                    selectedMessageData = SelectedMessageState.Reply(messageData = messageData)
+                },
                 openDeleteDialog = {
                     openDeleteDialog = true
                 },
-                resetDialogData = { dialogMessageData = null }
+                resetDialogData = { selectedMessageData = SelectedMessageState.NotSelected }
             )
         }
 
         if (openDeleteDialog) {
+            val messageData = (selectedMessageData as SelectedMessageState.Selected).messageData
             DeleteDialog(
-                isMessageMine = requireNotNull(dialogMessageData).writer == (uiState as ChatRoomUiState.Success).uid,
+                isMessageMine = messageData.writer == (uiState as ChatRoomUiState.Success).uid,
                 closeDialog = { openDeleteDialog = false },
                 onDelete = {
-                    dialogMessageData?.let {
-                        chatRoomViewModel.deleteMessage(it)
-                    }
-                    dialogMessageData = null
+                    chatRoomViewModel.deleteMessage(messageData)
+                    selectedMessageData = SelectedMessageState.NotSelected
                 }
             )
         }
@@ -518,14 +525,31 @@ fun UniversalBar(
     onTextSendButtonClick: () -> Unit,
     onPhotoSendButtonClick: () -> Unit,
     onCancelClick: () -> Unit,
+    replyEnd: () -> Unit,
+    uiState: ChatRoomUiState.Success,
     screenWidth: Int,
+    selectedMessageData: SelectedMessageState,
     query: TextFieldState,
     photoUri: String,
     modifier: Modifier = Modifier
 ) {
     if (photoUri.isEmpty()) {
         Column(modifier = modifier) {
-            MediaBar(onPhotoButtonClick = onPhotoButtonClick)
+            if (selectedMessageData is SelectedMessageState.Reply) {
+                val name = if (selectedMessageData.messageData.writer == uiState.uid) {
+                    "나"
+                } else {
+                    uiState.userName
+                }
+                ReplyBar(
+                    selectedMessageData = selectedMessageData.messageData,
+                    name = name,
+                    replyEnd = replyEnd
+                )
+
+            } else {
+                MediaBar(onPhotoButtonClick = onPhotoButtonClick)
+            }
             CommentBottomBar(
                 onClick = onTextSendButtonClick,
                 query = query
@@ -552,6 +576,38 @@ fun MediaBar(
                 imageVector = Icons.Filled.Image,
                 contentDescription = stringResource(R.string.media_bar_photo_icon_description)
             )
+        }
+    }
+}
+
+@Composable
+fun ReplyBar(
+    name: String,
+    selectedMessageData: MessageData,
+    replyEnd: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text(
+                text = "${name}에게 답장",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = selectedMessageData.comment,
+                maxLines = 1,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Light
+            )
+        }
+        IconButton(onClick = replyEnd) {
+            Icon(imageVector = Icons.Outlined.Close, contentDescription = null)
         }
     }
 }
@@ -897,7 +953,6 @@ fun MessageDialog(
                             .fillMaxWidth()
                             .clickable {
                                 onReply()
-                                resetDialogData()
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp, vertical = 8.dp)
