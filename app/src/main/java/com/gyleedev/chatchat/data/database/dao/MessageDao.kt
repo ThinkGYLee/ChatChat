@@ -27,7 +27,7 @@ interface MessageDao {
     fun getMessage(rid: String, time: Long, writer: String): Flow<MessageEntity>
 
     @Query("DELETE FROM message WHERE id = :messageId")
-    fun deleteMessage(messageId: Long)
+    suspend fun deleteMessage(messageId: Long)
 
     @Query("DELETE FROM message")
     suspend fun resetMessageDatabase()
