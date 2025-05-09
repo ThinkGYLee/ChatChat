@@ -21,12 +21,15 @@ import com.gyleedev.chatchat.data.database.entity.toUpdateEntity
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
+import com.gyleedev.chatchat.domain.ProcessResult
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toRemoteModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -51,11 +54,15 @@ interface MessageRepository {
 
     fun getMessage(message: MessageData): Flow<MessageEntity>
 
-    suspend fun deleteMessage(messageId: Long)
+    suspend fun deleteLocalMessage(messageId: Long)
 
     fun uploadImageToRemote(uri: String): Flow<String>
 
     suspend fun resetMessageData()
+
+    suspend fun deleteRemoteMessage(message: MessageData): Flow<ProcessResult>
+
+    suspend fun deleteMessageRequest(message: MessageData): Flow<ProcessResult>
 }
 
 class MessageRepositoryImpl @Inject constructor(
@@ -205,7 +212,7 @@ class MessageRepositoryImpl @Inject constructor(
         ).flowOn(Dispatchers.IO)
     }
 
-    override suspend fun deleteMessage(messageId: Long) {
+    override suspend fun deleteLocalMessage(messageId: Long) {
         return messageDao.deleteMessage(messageId)
     }
 
@@ -226,4 +233,30 @@ class MessageRepositoryImpl @Inject constructor(
     override suspend fun resetMessageData() {
         messageDao.resetMessageDatabase()
     }
+
+    override suspend fun deleteMessageRequest(message: MessageData): Flow<ProcessResult> =
+        callbackFlow {
+            val remoteRequest = deleteRemoteMessage(message).first()
+            if (remoteRequest == ProcessResult.Success) {
+                val messageEntity = getMessage(message).firstOrNull()
+                messageEntity?.let { deleteLocalMessage(it.id) }
+                trySend(ProcessResult.Success)
+            } else {
+                trySend(ProcessResult.Failure)
+            }
+
+            awaitClose()
+        }
+
+    override suspend fun deleteRemoteMessage(message: MessageData): Flow<ProcessResult> =
+        callbackFlow {
+            database.reference.child("messages").child(message.chatRoomId)
+                .child(message.time.toString()).removeValue()
+                .addOnSuccessListener {
+                    trySend(ProcessResult.Success)
+                }.addOnFailureListener {
+                    trySend(ProcessResult.Failure)
+                }
+            awaitClose()
+        }
 }
