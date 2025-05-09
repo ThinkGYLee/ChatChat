@@ -258,8 +258,11 @@ fun ChatRoomScreen(
 
         if (openMessageDialog) {
             MessageDialog(
-                "",
-                closeDialog = { openMessageDialog = false }
+                closeDialog = { openMessageDialog = false },
+                onCopy = {},
+                onPartialCopy = {},
+                onReply = {},
+                onDelete = {}
             )
         }
     }
@@ -820,7 +823,10 @@ fun ResendButtonPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageDialog(
-    name: String,
+    onCopy: () -> Unit,
+    onPartialCopy: () -> Unit,
+    onReply: () -> Unit,
+    onDelete: () -> Unit,
     closeDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -838,45 +844,42 @@ fun MessageDialog(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = name,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(R.string.add_favorite_button_text),
+                        text = stringResource(R.string.chat_room_dialog_copy_text),
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                closeDialog()
-                            }
-                            .padding(horizontal = 24.dp, vertical = 8.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.friend_block_button_text),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
+                                onCopy()
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp, vertical = 8.dp)
                     )
 
                     Text(
-                        text = stringResource(R.string.friend_delete_button_text),
+                        text = stringResource(R.string.chat_room_dialog_copy_partial_text),
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
+                                onPartialCopy()
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp, vertical = 8.dp)
                     )
                     Text(
-                        text = stringResource(R.string.friend_hide_button_text),
+                        text = stringResource(R.string.chat_room_dialog_reply_text),
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
+                                onReply()
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.chat_room_dialog_delete_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onDelete()
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp, vertical = 8.dp)
