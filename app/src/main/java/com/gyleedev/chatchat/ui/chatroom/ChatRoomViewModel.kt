@@ -17,6 +17,7 @@ import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.usecase.BlockRelatedUserUseCase
 import com.gyleedev.chatchat.domain.usecase.CancelMessageUseCase
+import com.gyleedev.chatchat.domain.usecase.DeleteMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomDataUseCase
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomLocalDataByUidUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendDataUseCase
@@ -58,6 +59,7 @@ class ChatRoomViewModel @Inject constructor(
     private val cancelMessageUseCase: CancelMessageUseCase,
     private val userToFriendUseCase: UserToFriendUseCase,
     private val blockRelatedUserUseCase: BlockRelatedUserUseCase,
+    private val deleteMessageUseCase: DeleteMessageUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
     private val relatedUserLocalData = MutableStateFlow(RelatedUserLocalData())
@@ -230,6 +232,12 @@ class ChatRoomViewModel @Inject constructor(
                 userRelation = UserRelationState.FRIEND
             )
             relatedUserLocalData.emit(changedData)
+        }
+    }
+
+    fun deleteMessage(messageData: MessageData) {
+        viewModelScope.launch {
+            val request = deleteMessageUseCase(messageData).first()
         }
     }
 }
