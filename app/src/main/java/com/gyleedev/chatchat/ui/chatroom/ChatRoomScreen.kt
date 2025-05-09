@@ -113,6 +113,7 @@ fun ChatRoomScreen(
     val photoUri = chatRoomViewModel.photoUri.collectAsStateWithLifecycle()
     chatRoomViewModel.messagesCallback.collectAsStateWithLifecycle()
     var openMessageDialog by remember { mutableStateOf(false) }
+    var dialogMessageData by remember { mutableStateOf<MessageData?>(null) }
 
     val lazyListState = remember {
         mutableStateOf(
@@ -226,7 +227,10 @@ fun ChatRoomScreen(
                                         messageData = messageData,
                                         resend = { chatRoomViewModel.resendMessage(messageData) },
                                         cancel = { chatRoomViewModel.cancelMessage(messageData) },
-                                        onLongClick = { openMessageDialog = true }
+                                        onLongClick = {
+                                            dialogMessageData = messageData
+                                            openMessageDialog = true
+                                        }
                                     )
                                 }
 
@@ -258,11 +262,18 @@ fun ChatRoomScreen(
 
         if (openMessageDialog) {
             MessageDialog(
-                closeDialog = { openMessageDialog = false },
-                onCopy = {},
-                onPartialCopy = {},
-                onReply = {},
-                onDelete = {}
+                closeDialog = {
+                    dialogMessageData = null
+                    openMessageDialog = false
+                },
+                onCopy = { },
+                onPartialCopy = { },
+                onReply = { },
+                onDelete = {
+                    dialogMessageData?.let {
+                        chatRoomViewModel.deleteMessage(it)
+                    }
+                }
             )
         }
     }
