@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -43,6 +45,8 @@ import androidx.compose.material.icons.outlined.PersonAddAlt
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
 import androidx.compose.material.icons.outlined.ReportProblem
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -108,6 +112,7 @@ fun ChatRoomScreen(
     val messages = chatRoomViewModel.messages.collectAsLazyPagingItems()
     val photoUri = chatRoomViewModel.photoUri.collectAsStateWithLifecycle()
     chatRoomViewModel.messagesCallback.collectAsStateWithLifecycle()
+    var openMessageDialog by remember { mutableStateOf(false) }
 
     val lazyListState = remember {
         mutableStateOf(
@@ -220,7 +225,8 @@ fun ChatRoomScreen(
                                         me = (uiState as ChatRoomUiState.Success).uid,
                                         messageData = messageData,
                                         resend = { chatRoomViewModel.resendMessage(messageData) },
-                                        cancel = { chatRoomViewModel.cancelMessage(messageData) }
+                                        cancel = { chatRoomViewModel.cancelMessage(messageData) },
+                                        onLongClick = { openMessageDialog = true }
                                     )
                                 }
 
@@ -249,6 +255,13 @@ fun ChatRoomScreen(
                 }
             }
         }
+
+        if (openMessageDialog) {
+            MessageDialog(
+                "",
+                closeDialog = { openMessageDialog = false }
+            )
+        }
     }
 }
 
@@ -256,6 +269,7 @@ fun ChatRoomScreen(
 fun ChatBubble(
     resend: () -> Unit,
     cancel: () -> Unit,
+    onLongClick: () -> Unit,
     me: String,
     messageData: MessageData,
     modifier: Modifier = Modifier
@@ -287,7 +301,11 @@ fun ChatBubble(
         }
         Surface(
             color = backgroundColor,
-            shape = backgroundShape
+            shape = backgroundShape,
+            modifier = Modifier.combinedClickable(
+                onLongClick = onLongClick,
+                onClick = {}
+            )
         ) {
             Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
         }
@@ -797,4 +815,75 @@ fun ResendButtonPreview() {
     ChatChatTheme {
         ResendButton(onResendClick = {}, onCancelClick = {})
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MessageDialog(
+    name: String,
+    closeDialog: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    BasicAlertDialog(
+        onDismissRequest = closeDialog,
+        content = {
+            Surface(
+                modifier = Modifier.wrapContentSize(),
+                shape = MaterialTheme.shapes.medium,
+                tonalElevation = AlertDialogDefaults.TonalElevation,
+                color = AlertDialogDefaults.containerColor
+            ) {
+                Column(
+                    modifier = Modifier.padding(vertical = 24.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.add_favorite_button_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.friend_block_button_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+
+                    Text(
+                        text = stringResource(R.string.friend_delete_button_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.friend_hide_button_text),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                closeDialog()
+                            }
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                    )
+                }
+            }
+        },
+        modifier = modifier.wrapContentSize()
+    )
 }
