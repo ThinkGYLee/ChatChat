@@ -24,6 +24,7 @@ import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.ProcessResult
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toRemoteModel
+import com.gyleedev.chatchat.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -67,7 +68,8 @@ interface MessageRepository {
 
 class MessageRepositoryImpl @Inject constructor(
     firebase: Firebase,
-    private val messageDao: MessageDao
+    private val messageDao: MessageDao,
+    private val preferenceUtil: PreferenceUtil
 ) : MessageRepository {
 
     val database =
@@ -234,17 +236,24 @@ class MessageRepositoryImpl @Inject constructor(
         messageDao.resetMessageDatabase()
     }
 
+    // 지우는 메시지의 작성자를 확인하고 본인이면 리모트에서도 삭제
+    // 작성자가 다른사람이면 로컬에서만 삭제
     override suspend fun deleteMessageRequest(message: MessageData): Flow<ProcessResult> =
         callbackFlow {
-            val remoteRequest = deleteRemoteMessage(message).first()
-            if (remoteRequest == ProcessResult.Success) {
+            if (message.writer == preferenceUtil.getMyData().uid) {
+                val remoteRequest = deleteRemoteMessage(message).first()
+                if (remoteRequest == ProcessResult.Success) {
+                    val messageEntity = getMessage(message).firstOrNull()
+                    messageEntity?.let { deleteLocalMessage(it.id) }
+                    trySend(ProcessResult.Success)
+                } else {
+                    trySend(ProcessResult.Failure)
+                }
+            } else {
                 val messageEntity = getMessage(message).firstOrNull()
                 messageEntity?.let { deleteLocalMessage(it.id) }
                 trySend(ProcessResult.Success)
-            } else {
-                trySend(ProcessResult.Failure)
             }
-
             awaitClose()
         }
 
