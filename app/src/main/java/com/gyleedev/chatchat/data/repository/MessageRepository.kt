@@ -21,12 +21,16 @@ import com.gyleedev.chatchat.data.database.entity.toUpdateEntity
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
+import com.gyleedev.chatchat.domain.ProcessResult
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toRemoteModel
+import com.gyleedev.chatchat.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -51,16 +55,21 @@ interface MessageRepository {
 
     fun getMessage(message: MessageData): Flow<MessageEntity>
 
-    suspend fun deleteMessage(messageId: Long)
+    suspend fun deleteLocalMessage(messageId: Long)
 
     fun uploadImageToRemote(uri: String): Flow<String>
 
     suspend fun resetMessageData()
+
+    suspend fun deleteRemoteMessage(message: MessageData): Flow<ProcessResult>
+
+    suspend fun deleteMessageRequest(message: MessageData): Flow<ProcessResult>
 }
 
 class MessageRepositoryImpl @Inject constructor(
     firebase: Firebase,
-    private val messageDao: MessageDao
+    private val messageDao: MessageDao,
+    private val preferenceUtil: PreferenceUtil
 ) : MessageRepository {
 
     val database =
@@ -205,7 +214,7 @@ class MessageRepositoryImpl @Inject constructor(
         ).flowOn(Dispatchers.IO)
     }
 
-    override suspend fun deleteMessage(messageId: Long) {
+    override suspend fun deleteLocalMessage(messageId: Long) {
         return messageDao.deleteMessage(messageId)
     }
 
@@ -226,4 +235,37 @@ class MessageRepositoryImpl @Inject constructor(
     override suspend fun resetMessageData() {
         messageDao.resetMessageDatabase()
     }
+
+    // 지우는 메시지의 작성자를 확인하고 본인이면 리모트에서도 삭제
+    // 작성자가 다른사람이면 로컬에서만 삭제
+    override suspend fun deleteMessageRequest(message: MessageData): Flow<ProcessResult> =
+        callbackFlow {
+            if (message.writer == preferenceUtil.getMyData().uid) {
+                val remoteRequest = deleteRemoteMessage(message).first()
+                if (remoteRequest == ProcessResult.Success) {
+                    val messageEntity = getMessage(message).firstOrNull()
+                    messageEntity?.let { deleteLocalMessage(it.id) }
+                    trySend(ProcessResult.Success)
+                } else {
+                    trySend(ProcessResult.Failure)
+                }
+            } else {
+                val messageEntity = getMessage(message).firstOrNull()
+                messageEntity?.let { deleteLocalMessage(it.id) }
+                trySend(ProcessResult.Success)
+            }
+            awaitClose()
+        }
+
+    override suspend fun deleteRemoteMessage(message: MessageData): Flow<ProcessResult> =
+        callbackFlow {
+            database.reference.child("messages").child(message.chatRoomId)
+                .child(message.time.toString()).removeValue()
+                .addOnSuccessListener {
+                    trySend(ProcessResult.Success)
+                }.addOnFailureListener {
+                    trySend(ProcessResult.Failure)
+                }
+            awaitClose()
+        }
 }

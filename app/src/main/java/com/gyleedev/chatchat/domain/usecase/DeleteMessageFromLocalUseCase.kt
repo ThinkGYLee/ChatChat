@@ -7,5 +7,5 @@ class DeleteMessageFromLocalUseCase @Inject constructor(
     private val repository: MessageRepository
 ) {
     suspend operator fun invoke(messageId: Long) =
-        repository.deleteMessage(messageId)
+        repository.deleteLocalMessage(messageId)
 }
