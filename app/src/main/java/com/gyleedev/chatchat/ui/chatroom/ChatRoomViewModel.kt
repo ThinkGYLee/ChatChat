@@ -75,6 +75,9 @@ class ChatRoomViewModel @Inject constructor(
     private val _networkState = MutableSharedFlow<Boolean>()
     val networkState: SharedFlow<Boolean> = _networkState
 
+    private val _replyTarget = MutableStateFlow<MessageData?>(null)
+    val replyTarget: StateFlow<MessageData?> = _replyTarget
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val messages = _chatRoomLocalData.flatMapLatest {
         getMessagesFromLocalUseCase(it.rid).cachedIn(viewModelScope)
