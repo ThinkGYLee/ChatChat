@@ -1,6 +1,7 @@
 package com.gyleedev.chatchat.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
@@ -19,6 +20,11 @@ object FirebaseModule {
     @Provides
     @Singleton
     fun provideFirebase(): Firebase = Firebase
+
+    @Provides
+    @Singleton
+    fun providesFirebaseDatabase(): FirebaseDatabase =
+        FirebaseDatabase.getInstance("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
     @Provides
     @Singleton
