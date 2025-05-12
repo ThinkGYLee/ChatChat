@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -48,6 +50,7 @@ import androidx.compose.material.icons.outlined.ReportProblem
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -70,13 +73,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -112,10 +119,9 @@ fun ChatRoomScreen(
     val query = rememberTextFieldState()
     val messages = chatRoomViewModel.messages.collectAsLazyPagingItems()
     val photoUri = chatRoomViewModel.photoUri.collectAsStateWithLifecycle()
-    chatRoomViewModel.messagesCallback.collectAsStateWithLifecycle()
     var openMessageDialog by remember { mutableStateOf(false) }
     var openDeleteDialog by remember { mutableStateOf(false) }
-    var selectedMessageData by remember { mutableStateOf<SelectedMessageState>(SelectedMessageState.NotSelected) }
+    val replyTarget = chatRoomViewModel.replyTarget.collectAsStateWithLifecycle()
 
     val lazyListState = remember {
         mutableStateOf(
@@ -193,14 +199,14 @@ fun ChatRoomScreen(
                         },
                         query = query,
                         onTextSendButtonClick = {
-                            chatRoomViewModel.sendMessage()
+                            chatRoomViewModel.sendMessage(selectedMessage = chatRoomViewModel.replyTarget.value)
                             query.edit { delete(0, query.text.length) }
-                            selectedMessageData = SelectedMessageState.NotSelected
+                            chatRoomViewModel.changeReplyTarget(SelectedMessageState.NotSelected)
                         },
                         onPhotoSendButtonClick = chatRoomViewModel::sendPhotoMessage,
                         onCancelClick = { chatRoomViewModel.editPhotoUri("") },
-                        selectedMessageData = selectedMessageData,
-                        replyEnd = { selectedMessageData = SelectedMessageState.NotSelected },
+                        selectedMessageData = replyTarget.value,
+                        replyEnd = { chatRoomViewModel.changeReplyTarget(SelectedMessageState.NotSelected) },
                         screenWidth = screenWidth,
                         photoUri = photoUri.value,
                         uiState = uiState as ChatRoomUiState.Success
@@ -229,12 +235,14 @@ fun ChatRoomScreen(
                                 MessageType.Text -> {
                                     ChatBubble(
                                         me = (uiState as ChatRoomUiState.Success).uid,
+                                        replyTo = (uiState as ChatRoomUiState.Success).userName,
                                         messageData = messageData,
                                         resend = { chatRoomViewModel.resendMessage(messageData) },
                                         cancel = { chatRoomViewModel.cancelMessage(messageData) },
                                         onLongClick = {
-                                            selectedMessageData =
+                                            chatRoomViewModel.changeReplyTarget(
                                                 SelectedMessageState.Selected(messageData)
+                                            )
                                             openMessageDialog = true
                                         }
                                     )
@@ -275,27 +283,60 @@ fun ChatRoomScreen(
                 onPartialCopy = { },
                 onReply = {
                     val messageData =
-                        (selectedMessageData as SelectedMessageState.Selected).messageData
-                    selectedMessageData = SelectedMessageState.Reply(messageData = messageData)
+                        (replyTarget.value as SelectedMessageState.Selected).messageData
+                    chatRoomViewModel.changeReplyTarget(SelectedMessageState.Reply(messageData = messageData))
                 },
                 openDeleteDialog = {
                     openDeleteDialog = true
                 },
-                resetDialogData = { selectedMessageData = SelectedMessageState.NotSelected }
+                resetDialogData = { chatRoomViewModel.changeReplyTarget(SelectedMessageState.NotSelected) }
             )
         }
 
         if (openDeleteDialog) {
-            val messageData = (selectedMessageData as SelectedMessageState.Selected).messageData
+            val messageData = (replyTarget.value as SelectedMessageState.Selected).messageData
             DeleteDialog(
                 isMessageMine = messageData.writer == (uiState as ChatRoomUiState.Success).uid,
                 closeDialog = { openDeleteDialog = false },
                 onDelete = {
                     chatRoomViewModel.deleteMessage(messageData)
-                    selectedMessageData = SelectedMessageState.NotSelected
+                    chatRoomViewModel.changeReplyTarget(SelectedMessageState.NotSelected)
                 }
             )
         }
+    }
+}
+
+@Composable
+fun ChatBubbleDivider(
+    width: Int?,
+    modifier: Modifier = Modifier,
+    thickness: Dp = DividerDefaults.Thickness
+) {
+    val density = LocalDensity.current
+    val color: Color = if (isSystemInDarkTheme()) {
+        MaterialTheme.colorScheme.outline
+    } else {
+        DividerDefaults.color
+    }
+
+    Canvas(
+        modifier
+            .then(
+                if (width != null) {
+                    modifier.width(with(density) { width.toDp() })
+                } else {
+                    modifier.width(0.dp)
+                }
+            )
+            .height(thickness)
+    ) {
+        drawLine(
+            color = color,
+            strokeWidth = thickness.toPx(),
+            start = Offset(0f, thickness.toPx() / 2),
+            end = Offset(size.width, thickness.toPx() / 2)
+        )
     }
 }
 
@@ -305,25 +346,38 @@ fun ChatBubble(
     cancel: () -> Unit,
     onLongClick: () -> Unit,
     me: String,
+    replyTo: String,
     messageData: MessageData,
     modifier: Modifier = Modifier
 ) {
     val backgroundColor: Color
     val backgroundShape: RoundedCornerShape
     val arrangement: Arrangement.Horizontal
+    val rowPaddingModifier: Modifier
 
     if (messageData.writer == me) {
         backgroundColor = MaterialTheme.colorScheme.primary
         backgroundShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
         arrangement = Arrangement.End
+        rowPaddingModifier = modifier.padding(start = 80.dp)
     } else {
         backgroundColor = MaterialTheme.colorScheme.surfaceVariant
         backgroundShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
         arrangement = Arrangement.Start
+        rowPaddingModifier = modifier.padding(end = 80.dp)
     }
+
+    val name = if (messageData.replyTo == me) {
+        "나"
+    } else {
+        replyTo
+    }
+
+    var dividerWidth: Int? by remember { mutableStateOf(null) }
+
     Row(
-        modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+        rowPaddingModifier
+            .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth(),
         horizontalArrangement = arrangement,
         verticalAlignment = Alignment.CenterVertically
@@ -336,12 +390,40 @@ fun ChatBubble(
         Surface(
             color = backgroundColor,
             shape = backgroundShape,
-            modifier = Modifier.combinedClickable(
-                onLongClick = onLongClick,
-                onClick = {}
-            )
+            modifier = Modifier
+                .combinedClickable(
+                    onLongClick = onLongClick,
+                    onClick = {}
+                )
+
         ) {
-            Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
+            Column(
+                modifier = Modifier
+                    .padding(12.dp)
+                    .onGloballyPositioned { layoutCoordinates ->
+                        dividerWidth = layoutCoordinates.size.width
+                    }
+            ) {
+                if (messageData.replyTo != null) {
+                    Text(
+                        text = "${name}에게 답장",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = requireNotNull(messageData.replyComment),
+                        maxLines = 1,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Light
+                    )
+
+                    ChatBubbleDivider(
+                        width = dividerWidth,
+                        modifier = Modifier.padding(vertical = 2.dp)
+                    )
+                }
+                Text(text = messageData.comment, style = MaterialTheme.typography.bodyMedium)
+            }
         }
     }
 }
@@ -546,7 +628,6 @@ fun UniversalBar(
                     name = name,
                     replyEnd = replyEnd
                 )
-
             } else {
                 MediaBar(onPhotoButtonClick = onPhotoButtonClick)
             }
