@@ -32,7 +32,15 @@ data class MessageEntity(
     @ColumnInfo(name = "time")
     val time: Long,
     @ColumnInfo(name = "messageSendState")
-    val messageSendState: MessageSendState
+    val messageSendState: MessageSendState,
+    @ColumnInfo(name = "replyTo")
+    val replyTo: String?,
+    @ColumnInfo(name = "replyComment")
+    val replyComment: String?,
+    @ColumnInfo(name = "replyType")
+    val replyType: MessageType?,
+    @ColumnInfo(name = "replyKey")
+    val replyKey: Long?,
 )
 
 fun MessageEntity.toModel(): MessageData {
@@ -42,7 +50,11 @@ fun MessageEntity.toModel(): MessageData {
         comment = comment,
         time = time,
         type = type,
-        messageSendState = messageSendState
+        messageSendState = messageSendState,
+        replyTo = replyTo,
+        replyKey = replyKey,
+        replyType = replyType,
+        replyComment = replyComment
     )
 }
 
@@ -55,7 +67,11 @@ fun MessageData.toEntity(roomId: Long): MessageEntity {
         time = time,
         type = type,
         roomId = roomId,
-        messageSendState = messageSendState
+        messageSendState = messageSendState,
+        replyTo = replyTo,
+        replyKey = replyKey,
+        replyType = replyType,
+        replyComment = replyComment
     )
 }
 
@@ -68,6 +84,10 @@ fun MessageData.toUpdateEntity(messageId: Long, roomId: Long): MessageEntity {
         type = type,
         time = time,
         roomId = roomId,
-        messageSendState = messageSendState
+        messageSendState = messageSendState,
+        replyTo = replyTo,
+        replyKey = replyKey,
+        replyType = replyType,
+        replyComment = replyComment
     )
 }
