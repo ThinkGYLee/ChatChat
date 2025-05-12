@@ -448,7 +448,7 @@ fun FriendDialog(
                     ) {
                         Text(
                             text = stringResource(R.string.friend_block_button_text),
-                            style = MaterialTheme.typography.labelLarge,
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
                     Row(
@@ -483,7 +483,6 @@ fun FriendDialog(
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
-
                 }
             }
         },

@@ -40,7 +40,7 @@ data class MessageEntity(
     @ColumnInfo(name = "replyType")
     val replyType: MessageType?,
     @ColumnInfo(name = "replyKey")
-    val replyKey: Long?,
+    val replyKey: Long?
 )
 
 fun MessageEntity.toModel(): MessageData {
