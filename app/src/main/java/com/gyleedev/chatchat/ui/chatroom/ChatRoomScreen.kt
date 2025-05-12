@@ -357,12 +357,12 @@ fun ChatBubble(
 
     if (messageData.writer == me) {
         backgroundColor = MaterialTheme.colorScheme.primary
-        backgroundShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
+        backgroundShape = RoundedCornerShape(12.dp, 12.dp, 4.dp, 12.dp)
         arrangement = Arrangement.End
         rowPaddingModifier = modifier.padding(start = 80.dp)
     } else {
         backgroundColor = MaterialTheme.colorScheme.surfaceVariant
-        backgroundShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
+        backgroundShape = RoundedCornerShape(4.dp, 12.dp, 12.dp, 12.dp)
         arrangement = Arrangement.Start
         rowPaddingModifier = modifier.padding(end = 80.dp)
     }

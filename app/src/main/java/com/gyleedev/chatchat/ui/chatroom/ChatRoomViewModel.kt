@@ -27,6 +27,7 @@ import com.gyleedev.chatchat.domain.usecase.GetMyUidFromLogInDataUseCase
 import com.gyleedev.chatchat.domain.usecase.ResendMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.UserToFriendUseCase
+import com.gyleedev.chatchat.util.FirebaseServerTimeHelper
 import com.gyleedev.chatchat.util.NetworkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,6 +62,7 @@ class ChatRoomViewModel @Inject constructor(
     private val userToFriendUseCase: UserToFriendUseCase,
     private val blockRelatedUserUseCase: BlockRelatedUserUseCase,
     private val deleteMessageUseCase: DeleteMessageUseCase,
+    private val firebaseServerTimeHelper: FirebaseServerTimeHelper,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
     private val relatedUserLocalData = MutableStateFlow(RelatedUserLocalData())
@@ -150,7 +152,7 @@ class ChatRoomViewModel @Inject constructor(
                     writer = it,
                     type = MessageType.Photo,
                     comment = photoUrl,
-                    time = Instant.now().toEpochMilli(),
+                    time = firebaseServerTimeHelper.getEstimatedServerTime(),
                     messageSendState = MessageSendState.LOADING
                 )
             }
