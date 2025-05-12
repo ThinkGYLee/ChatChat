@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -75,6 +76,10 @@ class ChatRoomViewModel @Inject constructor(
     private val _networkState = MutableSharedFlow<Boolean>()
     val networkState: SharedFlow<Boolean> = _networkState
 
+    private val _replyTarget =
+        MutableStateFlow<SelectedMessageState>(SelectedMessageState.NotSelected)
+    val replyTarget: StateFlow<SelectedMessageState> = _replyTarget
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val messages = _chatRoomLocalData.flatMapLatest {
         getMessagesFromLocalUseCase(it.rid).cachedIn(viewModelScope)
@@ -96,13 +101,9 @@ class ChatRoomViewModel @Inject constructor(
         ChatRoomUiState.Loading
     )
 
-    val messagesCallback = relatedUserLocalData.flatMapLatest {
+    private val messagesCallback = relatedUserLocalData.flatMapLatest {
         getMessagesFromRemoteUseCase(_chatRoomLocalData.value, it.userRelation)
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        MessageData()
-    )
+    }
 
     init {
         val passedFriendUid = savedStateHandle.get<String>("friend")
@@ -115,6 +116,7 @@ class ChatRoomViewModel @Inject constructor(
             relatedUserLocalData.emit(friend)
             getChatRoomDataUseCase(friend)
             getChatRoomFromLocal(friend)
+            messagesCallback.collectLatest { }
         }
     }
 
@@ -160,10 +162,24 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun sendMessage() {
+    fun sendMessage(
+        selectedMessage: SelectedMessageState = SelectedMessageState.NotSelected
+    ) {
         viewModelScope.launch {
-            val networkState = getNetworkState()
+            val networkState = getNetworkState().also { println(it) }
             _networkState.emit(networkState)
+
+            var replyTo: String? = null
+            var replyComment: String? = null
+            var replyKey: Long? = null
+            var replyType: MessageType? = null
+            if (selectedMessage is SelectedMessageState.Reply) {
+                replyTo = selectedMessage.messageData.writer
+                replyComment = selectedMessage.messageData.comment
+                replyType = selectedMessage.messageData.type
+                replyKey = selectedMessage.messageData.time
+            }
+
             val message = uid?.let {
                 MessageData(
                     chatRoomId = _chatRoomLocalData.value.rid,
@@ -171,7 +187,11 @@ class ChatRoomViewModel @Inject constructor(
                     type = isCommentContainLink(_messageQuery.value),
                     comment = _messageQuery.value,
                     time = Instant.now().toEpochMilli(),
-                    messageSendState = MessageSendState.LOADING
+                    messageSendState = MessageSendState.LOADING,
+                    replyKey = replyKey,
+                    replyTo = replyTo,
+                    replyComment = replyComment,
+                    replyType = replyType
                 )
             }
             val rid = _chatRoomLocalData.value.id
@@ -237,7 +257,13 @@ class ChatRoomViewModel @Inject constructor(
 
     fun deleteMessage(messageData: MessageData) {
         viewModelScope.launch {
-            val request = deleteMessageUseCase(messageData).first()
+            deleteMessageUseCase(messageData).first()
+        }
+    }
+
+    fun changeReplyTarget(selectedMessage: SelectedMessageState) {
+        viewModelScope.launch {
+            _replyTarget.emit(selectedMessage)
         }
     }
 }

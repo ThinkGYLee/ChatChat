@@ -2,7 +2,6 @@ package com.gyleedev.chatchat.ui.friendlist
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -53,6 +53,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -107,7 +108,8 @@ fun FriendListScreen(
         viewModel.noSuchUserAlert
             .flowWithLifecycle(lifecycle.lifecycle)
             .collect {
-                Toast.makeText(context, R.string.search_result_no_user_text, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.search_result_no_user_text, Toast.LENGTH_SHORT)
+                    .show()
             }
     }
 
@@ -321,7 +323,6 @@ fun MyUserData(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FriendData(
     onClick: () -> Unit,
@@ -408,57 +409,80 @@ fun FriendDialog(
                     Text(
                         text = name,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(
-                            if (favoriteState) {
-                                R.string.remove_favorite_button_text
-                            } else {
-                                R.string.add_favorite_button_text
-                            }
-                        ),
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
+                            .heightIn(min = 48.dp)
+                            .clickable(role = Role.Button) {
                                 updateFavorite()
                                 closeDialog()
                             }
-                            .padding(horizontal = 24.dp, vertical = 8.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.friend_block_button_text),
+                            .padding(horizontal = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(
+                                if (favoriteState) {
+                                    R.string.remove_favorite_button_text
+                                } else {
+                                    R.string.add_favorite_button_text
+                                }
+                            ),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
+                            .heightIn(min = 48.dp)
+                            .clickable(role = Role.Button) {
                                 blockRequest()
                                 closeDialog()
                             }
-                            .padding(horizontal = 24.dp, vertical = 8.dp)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.friend_delete_button_text),
+                            .padding(horizontal = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.friend_block_button_text),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
+                            .heightIn(min = 48.dp)
+                            .clickable(role = Role.Button) {
                                 deleteRequest()
                                 closeDialog()
                             }
-                            .padding(horizontal = 24.dp, vertical = 8.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.friend_hide_button_text),
+                            .padding(horizontal = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.friend_delete_button_text),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
+                            .heightIn(min = 48.dp)
+                            .clickable(role = Role.Button) {
                                 hideRequest()
                                 closeDialog()
                             }
-                            .padding(horizontal = 24.dp, vertical = 8.dp)
-                    )
+                            .padding(horizontal = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.friend_hide_button_text),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
                 }
             }
         },
