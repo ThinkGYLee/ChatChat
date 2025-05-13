@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.ui.finduser
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -42,9 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,12 +65,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.UserData
-import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
-import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -272,16 +270,19 @@ fun FindUserCard(
                 .padding(vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            var imageUrl by rememberSaveable { mutableStateOf("") }
-            LaunchedEffect(userData) { imageUrl = getImageFromFireStore(userData.picture).first() }
             GlideImage(
-                imageModel = { imageUrl.ifBlank { R.drawable.baseline_person_24 } },
+                imageModel = { userData.picture.ifBlank { R.drawable.baseline_person_24 } },
                 modifier = Modifier
                     .size(
                         width = 80.dp,
                         height = 80.dp
                     )
-                    .clip(RoundedCornerShape(20.dp))
+                    .border(
+                        width = 0.01.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape
+                    )
+                    .clip(CircleShape)
                     .background(color = colorResource(R.color.avatar_background)),
                 component = rememberImageComponent {
                     +ShimmerPlugin(

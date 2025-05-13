@@ -66,13 +66,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserData
-import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
-import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -278,9 +276,6 @@ fun MyUserData(
     userData: UserData,
     modifier: Modifier = Modifier
 ) {
-    var imageUrl by rememberSaveable { mutableStateOf("") }
-    LaunchedEffect(userData) { imageUrl = getImageFromFireStore(userData.picture).first() }
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -289,7 +284,7 @@ fun MyUserData(
         verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(
-            imageModel = { imageUrl.ifBlank { R.drawable.baseline_person_24 } },
+            imageModel = { userData.picture.ifBlank { R.drawable.baseline_person_24 } },
             imageOptions = ImageOptions(contentScale = ContentScale.Crop),
             modifier = Modifier
                 .size(56.dp)
@@ -330,10 +325,6 @@ fun FriendData(
     relatedUserLocalData: RelatedUserLocalData,
     modifier: Modifier = Modifier
 ) {
-    var imageUrl by rememberSaveable { mutableStateOf("") }
-    LaunchedEffect(relatedUserLocalData) {
-        imageUrl = getImageFromFireStore(relatedUserLocalData.picture).first()
-    }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -346,7 +337,7 @@ fun FriendData(
     ) {
         Box(modifier = Modifier.wrapContentSize()) {
             GlideImage(
-                imageModel = { imageUrl.ifBlank { R.drawable.baseline_person_24 } },
+                imageModel = { relatedUserLocalData.picture.ifBlank { R.drawable.baseline_person_24 } },
                 imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
                     .size(40.dp)

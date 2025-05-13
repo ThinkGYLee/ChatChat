@@ -68,7 +68,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -98,7 +97,6 @@ import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.UrlMetaData
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
-import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.gyleedev.chatchat.util.getMedaData
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
@@ -106,7 +104,6 @@ import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -490,9 +487,6 @@ fun PhotoBubble(
     messageData: MessageData,
     modifier: Modifier = Modifier
 ) {
-    var imageUrl by rememberSaveable { mutableStateOf("") }
-    LaunchedEffect(messageData) { imageUrl = getImageFromFireStore(messageData.comment).first() }
-
     val arrangement: Arrangement.Horizontal = if (messageData.writer == me) {
         Arrangement.End
     } else {
@@ -513,7 +507,7 @@ fun PhotoBubble(
         GlideImage(
             imageModel = {
                 // place holder size
-                imageUrl // .ifBlank { R.drawable.icons8__ }
+                messageData.comment // .ifBlank { R.drawable.icons8__ }
             },
             modifier = Modifier
                 .sizeIn(

@@ -1,5 +1,7 @@
 package com.gyleedev.chatchat.ui.friendinfo
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,8 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
@@ -24,11 +25,11 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,18 +38,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.chatchat.R
-import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
-import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,20 +125,17 @@ fun FriendInfoScreen(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            var imageUrl by rememberSaveable { mutableStateOf("") }
-            LaunchedEffect(friendData) {
-                if (friendData != null) {
-                    imageUrl = getImageFromFireStore(requireNotNull(friendData).picture).first()
-                }
-            }
             GlideImage(
-                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+                imageModel = { requireNotNull(friendData).picture.ifBlank { R.drawable.baseline_person_24 } },
                 modifier = Modifier
-                    .sizeIn(
-                        maxWidth = 80.dp,
-                        maxHeight = 80.dp
+                    .size(120.dp)
+                    .border(
+                        width = 0.01.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape
                     )
-                    .clip(RoundedCornerShape(20.dp)),
+                    .clip(CircleShape)
+                    .background(color = colorResource(R.color.avatar_background)),
                 component = rememberImageComponent {
                     +ShimmerPlugin(
                         Shimmer.Flash(
@@ -147,7 +144,7 @@ fun FriendInfoScreen(
                         )
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.icons8__)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
             )
             Spacer(modifier = Modifier.height(20.dp))
             Text(text = friendData?.name ?: stringResource(R.string.anonymous_user_text))
