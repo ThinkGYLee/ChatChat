@@ -10,9 +10,8 @@ import androidx.paging.map
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import com.gyleedev.chatchat.data.database.dao.MessageDao
 import com.gyleedev.chatchat.data.database.entity.MessageEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
@@ -67,15 +66,13 @@ interface MessageRepository {
 }
 
 class MessageRepositoryImpl @Inject constructor(
-    firebase: Firebase,
+    private val database: FirebaseDatabase,
+    storage: FirebaseStorage,
     private val messageDao: MessageDao,
     private val preferenceUtil: PreferenceUtil
 ) : MessageRepository {
 
-    val database =
-        firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
-
-    private val imageStorage = firebase.storage.getReference("image")
+    private val imageStorageReference = storage.getReference("image")
 
     override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long {
         return messageDao.insertMessage(
@@ -222,7 +219,7 @@ class MessageRepositoryImpl @Inject constructor(
     override fun uploadImageToRemote(uri: String): Flow<String> = callbackFlow {
         val fileName = Instant.now().toEpochMilli()
         val uuid = UUID.randomUUID().toString()
-        val mountainsRef = imageStorage.child("$uuid$fileName.png")
+        val mountainsRef = imageStorageReference.child("$uuid$fileName.png")
         val uploadTask = mountainsRef.putFile(uri.toUri())
         uploadTask.addOnSuccessListener {
             trySend("$uuid$fileName.png")
