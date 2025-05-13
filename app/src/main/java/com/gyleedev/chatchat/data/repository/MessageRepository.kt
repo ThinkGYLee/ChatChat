@@ -1,5 +1,6 @@
 package com.gyleedev.chatchat.data.repository
 
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
@@ -20,6 +21,7 @@ import com.gyleedev.chatchat.data.database.entity.toUpdateEntity
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
+import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.ProcessResult
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toRemoteModel
@@ -56,13 +58,12 @@ interface MessageRepository {
 
     suspend fun deleteLocalMessage(messageId: Long)
 
-    fun uploadImageToRemote(uri: String): Flow<String>
-
     suspend fun resetMessageData()
 
     suspend fun deleteRemoteMessage(message: MessageData): Flow<ProcessResult>
 
     suspend fun deleteMessageRequest(message: MessageData): Flow<ProcessResult>
+    suspend fun sendMessage(messageData: MessageData, rid: Long, networkState: Boolean)
 }
 
 class MessageRepositoryImpl @Inject constructor(
@@ -216,14 +217,36 @@ class MessageRepositoryImpl @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun uploadImageToRemote(uri: String): Flow<String> = callbackFlow {
+    private fun uploadAndGetImage(uri: Uri): Flow<String> = callbackFlow {
+        val fileName = uploadImageToRemote(uri).first()
+        val filePath = getImagePathByFirebase(fileName).first()
+        trySend(filePath)
+        awaitClose()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun uploadImageToRemote(uri: Uri): Flow<String> = callbackFlow {
         val fileName = Instant.now().toEpochMilli()
         val uuid = UUID.randomUUID().toString()
         val mountainsRef = imageStorageReference.child("$uuid$fileName.png")
-        val uploadTask = mountainsRef.putFile(uri.toUri())
+        val uploadTask = mountainsRef.putFile(uri)
         uploadTask.addOnSuccessListener {
             trySend("$uuid$fileName.png")
         }.addOnFailureListener {
+            trySend("")
+        }
+        awaitClose()
+    }
+
+    private fun getImagePathByFirebase(fileName: String): Flow<String> = callbackFlow {
+        if (fileName != "") {
+            val firebaseStorage = FirebaseStorage.getInstance().getReference("image")
+            firebaseStorage.child(fileName).downloadUrl.addOnSuccessListener {
+                trySend(it.toString())
+            }.addOnFailureListener {
+                trySend("")
+            }
+        } else {
             trySend("")
         }
         awaitClose()
@@ -265,4 +288,30 @@ class MessageRepositoryImpl @Inject constructor(
                 }
             awaitClose()
         }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override suspend fun sendMessage(messageData: MessageData, rid: Long, networkState: Boolean) {
+        val message = if (messageData.type == MessageType.Photo) {
+            messageData.copy(
+                comment = uploadAndGetImage(messageData.comment.toUri()).first()
+            )
+        } else {
+            messageData
+        }
+        val messageId = insertMessageToLocal(message, rid)
+        if (networkState) {
+            val request = try {
+                insertMessageToRemote(message).first()
+            } catch (e: Throwable) {
+                println(e)
+            }
+            if (request is MessageSendState) {
+                val updateMessage = message.copy(messageSendState = request)
+                updateMessageState(messageId, rid, updateMessage)
+            }
+        } else {
+            val updateMessage = message.copy(messageSendState = MessageSendState.FAIL)
+            updateMessageState(messageId, rid, updateMessage)
+        }
+    }
 }
