@@ -11,10 +11,9 @@ import androidx.paging.map
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.FirebaseStorage
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.dao.FavoriteDao
 import com.gyleedev.chatchat.data.database.dao.UserAndFavoriteDao
@@ -143,17 +142,16 @@ interface UserRepository {
 
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
-    firebase: Firebase,
+    private val database: FirebaseDatabase,
+    storage: FirebaseStorage,
     private val auth: FirebaseAuth,
     private val chatRoomDao: ChatRoomDao,
     private val favoriteDao: FavoriteDao,
     private val userAndFavoriteDao: UserAndFavoriteDao,
     private val preferenceUtil: PreferenceUtil
 ) : UserRepository {
-    val database =
-        firebase.database("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
-    private val imageStorage = firebase.storage.getReference("image")
+    private val imageStorageReference = storage.getReference("image")
 
     override fun getUsersFromLocal(): List<UserData> {
         return userDao.getUsers().map { it.toModel() }
@@ -679,7 +677,7 @@ class UserRepositoryImpl @Inject constructor(
     private fun uploadImageToRemote(uri: Uri): Flow<String> = callbackFlow {
         val fileName = Instant.now().toEpochMilli()
         val uuid = UUID.randomUUID().toString()
-        val mountainsRef = imageStorage.child("$uuid$fileName.png")
+        val mountainsRef = imageStorageReference.child("$uuid$fileName.png")
         val uploadTask = mountainsRef.putFile(uri)
         uploadTask.addOnSuccessListener {
             trySend("$uuid$fileName.png")
@@ -823,9 +821,14 @@ class UserRepositoryImpl @Inject constructor(
                 picture = userData.picture,
                 userRelation = UserRelationState.BLOCKED
             )
-            val remoteAddRequest = addRelatedUserToRemote(user = userData, userRelation = UserRelationState.BLOCKED).first()
+            val remoteAddRequest = addRelatedUserToRemote(
+                user = userData,
+                userRelation = UserRelationState.BLOCKED
+            ).first()
             val localRequest = insertUserToLocal(uploadData)
-            val addBlockRequest = addUserToRemoteBlockedEntity(uploadData.toRelatedUserLocalData().copy(id = localRequest)).first()
+            val addBlockRequest = addUserToRemoteBlockedEntity(
+                uploadData.toRelatedUserLocalData().copy(id = localRequest)
+            ).first()
             return if (remoteAddRequest && addBlockRequest == ProcessResult.Success) {
                 ChangeRelationResult.SUCCESS
             } else {
