@@ -624,13 +624,13 @@ class UserRepositoryImpl @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun updateMyUserInfo(user: UserData): Flow<Boolean> = callbackFlow {
-        val imageUrl = uploadImageToRemote(user.picture.toUri()).first()
+        val imagePath = uploadAndGetImage(user.picture.toUri()).first()
         val userData = UserData(
             email = user.email,
             name = user.name,
             status = user.status,
             uid = user.uid,
-            picture = imageUrl
+            picture = imagePath
         )
         database.reference.child("users").child(user.uid).setValue(userData)
             .addOnSuccessListener {
@@ -674,6 +674,14 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    private fun uploadAndGetImage(uri: Uri): Flow<String> = callbackFlow {
+        val fileName = uploadImageToRemote(uri).first()
+        val filePath = getImagePathByFirebase(fileName).first()
+        trySend(filePath)
+        awaitClose()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun uploadImageToRemote(uri: Uri): Flow<String> = callbackFlow {
         val fileName = Instant.now().toEpochMilli()
         val uuid = UUID.randomUUID().toString()
@@ -682,6 +690,20 @@ class UserRepositoryImpl @Inject constructor(
         uploadTask.addOnSuccessListener {
             trySend("$uuid$fileName.png")
         }.addOnFailureListener {
+            trySend("")
+        }
+        awaitClose()
+    }
+
+    private fun getImagePathByFirebase(fileName: String): Flow<String> = callbackFlow {
+        if (fileName != "") {
+            val firebaseStorage = FirebaseStorage.getInstance().getReference("image")
+            firebaseStorage.child(fileName).downloadUrl.addOnSuccessListener {
+                trySend(it.toString())
+            }.addOnFailureListener {
+                trySend("")
+            }
+        } else {
             trySend("")
         }
         awaitClose()
