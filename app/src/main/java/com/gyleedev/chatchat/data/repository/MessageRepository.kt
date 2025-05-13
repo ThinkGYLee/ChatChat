@@ -72,7 +72,6 @@ class MessageRepositoryImpl @Inject constructor(
     private val preferenceUtil: PreferenceUtil
 ) : MessageRepository {
 
-
     private val imageStorageReference = storage.getReference("image")
 
     override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long {
