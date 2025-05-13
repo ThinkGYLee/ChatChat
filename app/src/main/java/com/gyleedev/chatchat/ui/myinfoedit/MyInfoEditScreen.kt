@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +17,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -37,9 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,21 +46,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.gyleedev.chatchat.R
-import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
-import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +67,6 @@ fun MyInfoEditScreen(
     modifier: Modifier = Modifier,
     viewModel: MyInfoEditViewModel = hiltViewModel()
 ) {
-    val myData by viewModel.myUserData.collectAsStateWithLifecycle()
     val myName by viewModel.myNameQuery.collectAsStateWithLifecycle()
     val myStatus by viewModel.myStatusQuery.collectAsStateWithLifecycle()
     val myPicture by viewModel.myPictureAddress.collectAsStateWithLifecycle()
@@ -137,23 +133,18 @@ fun MyInfoEditScreen(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            var imageUrl by rememberSaveable { mutableStateOf("") }
-            LaunchedEffect(myData) {
-                if (requireNotNull(myData?.picture).isNotEmpty()) {
-                    imageUrl = getImageFromFireStore(myPicture).first()
-                    viewModel.changePictureUri(imageUrl.toUri())
-                }
-            }
-
             Box {
                 GlideImage(
-                    imageModel = { myPicture.ifBlank { R.drawable.icons8__ } },
+                    imageModel = { myPicture.ifBlank { R.drawable.baseline_person_24 } },
                     modifier = Modifier
-                        .sizeIn(
-                            maxWidth = 80.dp,
-                            maxHeight = 80.dp
+                        .size(120.dp)
+                        .border(
+                            width = 0.01.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            shape = CircleShape
                         )
-                        .clip(RoundedCornerShape(20.dp)),
+                        .clip(CircleShape)
+                        .background(color = colorResource(R.color.avatar_background)),
                     component = rememberImageComponent {
                         +ShimmerPlugin(
                             Shimmer.Flash(
@@ -162,7 +153,7 @@ fun MyInfoEditScreen(
                             )
                         )
                     },
-                    previewPlaceholder = painterResource(id = R.drawable.icons8__)
+                    previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
                 )
                 Box(
                     modifier = Modifier

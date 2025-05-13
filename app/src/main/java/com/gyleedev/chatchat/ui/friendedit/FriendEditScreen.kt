@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,9 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +46,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -61,13 +62,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.UserRelationState
-import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
-import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -253,10 +252,6 @@ fun FriendData(
     relatedUserLocalData: RelatedUserLocalData,
     modifier: Modifier = Modifier
 ) {
-    var imageUrl by rememberSaveable { mutableStateOf("") }
-    LaunchedEffect(relatedUserLocalData) {
-        imageUrl = getImageFromFireStore(relatedUserLocalData.picture).first()
-    }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -267,11 +262,17 @@ fun FriendData(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             GlideImage(
-                imageModel = { imageUrl.ifBlank { R.drawable.icons8__ } },
+                imageModel = { relatedUserLocalData.picture.ifBlank { R.drawable.baseline_person_24 } },
                 imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
                     .size(60.dp)
-                    .clip(RoundedCornerShape(20.dp)),
+                    .border(
+                        width = 0.01.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape
+                    )
+                    .clip(CircleShape)
+                    .background(color = colorResource(R.color.avatar_background)),
                 component = rememberImageComponent {
                     +ShimmerPlugin(
                         Shimmer.Flash(
@@ -280,7 +281,7 @@ fun FriendData(
                         )
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.icons8__)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
             )
             Spacer(modifier = Modifier.width(20.dp))
             Text(

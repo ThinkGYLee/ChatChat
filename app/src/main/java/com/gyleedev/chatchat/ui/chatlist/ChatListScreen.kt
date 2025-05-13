@@ -25,10 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -45,13 +41,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.domain.ChatRoomDataWithAllRelatedUsersAndMessage
 import com.gyleedev.chatchat.domain.MessageType
-import com.gyleedev.chatchat.util.getImageFromFireStore
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
-import kotlinx.coroutines.flow.first
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -121,17 +115,6 @@ fun ChatRoomItem(
         else -> ""
     }
 
-    var imageUrl by rememberSaveable {
-        mutableStateOf("")
-    }
-
-    LaunchedEffect(chatRoomDataWithAllRelatedUsersAndMessage) {
-        imageUrl =
-            getImageFromFireStore(
-                chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.picture
-            ).first()
-    }
-
     Row(
         modifier
             .fillMaxWidth()
@@ -143,7 +126,9 @@ fun ChatRoomItem(
     ) {
         Row(Modifier) {
             GlideImage(
-                imageModel = { imageUrl.ifBlank { R.drawable.baseline_person_24 } },
+                imageModel = {
+                    chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.picture.ifBlank { R.drawable.baseline_person_24 }
+                },
                 imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
                     .size(48.dp)
