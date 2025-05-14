@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.crashlytics)
+    alias(libs.plugins.jetbrains.kotlin.parcelize)
 }
 
 android {

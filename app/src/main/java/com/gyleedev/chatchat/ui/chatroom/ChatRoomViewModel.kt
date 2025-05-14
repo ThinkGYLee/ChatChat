@@ -168,7 +168,7 @@ class ChatRoomViewModel @Inject constructor(
         selectedMessage: SelectedMessageState = SelectedMessageState.NotSelected
     ) {
         viewModelScope.launch {
-            val networkState = getNetworkState().also { println(it) }
+            val networkState = getNetworkState()
             _networkState.emit(networkState)
 
             var replyTo: String? = null
@@ -182,12 +182,19 @@ class ChatRoomViewModel @Inject constructor(
                 replyKey = selectedMessage.messageData.time
             }
 
+            val type = isCommentContainLink(_messageQuery.value)
+            val comment = if (type == MessageType.Link) {
+                isLinkStartFromHttp(_messageQuery.value).also { println(it) }
+            } else {
+                _messageQuery.value
+            }
+
             val message = uid?.let {
                 MessageData(
                     chatRoomId = _chatRoomLocalData.value.rid,
                     writer = it,
-                    type = isCommentContainLink(_messageQuery.value),
-                    comment = _messageQuery.value,
+                    type = type,
+                    comment = comment,
                     time = Instant.now().toEpochMilli(),
                     messageSendState = MessageSendState.LOADING,
                     replyKey = replyKey,
@@ -233,6 +240,14 @@ class ChatRoomViewModel @Inject constructor(
             MessageType.Link
         } else {
             MessageType.Text
+        }
+    }
+
+    private fun isLinkStartFromHttp(query: String): String {
+        return if (query.startsWith("http") || query.startsWith("https")) {
+            query
+        } else {
+            "http://$query"
         }
     }
 

@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -68,19 +69,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -96,8 +102,8 @@ import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.UrlMetaData
 import com.gyleedev.chatchat.domain.UserRelationState
-import com.gyleedev.chatchat.ui.theme.ChatChatTheme
 import com.gyleedev.chatchat.util.getMedaData
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
@@ -259,7 +265,12 @@ fun ChatRoomScreen(
                                         me = (uiState as ChatRoomUiState.Success).uid,
                                         messageData = messageData,
                                         resend = { chatRoomViewModel.resendMessage(messageData) },
-                                        cancel = { chatRoomViewModel.cancelMessage(messageData) }
+                                        cancel = { chatRoomViewModel.cancelMessage(messageData) },
+                                        linkClick = {
+                                            val customTabsIntent =
+                                                CustomTabsIntent.Builder().build()
+                                            customTabsIntent.launchUrl(context, it.toUri())
+                                        }
                                     )
                                 }
 
@@ -427,6 +438,7 @@ fun ChatBubble(
 
 @Composable
 fun LinkBubble(
+    linkClick: (String) -> Unit,
     resend: () -> Unit,
     cancel: () -> Unit,
     me: String,
@@ -436,30 +448,46 @@ fun LinkBubble(
     val backgroundColor: Color
     val backgroundShape: RoundedCornerShape
     val arrangement: Arrangement.Horizontal
+    val rowPaddingModifier: Modifier
+    val hyperLinkColor: Color
 
     val coroutineScope = rememberCoroutineScope()
 
     if (messageData.writer == me) {
         backgroundColor = MaterialTheme.colorScheme.primary
-        backgroundShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
+        hyperLinkColor =
+            if (isSystemInDarkTheme()) {
+                colorResource(R.color.hyperlink_color_dark)
+            } else {
+                colorResource(R.color.hyperlink_color_bright)
+            }
+        backgroundShape = RoundedCornerShape(12.dp, 12.dp, 4.dp, 12.dp)
         arrangement = Arrangement.End
+        rowPaddingModifier = modifier.padding(start = 80.dp)
     } else {
         backgroundColor = MaterialTheme.colorScheme.surfaceVariant
-        backgroundShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
+        hyperLinkColor =
+            if (isSystemInDarkTheme()) {
+                colorResource(R.color.hyperlink_color_bright)
+            } else {
+                colorResource(R.color.hyperlink_color_dark)
+            }
+        backgroundShape = RoundedCornerShape(4.dp, 12.dp, 12.dp, 12.dp)
         arrangement = Arrangement.Start
+        rowPaddingModifier = modifier.padding(end = 80.dp)
     }
 
-    val metaData = remember {
+    var metaData by rememberSaveable {
         mutableStateOf(UrlMetaData())
     }
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.Default) {
-            metaData.value = getMedaData(messageData.comment)
+            metaData = getMedaData(messageData.comment)
         }
     }
 
     Row(
-        modifier
+        rowPaddingModifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
         horizontalArrangement = arrangement,
@@ -474,8 +502,85 @@ fun LinkBubble(
             color = backgroundColor,
             shape = backgroundShape
         ) {
-            Text(text = messageData.comment, modifier = Modifier.padding(16.dp))
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = messageData.comment,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = hyperLinkColor,
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable {
+                        linkClick(messageData.comment)
+                    },
+                    style = MaterialTheme.typography.labelLarge
+
+                )
+                if (metaData.title.isNotEmpty() || metaData.description.isNotEmpty() || metaData.imageUrl.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (metaData.imageUrl.isNotEmpty()) {
+                        GlideImage(
+                            imageModel = { metaData.imageUrl },
+                            imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+                            modifier = Modifier
+                                .size(60.dp)
+                                .background(colorResource(R.color.avatar_background)),
+                            component = rememberImageComponent {
+                                +ShimmerPlugin(
+                                    Shimmer.Flash(
+                                        baseColor = Color.White,
+                                        highlightColor = Color.LightGray
+                                    )
+                                )
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(20.dp))
+                    }
+
+                    Column {
+                        if (metaData.title.isNotEmpty()) {
+                            Text(
+                                text = metaData.title,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+                        if (metaData.title.isNotEmpty() && metaData.description.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                        if (metaData.description.isNotEmpty()) {
+                            Text(
+                                text = metaData.description,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Light
+                            )
+                        }
+                    }
+                }
+            }
         }
+    }
+}
+
+@Preview
+@Composable
+fun LinkBubblePreview() {
+    MaterialTheme {
+        LinkBubble(
+            resend = TODO(),
+            cancel = TODO(),
+            me = "aa",
+            messageData = MessageData(
+                type = MessageType.Link,
+                comment = "https://daum.net"
+            ),
+            linkClick = {},
+            modifier = TODO()
+        )
     }
 }
 
@@ -523,19 +628,6 @@ fun PhotoBubble(
                     )
                 )
             }
-        )
-    }
-}
-
-@Preview
-@Composable
-fun PhotoBubblePreview() {
-    ChatChatTheme {
-        PhotoBubble(
-            resend = {},
-            cancel = {},
-            me = "me",
-            messageData = MessageData(writer = "", type = MessageType.Photo, comment = "")
         )
     }
 }
@@ -736,14 +828,6 @@ fun CommentBottomBar(
     )
 }
 
-@Preview
-@Composable
-fun CommentBarPreview() {
-    ChatChatTheme {
-        CommentBottomBar(onClick = {}, query = TextFieldState())
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatRoomTopBar(
@@ -920,21 +1004,6 @@ fun ChatRoomTopBar(
     }
 }
 
-@Preview
-@Composable
-fun ChatRoomTopBarPreview() {
-    MaterialTheme {
-        ChatRoomTopBar(
-            onBackPressKeyClick = {},
-            state = UserRelationState.UNKNOWN,
-            name = "abcd",
-            onUnblockClick = {},
-            onBlockClick = {},
-            onAddFriendClick = {}
-        )
-    }
-}
-
 @Composable
 fun ResendButton(
     onResendClick: () -> Unit,
@@ -964,14 +1033,6 @@ fun ResendButton(
                 modifier = Modifier.padding(2.dp)
             )
         }
-    }
-}
-
-@Preview
-@Composable
-fun ResendButtonPreview() {
-    ChatChatTheme {
-        ResendButton(onResendClick = {}, onCancelClick = {})
     }
 }
 

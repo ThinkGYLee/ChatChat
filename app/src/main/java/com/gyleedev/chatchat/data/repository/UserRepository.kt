@@ -663,7 +663,7 @@ class UserRepositoryImpl @Inject constructor(
                 localEntity.copy(
                     name = remoteData!!.name.ifBlank { localEntity.name },
                     status = remoteData.status.ifBlank { localEntity.status },
-                    picture = remoteData.picture.ifBlank { localEntity.picture }
+                    picture = remoteData.picture
                 )
             )
         }
