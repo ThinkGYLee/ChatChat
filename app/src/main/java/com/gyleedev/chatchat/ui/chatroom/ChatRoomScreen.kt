@@ -85,10 +85,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -144,7 +144,9 @@ fun ChatRoomScreen(
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
 
-    val screenWidth = LocalWindowInfo.current.containerSize.width.dp
+    val configuration = LocalConfiguration.current
+
+    val screenWidth = configuration.screenWidthDp.dp
 
     val pickMedia =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -175,7 +177,7 @@ fun ChatRoomScreen(
     }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         topBar = {
             if (uiState is ChatRoomUiState.Success) {
                 val uiStateCast = uiState as ChatRoomUiState.Success
@@ -195,7 +197,7 @@ fun ChatRoomScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = (screenWidth.value + 48).dp)
+                            .height(52.dp)
                             .padding(vertical = 20.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
@@ -221,7 +223,7 @@ fun ChatRoomScreen(
                         screenWidth = screenWidth,
                         photoUri = photoUri.value,
                         uiState = uiState as ChatRoomUiState.Success,
-                        modifier = Modifier.heightIn(max = (screenWidth.value + 48).dp)
+                        modifier = Modifier.heightIn(max = screenWidth)
                     )
                 }
             }
@@ -230,9 +232,9 @@ fun ChatRoomScreen(
         if (uiState is ChatRoomUiState.Success) {
             LazyColumn(
                 modifier = Modifier
+                    .fillMaxSize()
                     .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .fillMaxSize(),
+                    .consumeWindowInsets(innerPadding),
                 state = lazyListState.value,
                 reverseLayout = true
             ) {
@@ -631,7 +633,9 @@ fun PhotoBottomBar(
     uri: String,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Absolute.SpaceBetween,
@@ -656,25 +660,24 @@ fun PhotoBottomBar(
         }
         HorizontalDivider()
         Spacer(Modifier.height(8.dp))
-        GlideImage(
-            imageModel = { uri.toUri() },
-            imageOptions = ImageOptions(contentScale = ContentScale.Inside),
-            modifier = Modifier
-                .padding(12.dp)
-                .sizeIn(
-                    maxHeight = screenWidth,
-                    maxWidth = screenWidth
-                )
-                .clip(RoundedCornerShape(20.dp)),
-            component = rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray
+        Box(modifier = Modifier.size(screenWidth), contentAlignment = Alignment.Center) {
+            GlideImage(
+                imageModel = { uri.toUri() },
+                imageOptions = ImageOptions(contentScale = ContentScale.Fit),
+                modifier = Modifier
+                    .size(screenWidth)
+                    .padding(12.dp)
+                    .clip(RoundedCornerShape(20.dp)),
+                component = rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray
+                        )
                     )
-                )
-            }
-        )
+                }
+            )
+        }
         Spacer(Modifier.height(8.dp))
     }
 }
@@ -764,7 +767,8 @@ fun UniversalBar(
             onCancelButtonClick = onCancelClick,
             onSendButtonClick = onPhotoSendButtonClick,
             uri = photoUri,
-            screenWidth = screenWidth
+            screenWidth = screenWidth,
+            modifier = modifier
         )
     }
 }
