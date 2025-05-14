@@ -21,7 +21,7 @@
     <string name="add_friend_button_description">add friend</string>
     <string name="friend_list_setting_button_description">설정</string>
     <string name="chat_list_screen_title">채팅방</string>
-    <string name="chat_room_screen_chat_hint">채팅을 입력하세요</string>
+    <string name="chat_room_screen_chat_hint">메시지 입력</string>
     <string name="reply_icon_description">reply icon</string>
     <string name="message_resend_icon_description">message_resend icon</string>
     <string name="message_cancel_icon_description">message_cancel icon</string>

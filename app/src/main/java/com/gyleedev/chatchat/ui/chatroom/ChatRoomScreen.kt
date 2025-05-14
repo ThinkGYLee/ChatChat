@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.outlined.Block
@@ -56,6 +58,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -74,20 +78,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -137,7 +144,9 @@ fun ChatRoomScreen(
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
 
-    val screenWidth = LocalWindowInfo.current.containerSize.width
+    val configuration = LocalConfiguration.current
+
+    val screenWidth = configuration.screenWidthDp.dp
 
     val pickMedia =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -168,7 +177,7 @@ fun ChatRoomScreen(
     }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         topBar = {
             if (uiState is ChatRoomUiState.Success) {
                 val uiStateCast = uiState as ChatRoomUiState.Success
@@ -188,6 +197,7 @@ fun ChatRoomScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(52.dp)
                             .padding(vertical = 20.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
@@ -212,7 +222,8 @@ fun ChatRoomScreen(
                         replyEnd = { chatRoomViewModel.changeReplyTarget(SelectedMessageState.NotSelected) },
                         screenWidth = screenWidth,
                         photoUri = photoUri.value,
-                        uiState = uiState as ChatRoomUiState.Success
+                        uiState = uiState as ChatRoomUiState.Success,
+                        modifier = Modifier.heightIn(max = screenWidth)
                     )
                 }
             }
@@ -221,9 +232,9 @@ fun ChatRoomScreen(
         if (uiState is ChatRoomUiState.Success) {
             LazyColumn(
                 modifier = Modifier
+                    .fillMaxSize()
                     .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .fillMaxSize(),
+                    .consumeWindowInsets(innerPadding),
                 state = lazyListState.value,
                 reverseLayout = true
             ) {
@@ -566,24 +577,6 @@ fun LinkBubble(
     }
 }
 
-@Preview
-@Composable
-fun LinkBubblePreview() {
-    MaterialTheme {
-        LinkBubble(
-            resend = TODO(),
-            cancel = TODO(),
-            me = "aa",
-            messageData = MessageData(
-                type = MessageType.Link,
-                comment = "https://daum.net"
-            ),
-            linkClick = {},
-            modifier = TODO()
-        )
-    }
-}
-
 @Composable
 fun PhotoBubble(
     resend: () -> Unit,
@@ -634,13 +627,15 @@ fun PhotoBubble(
 
 @Composable
 fun PhotoBottomBar(
-    screenWidth: Int,
+    screenWidth: Dp,
     onSendButtonClick: () -> Unit,
     onCancelButtonClick: () -> Unit,
     uri: String,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Absolute.SpaceBetween,
@@ -665,24 +660,24 @@ fun PhotoBottomBar(
         }
         HorizontalDivider()
         Spacer(Modifier.height(8.dp))
-        GlideImage(
-            imageModel = { uri.toUri() },
-            modifier = Modifier
-                .padding(12.dp)
-                .sizeIn(
-                    maxWidth = screenWidth.dp,
-                    maxHeight = screenWidth.dp
-                )
-                .clip(RoundedCornerShape(20.dp)),
-            component = rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray
+        Box(modifier = Modifier.size(screenWidth), contentAlignment = Alignment.Center) {
+            GlideImage(
+                imageModel = { uri.toUri() },
+                imageOptions = ImageOptions(contentScale = ContentScale.Fit),
+                modifier = Modifier
+                    .size(screenWidth)
+                    .padding(12.dp)
+                    .clip(RoundedCornerShape(20.dp)),
+                component = rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray
+                        )
                     )
-                )
-            }
-        )
+                }
+            )
+        }
         Spacer(Modifier.height(8.dp))
     }
 }
@@ -695,12 +690,15 @@ fun UniversalBar(
     onCancelClick: () -> Unit,
     replyEnd: () -> Unit,
     uiState: ChatRoomUiState.Success,
-    screenWidth: Int,
+    screenWidth: Dp,
     selectedMessageData: SelectedMessageState,
     query: TextFieldState,
     photoUri: String,
     modifier: Modifier = Modifier
 ) {
+    var isFocused by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
     if (photoUri.isEmpty()) {
         Column(modifier = modifier) {
             if (selectedMessageData is SelectedMessageState.Reply) {
@@ -714,36 +712,64 @@ fun UniversalBar(
                     name = name,
                     replyEnd = replyEnd
                 )
-            } else {
-                MediaBar(onPhotoButtonClick = onPhotoButtonClick)
             }
-            CommentBottomBar(
-                onClick = onTextSendButtonClick,
-                query = query
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp, horizontal = 8.dp)
+            ) {
+                if (isFocused) {
+                    IconButton(
+                        onClick = { focusManager.clearFocus() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = null
+                        )
+                    }
+                } else {
+                    IconButton(onClick = onPhotoButtonClick) {
+                        Icon(
+                            imageVector = Icons.Default.Image,
+                            contentDescription = null
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                CommentBottomBar(
+                    query = query,
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .onFocusChanged {
+                            isFocused = it.isFocused
+                        }
+                        .weight(1f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(
+                    onClick = onTextSendButtonClick,
+                    enabled = query.text.isNotEmpty(),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = Color.Yellow,
+                        disabledContentColor = LocalContentColor.current.copy(alpha = 0.38f)
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.Send,
+                        contentDescription = stringResource(R.string.reply_icon_description),
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                }
+            }
         }
     } else {
         PhotoBottomBar(
             onCancelButtonClick = onCancelClick,
             onSendButtonClick = onPhotoSendButtonClick,
             uri = photoUri,
-            screenWidth = screenWidth
+            screenWidth = screenWidth,
+            modifier = modifier
         )
-    }
-}
-
-@Composable
-fun MediaBar(
-    onPhotoButtonClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(modifier.padding(start = 8.dp)) {
-        IconButton(onClick = onPhotoButtonClick) {
-            Icon(
-                imageVector = Icons.Filled.Image,
-                contentDescription = stringResource(R.string.media_bar_photo_icon_description)
-            )
-        }
     }
 }
 
@@ -781,7 +807,6 @@ fun ReplyBar(
 
 @Composable
 fun CommentBottomBar(
-    onClick: () -> Unit,
     query: TextFieldState,
     modifier: Modifier = Modifier
 ) {
@@ -789,10 +814,15 @@ fun CommentBottomBar(
     BasicTextField(
         state = query,
         modifier = modifier
-            .fillMaxWidth()
+            .height(48.dp)
             .imePadding(),
         decorator = { innerTextField ->
-            Box {
+            Box(
+                modifier = Modifier.background(
+                    MaterialTheme.colorScheme.surfaceContainerLow,
+                    shape = RoundedCornerShape(20.dp)
+                )
+            ) {
                 if (query.text.isEmpty()) {
                     Text(
                         text = stringResource(R.string.chat_room_screen_chat_hint),
@@ -806,21 +836,11 @@ fun CommentBottomBar(
                 Row(
                     modifier = Modifier
                         .padding(start = 20.dp)
-                        .fillMaxWidth(),
+                        .height(48.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     innerTextField()
-                    IconButton(
-                        onClick = onClick,
-                        enabled = query.text.isNotEmpty()
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.Send,
-                            contentDescription = stringResource(R.string.reply_icon_description),
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-                    }
                 }
             }
         },
