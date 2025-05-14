@@ -1,6 +1,6 @@
 [versions]
 agp = "8.9.2"
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -64,12 +64,13 @@ landscapist-glide = { module = "com.github.skydoves:landscapist-glide", version.
 landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholder", version.ref = "landscapist" }
 paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
-jsoup = { module = "org.jsoup:jsoup", version.ref= "jsoup" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 firebase = { id = "com.google.gms.google-services", version.ref = "firebase" }
