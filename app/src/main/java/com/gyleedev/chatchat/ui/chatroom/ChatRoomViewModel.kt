@@ -184,7 +184,7 @@ class ChatRoomViewModel @Inject constructor(
 
             val type = isCommentContainLink(_messageQuery.value)
             val comment = if (type == MessageType.Link) {
-                isLinkStartFromHttp(_messageQuery.value).also { println(it) }
+                isLinkStartFromHttp(_messageQuery.value)
             } else {
                 _messageQuery.value
             }

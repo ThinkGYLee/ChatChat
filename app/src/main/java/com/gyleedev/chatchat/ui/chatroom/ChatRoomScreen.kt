@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -52,6 +53,7 @@ import androidx.compose.material.icons.outlined.RemoveCircleOutline
 import androidx.compose.material.icons.outlined.ReportProblem
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -83,6 +85,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
@@ -191,6 +194,7 @@ fun ChatRoomScreen(
                 )
             }
         },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (uiState is ChatRoomUiState.Success) {
                 if ((uiState as ChatRoomUiState.Success).relationState == UserRelationState.BLOCKED) {
@@ -232,11 +236,10 @@ fun ChatRoomScreen(
         if (uiState is ChatRoomUiState.Success) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
+                    .fillMaxSize(),
                 state = lazyListState.value,
-                reverseLayout = true
+                reverseLayout = true,
+                contentPadding = innerPadding
             ) {
                 items(
                     count = messages.itemCount,
@@ -582,13 +585,16 @@ fun PhotoBubble(
     resend: () -> Unit,
     cancel: () -> Unit,
     me: String,
-    messageData: MessageData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    messageData: MessageData = MessageData()
 ) {
     val arrangement: Arrangement.Horizontal = if (messageData.writer == me) {
         Arrangement.End
     } else {
         Arrangement.Start
+    }
+    var messageData = rememberSaveable {
+        mutableStateOf(messageData)
     }
     Row(
         modifier
@@ -597,15 +603,10 @@ fun PhotoBubble(
         horizontalArrangement = arrangement,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (messageData.messageSendState == MessageSendState.LOADING) {
-            CircularProgressIndicator(modifier = Modifier.size(20.dp))
-        } else if (messageData.messageSendState == MessageSendState.FAIL) {
-            ResendButton(onResendClick = resend, onCancelClick = cancel)
-        }
         GlideImage(
             imageModel = {
                 // place holder size
-                messageData.comment // .ifBlank { R.drawable.icons8__ }
+                messageData.value.comment // .ifBlank { R.drawable.icons8__ }
             },
             modifier = Modifier
                 .sizeIn(
@@ -634,7 +635,9 @@ fun PhotoBottomBar(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .height(screenWidth)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -700,18 +703,26 @@ fun UniversalBar(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     if (photoUri.isEmpty()) {
-        Column(modifier = modifier) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(color = BottomAppBarDefaults.containerColor)
+                .windowInsetsPadding(BottomAppBarDefaults.windowInsets)
+                .imePadding()
+        ) {
             if (selectedMessageData is SelectedMessageState.Reply) {
-                val name = if (selectedMessageData.messageData.writer == uiState.uid) {
-                    "나"
-                } else {
-                    uiState.userName
+                Column {
+                    val name = if (selectedMessageData.messageData.writer == uiState.uid) {
+                        "나"
+                    } else {
+                        uiState.userName
+                    }
+                    ReplyBar(
+                        selectedMessageData = selectedMessageData.messageData,
+                        name = name,
+                        replyEnd = replyEnd
+                    )
                 }
-                ReplyBar(
-                    selectedMessageData = selectedMessageData.messageData,
-                    name = name,
-                    replyEnd = replyEnd
-                )
             }
             Row(
                 modifier = Modifier
@@ -784,7 +795,8 @@ fun ReplyBar(
         modifier
             .fillMaxWidth()
             .padding(start = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
             Text(
@@ -814,8 +826,8 @@ fun CommentBottomBar(
     BasicTextField(
         state = query,
         modifier = modifier
-            .height(48.dp)
-            .imePadding(),
+            .heightIn(min = 48.dp),
+        cursorBrush = SolidColor(color),
         decorator = { innerTextField ->
             Box(
                 modifier = Modifier.background(

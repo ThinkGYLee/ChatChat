@@ -1,9 +1,12 @@
 package com.gyleedev.chatchat.domain
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.gyleedev.chatchat.data.model.MessageRemoteData
+import kotlinx.parcelize.Parcelize
 
 // 기본값 설정 안해주면 crash남
+@Parcelize
 data class MessageData(
     @SerializedName("chatRoomId") val chatRoomId: String = "",
     @SerializedName("writer") val writer: String = "",
@@ -15,7 +18,7 @@ data class MessageData(
     @SerializedName("replyComment") val replyComment: String? = null, // 답장 상대의 메시지 내용
     @SerializedName("replyType") val replyType: MessageType? = null, // 답장 상대의 메시지 타입
     @SerializedName("replyKey") val replyKey: Long? = null // 로컬 db Key 값으로 쓸것 (고유값인 time)
-)
+) : Parcelable
 
 fun MessageData.toRemoteModel(): MessageRemoteData {
     return MessageRemoteData(
