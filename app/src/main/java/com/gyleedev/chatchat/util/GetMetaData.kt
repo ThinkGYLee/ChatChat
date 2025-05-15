@@ -40,14 +40,13 @@ fun getMedaData(comment: String): UrlMetaData {
 
                     "og:image" -> {
                         el.attr("content").let { content ->
-                            println(content)
                             metaData.imageUrl = content.toString()
                         }
                     }
                 }
             }
         }
-        return metaData.also { println(it) }
+        return metaData
     } catch (e: Error) {
         return UrlMetaData()
     }
