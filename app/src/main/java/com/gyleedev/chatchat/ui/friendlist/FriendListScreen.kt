@@ -510,7 +510,7 @@ fun FriendManagementDropDownMenu(
             }
         )
         DropdownMenuItem(
-            text = { Text(stringResource(R.string.entire_setting_button_text)) },
+            text = { Text(stringResource(R.string.setting_text)) },
             onClick = {
                 settingRequest()
                 onDismiss()
