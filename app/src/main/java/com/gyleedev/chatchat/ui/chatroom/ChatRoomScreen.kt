@@ -40,9 +40,9 @@ import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.outlined.Block
@@ -706,7 +706,8 @@ fun UniversalBar(
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .background(color = BottomAppBarDefaults.containerColor)
+                .background(color = MaterialTheme.colorScheme.surfaceContainerLowest)
+                .padding(bottom = 4.dp)
                 .windowInsetsPadding(BottomAppBarDefaults.windowInsets)
                 .imePadding()
         ) {
@@ -734,7 +735,7 @@ fun UniversalBar(
                         onClick = { focusManager.clearFocus() }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                             contentDescription = null
                         )
                     }
@@ -831,7 +832,7 @@ fun CommentBottomBar(
         decorator = { innerTextField ->
             Box(
                 modifier = Modifier.background(
-                    MaterialTheme.colorScheme.surfaceContainerLow,
+                    MaterialTheme.colorScheme.surfaceContainer,
                     shape = RoundedCornerShape(20.dp)
                 )
             ) {
