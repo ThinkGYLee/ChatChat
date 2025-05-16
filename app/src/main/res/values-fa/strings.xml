@@ -125,4 +125,9 @@
     <string name="navigation_bar_label_setting">تنظیمات</string>
     <string name="friend_list_header_favorite">مورد علاقه</string>
     <string name="friend_list_header_friend">دوستان</string>
+    <string name="email_input_guide">لطفاً ایمیل خود را وارد کنید</string>
+    <string name="nickname_input_guide">لطفاً نام مستعار خود را وارد کنید</string>
+    <string name="email_format_error">لطفاً فرمت ایمیل را رعایت کنید</string>
+    <string name="nickname_length_error">نام مستعار باید حداقل ۲ کاراکتر داشته باشد</string>
+    <string name="block_friend_action">مسدود کردن دوست</string>
 </resources> 

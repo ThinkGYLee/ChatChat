@@ -125,4 +125,9 @@
     <string name="navigation_bar_label_setting">设置</string>
     <string name="friend_list_header_favorite">收藏 %d</string>
     <string name="friend_list_header_friend">好友 %d</string>
+    <string name="email_input_guide">请输入邮箱地址</string>
+    <string name="nickname_input_guide">请输入昵称</string>
+    <string name="email_format_error">请遵循邮箱格式</string>
+    <string name="nickname_length_error">昵称请至少输入2个字符</string>
+    <string name="block_friend_action">屏蔽好友</string>
 </resources> 

@@ -125,4 +125,9 @@
     <string name="navigation_bar_label_setting">Configurações</string>
     <string name="friend_list_header_favorite">Favoritos</string>
     <string name="friend_list_header_friend">Amigos</string>
+    <string name="email_input_guide">Por favor, insira seu e-mail</string>
+    <string name="nickname_input_guide">Por favor, insira seu apelido</string>
+    <string name="email_format_error">Por favor, siga o formato de e-mail</string>
+    <string name="nickname_length_error">O apelido deve ter pelo menos 2 caracteres</string>
+    <string name="block_friend_action">Bloquear Amigo</string>
 </resources> 

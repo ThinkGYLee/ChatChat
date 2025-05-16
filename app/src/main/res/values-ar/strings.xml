@@ -125,4 +125,9 @@
     <string name="navigation_bar_label_setting">الإعدادات</string>
     <string name="friend_list_header_favorite">المفضلة</string>
     <string name="friend_list_header_friend">الأصدقاء</string>
+    <string name="email_input_guide">الرجاء إدخال بريدك الإلكتروني</string>
+    <string name="nickname_input_guide">الرجاء إدخال اسمك المستعار</string>
+    <string name="email_format_error">يرجى اتباع تنسيق البريد الإلكتروني</string>
+    <string name="nickname_length_error">يجب أن يحتوي الاسم المستعار على حرفين على الأقل</string>
+    <string name="block_friend_action">حظر الصديق</string>
 </resources> 

@@ -125,4 +125,9 @@
     <string name="navigation_bar_label_setting">設定</string>
     <string name="friend_list_header_favorite">お気に入り %d</string>
     <string name="friend_list_header_friend">友達 %d</string>
+    <string name="email_input_guide">メールアドレスを入力してください</string>
+    <string name="nickname_input_guide">ニックネームを入力してください</string>
+    <string name="email_format_error">メールアドレスの形式を確認してください</string>
+    <string name="nickname_length_error">ニックネームは2文字以上入力してください</string>
+    <string name="block_friend_action">友達をブロック</string>
 </resources> 

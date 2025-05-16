@@ -124,4 +124,9 @@
     <string name="navigation_bar_label_setting">설정</string>
     <string name="friend_list_header_favorite">즐겨찾기 %d</string>
     <string name="friend_list_header_friend">친구 %d</string>
+    <string name="email_input_guide">이메일을 입력해주세요</string>
+    <string name="nickname_input_guide">닉네임을 입력해 주세요</string>
+    <string name="email_format_error">이메일 형식을 지켜주세요</string>
+    <string name="nickname_length_error">닉네임을 2글자 이상 입력해 주세요</string>
+    <string name="block_friend_action">친구 차단</string>
 </resources>
