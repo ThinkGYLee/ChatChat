@@ -353,9 +353,9 @@ fun IdScreen(
     onReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val idComment = if (idIsAvailable || idQuery.text.isEmpty()) "" else "이메일 형식을 지켜주세요"
+    val idComment = if (idIsAvailable || idQuery.text.isEmpty()) "" else stringResource(R.string.email_format_error)
     Column(modifier = modifier) {
-        Text(text = "이메일을 입력해주세요")
+        Text(text = stringResource(R.string.email_input_guide))
         Spacer(modifier = Modifier.height(16.dp))
         IdTextField(
             idQuery = idQuery,
@@ -372,17 +372,16 @@ fun NicknameScreen(
     onReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val nicknameComment =
-        if (nickNameIsAvailable || nicknameQuery.text.isEmpty()) "" else "닉네임을 2글자 이상 입력해 주세요"
+    val nickNameComment = if (nickNameIsAvailable || nicknameQuery.text.isEmpty()) "" else stringResource(R.string.nickname_length_error)
     Column(modifier = modifier) {
-        Text(text = "닉네임을 입력해 주세요")
+        Text(text = stringResource(R.string.nickname_input_guide))
         Spacer(modifier = Modifier.height(16.dp))
         NicknameTextField(
             nicknameQuery = nicknameQuery,
             onReset = onReset
         )
         Text(
-            text = nicknameComment,
+            text = nickNameComment,
             style = MaterialTheme.typography.labelMedium,
             color = Color.Red
         )

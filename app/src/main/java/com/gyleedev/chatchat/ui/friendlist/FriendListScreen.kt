@@ -179,7 +179,7 @@ fun FriendListScreen(
                             .padding(bottom = 8.dp)
                     ) {
                         Text(
-                            text = "즐겨찾기 ${favorites.itemCount}",
+                            text = stringResource(R.string.friend_list_header_favorite, favorites.itemCount),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }
@@ -227,7 +227,7 @@ fun FriendListScreen(
                         )
                     ) {
                         Text(
-                            text = "친구 ${friends.itemCount}",
+                            text = stringResource(R.string.friend_list_header_friend, friends.itemCount),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }

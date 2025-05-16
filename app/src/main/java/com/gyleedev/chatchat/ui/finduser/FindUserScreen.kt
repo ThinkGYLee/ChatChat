@@ -302,7 +302,7 @@ fun FindUserCard(
                 horizontalArrangement = Arrangement.Center
             ) {
                 OutlinedButton(onClick = onBlockUser) {
-                    Text("친구 차단")
+                    stringResource(R.string.block_friend_action)
                 }
                 Spacer(modifier = Modifier.width(20.dp))
                 Button(onClick = onAddAsFriend) {

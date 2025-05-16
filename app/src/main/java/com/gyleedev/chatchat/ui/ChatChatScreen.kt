@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -28,6 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.ui.blockmanage.BlockManageScreen
 import com.gyleedev.chatchat.ui.chatlist.ChatListScreen
 import com.gyleedev.chatchat.ui.chatroom.ChatRoomScreen
@@ -285,15 +287,15 @@ fun BottomNavigation(
                 label = {
                     val label = when (item.screenRoute) {
                         FRIENDLIST -> {
-                            "친구"
+                            stringResource(R.string.navigation_bar_label_friend)
                         }
 
                         CHATLIST -> {
-                            "채팅"
+                            stringResource(R.string.navigation_bar_label_chat)
                         }
 
                         SETTING -> {
-                            "설정"
+                            stringResource(R.string.navigation_bar_label_setting)
                         }
 
                         else -> {
