@@ -130,4 +130,6 @@
     <string name="email_format_error">يرجى اتباع تنسيق البريد الإلكتروني</string>
     <string name="nickname_length_error">يجب أن يحتوي الاسم المستعار على حرفين على الأقل</string>
     <string name="block_friend_action">حظر الصديق</string>
+    <string name="chatroom_text_me">أنا</string>
+    <string name="chatroom_text_reply_to">الرد على %s</string>
 </resources> 

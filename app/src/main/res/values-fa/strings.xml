@@ -130,4 +130,6 @@
     <string name="email_format_error">لطفاً فرمت ایمیل را رعایت کنید</string>
     <string name="nickname_length_error">نام مستعار باید حداقل ۲ کاراکتر داشته باشد</string>
     <string name="block_friend_action">مسدود کردن دوست</string>
+    <string name="chatroom_text_me">من</string>
+    <string name="chatroom_text_reply_to">پاسخ به %s</string>
 </resources> 

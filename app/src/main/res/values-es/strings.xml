@@ -130,4 +130,6 @@
     <string name="email_format_error">Por favor, siga el formato de correo electrónico</string>
     <string name="nickname_length_error">El apodo debe tener al menos 2 caracteres</string>
     <string name="block_friend_action">Bloquear Amigo</string>
+    <string name="chatroom_text_me">yo</string>
+    <string name="chatroom_text_reply_to">responder a %s</string>
 </resources> 

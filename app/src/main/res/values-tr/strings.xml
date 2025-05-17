@@ -130,4 +130,6 @@
     <string name="email_format_error">Lütfen e-posta formatına uyun</string>
     <string name="nickname_length_error">Takma ad en az 2 karakter olmalıdır</string>
     <string name="block_friend_action">Arkadaşı Engelle</string>
+    <string name="chatroom_text_me">ben</string>
+    <string name="chatroom_text_reply_to">%s kişisini yanıtla</string>
 </resources> 

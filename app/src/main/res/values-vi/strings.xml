@@ -130,4 +130,6 @@
     <string name="email_format_error">Vui lòng tuân thủ định dạng email</string>
     <string name="nickname_length_error">Biệt danh phải có ít nhất 2 ký tự</string>
     <string name="block_friend_action">Chặn Bạn Bè</string>
+    <string name="chatroom_text_me">tôi</string>
+    <string name="chatroom_text_reply_to">trả lời %s</string>
 </resources> 

@@ -130,4 +130,6 @@
     <string name="email_format_error">Bitte gültiges E-Mail-Format verwenden</string>
     <string name="nickname_length_error">Nickname muss mindestens 2 Zeichen lang sein</string>
     <string name="block_friend_action">Freund blockieren</string>
+    <string name="chatroom_text_me">ich</string>
+    <string name="chatroom_text_reply_to">Antwort an %s</string>
 </resources> 

@@ -130,4 +130,6 @@
     <string name="email_format_error">メールアドレスの形式を確認してください</string>
     <string name="nickname_length_error">ニックネームは2文字以上入力してください</string>
     <string name="block_friend_action">友達をブロック</string>
+    <string name="chatroom_text_me">自分</string>
+    <string name="chatroom_text_reply_to">%sに返信</string>
 </resources> 

@@ -130,4 +130,6 @@
     <string name="email_format_error">Veuillez respecter le format email</string>
     <string name="nickname_length_error">Le pseudo doit contenir au moins 2 caractères</string>
     <string name="block_friend_action">Bloquer l\'ami</string>
+    <string name="chatroom_text_me">moi</string>
+    <string name="chatroom_text_reply_to">répondre à %s</string>
 </resources> 

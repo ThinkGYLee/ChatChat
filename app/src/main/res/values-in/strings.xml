@@ -130,4 +130,6 @@
     <string name="email_format_error">Harap ikuti format email</string>
     <string name="nickname_length_error">Nama panggilan harus minimal 2 karakter</string>
     <string name="block_friend_action">Blokir Teman</string>
+    <string name="chatroom_text_me">saya</string>
+    <string name="chatroom_text_reply_to">balas ke %s</string>
 </resources> 

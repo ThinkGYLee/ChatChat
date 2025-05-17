@@ -129,4 +129,6 @@
     <string name="email_format_error">이메일 형식을 지켜주세요</string>
     <string name="nickname_length_error">닉네임을 2글자 이상 입력해 주세요</string>
     <string name="block_friend_action">친구 차단</string>
+    <string name="chatroom_text_me">나</string>
+    <string name="chatroom_text_reply_to">%s님에게 답장</string>
 </resources>
