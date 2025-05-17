@@ -390,7 +390,7 @@ fun ChatBubble(
     }
 
     val name = if (messageData.replyTo == me) {
-        "나"
+        stringResource(R.string.chatroom_text_me)
     } else {
         replyTo
     }
@@ -428,7 +428,7 @@ fun ChatBubble(
             ) {
                 if (messageData.replyTo != null) {
                     Text(
-                        text = "${name}에게 답장",
+                        text = stringResource(R.string.chatroom_text_reply_to, name),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold
                     )
