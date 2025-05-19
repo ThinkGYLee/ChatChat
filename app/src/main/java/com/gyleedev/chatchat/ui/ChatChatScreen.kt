@@ -13,15 +13,14 @@ import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -30,6 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.ui.blockmanage.BlockManageScreen
 import com.gyleedev.chatchat.ui.chatlist.ChatListScreen
 import com.gyleedev.chatchat.ui.chatroom.ChatRoomScreen
@@ -44,82 +44,6 @@ import com.gyleedev.chatchat.ui.myinfo.MyInfoScreen
 import com.gyleedev.chatchat.ui.myinfoedit.MyInfoEditScreen
 import com.gyleedev.chatchat.ui.setting.SettingScreen
 import com.gyleedev.chatchat.ui.signin.SignInScreen
-
-sealed class BottomNavItem(
-    val icons: ImageVector,
-    val screenRoute: String
-) {
-
-    data object LOGIN : BottomNavItem(
-        Icons.Outlined.Settings,
-        com.gyleedev.chatchat.ui.LOGIN
-    )
-
-    data object SIGNIN : BottomNavItem(
-        Icons.Outlined.Settings,
-        com.gyleedev.chatchat.ui.SIGNIN
-    )
-
-    data object FRIENDLIST : BottomNavItem(
-        Icons.Outlined.AccountCircle,
-        com.gyleedev.chatchat.ui.FRIENDLIST
-    )
-
-    data object CHATLIST : BottomNavItem(
-        Icons.Outlined.Email,
-        com.gyleedev.chatchat.ui.CHATLIST
-    )
-
-    data object SETTING : BottomNavItem(
-        Icons.Outlined.Settings,
-        com.gyleedev.chatchat.ui.SETTING
-    )
-
-    data object FINDUSER : BottomNavItem(
-        Icons.Outlined.Settings,
-        com.gyleedev.chatchat.ui.FINDUSER
-    )
-
-    data object CHATROOM : BottomNavItem(
-        Icons.Outlined.Menu,
-        com.gyleedev.chatchat.ui.CHATROOM
-    )
-
-    data object MYINFO : BottomNavItem(
-        Icons.Outlined.ThumbUp,
-        com.gyleedev.chatchat.ui.MYINFO
-    )
-
-    data object FRIENDINFO : BottomNavItem(
-        Icons.Outlined.ThumbUp,
-        com.gyleedev.chatchat.ui.FRIENDINFO
-    )
-
-    data object MYINFOEDIT : BottomNavItem(
-        Icons.Outlined.ThumbUp,
-        com.gyleedev.chatchat.ui.MYINFOEDIT
-    )
-
-    data object FRIENDEDIT : BottomNavItem(
-        Icons.Outlined.ThumbUp,
-        com.gyleedev.chatchat.ui.FRIENDEDIT
-    )
-
-    data object FRIENDMANAGE : BottomNavItem(
-        Icons.Outlined.ThumbUp,
-        com.gyleedev.chatchat.ui.FRIENDMANAGE
-    )
-
-    data object MANAGEHIDE : BottomNavItem(
-        Icons.Outlined.ThumbUp,
-        com.gyleedev.chatchat.ui.MANAGEHIDE
-    )
-
-    data object MANAGEBLOCKED : BottomNavItem(
-        Icons.Outlined.ThumbUp,
-        com.gyleedev.chatchat.ui.MANAGEBLOCKED
-    )
-}
 
 @Composable
 fun ChatChatScreen(
@@ -156,52 +80,52 @@ fun ChatChatScreen(
                 .padding(paddingValue)
                 .consumeWindowInsets(paddingValue)
         ) {
-            composable(route = BottomNavItem.FRIENDLIST.screenRoute) {
+            composable(route = BottomNavItem.FriendList.screenRoute) {
                 FriendListScreen(
-                    onMyInfoClick = { navController.navigate("${BottomNavItem.MYINFO.screenRoute}/$it") },
-                    onFriendClick = { navController.navigate("${BottomNavItem.FRIENDINFO.screenRoute}/$it") },
-                    onFindUserButtonClick = { navController.navigate(BottomNavItem.FINDUSER.screenRoute) },
-                    onEditFriendClick = { navController.navigate(BottomNavItem.FRIENDEDIT.screenRoute) },
-                    onManageFriendClick = { navController.navigate(BottomNavItem.FRIENDMANAGE.screenRoute) },
-                    onSettingClick = { navController.navigate(BottomNavItem.SETTING.screenRoute) }
+                    onMyInfoClick = { navController.navigate("${BottomNavItem.MyInfo.screenRoute}/$it") },
+                    onFriendClick = { navController.navigate("${BottomNavItem.FriendInfo.screenRoute}/$it") },
+                    onFindUserButtonClick = { navController.navigate(BottomNavItem.FindUser.screenRoute) },
+                    onEditFriendClick = { navController.navigate(BottomNavItem.FriendInfoEdit.screenRoute) },
+                    onManageFriendClick = { navController.navigate(BottomNavItem.FriendManage.screenRoute) },
+                    onSettingClick = { navController.navigate(BottomNavItem.Setting.screenRoute) }
                 )
             }
 
-            composable(route = BottomNavItem.CHATLIST.screenRoute) {
+            composable(route = BottomNavItem.ChatList.screenRoute) {
                 ChatListScreen(
-                    onClick = { navController.navigate("${BottomNavItem.CHATROOM.screenRoute}/$it") },
+                    onClick = { navController.navigate("${BottomNavItem.ChatRoom.screenRoute}/$it") },
                     modifier = Modifier.fillMaxSize()
                 )
             }
 
-            composable(route = BottomNavItem.LOGIN.screenRoute) {
+            composable(route = BottomNavItem.Login.screenRoute) {
                 LoginScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onSignInClicked = { navController.navigate(BottomNavItem.SIGNIN.screenRoute) },
+                    onSignInClicked = { navController.navigate(BottomNavItem.Signin.screenRoute) },
                     onLogInComplete = {
-                        navController.navigate(BottomNavItem.FRIENDLIST.screenRoute) {
-                            popUpTo(BottomNavItem.LOGIN.screenRoute) { inclusive = true }
+                        navController.navigate(BottomNavItem.FriendList.screenRoute) {
+                            popUpTo(BottomNavItem.Login.screenRoute) { inclusive = true }
                         }
                     }
                 )
             }
 
-            composable(route = BottomNavItem.SIGNIN.screenRoute) {
+            composable(route = BottomNavItem.Signin.screenRoute) {
                 SignInScreen(
                     modifier = Modifier.fillMaxSize(),
                     onSignInComplete = {
-                        navController.navigate(BottomNavItem.CHATLIST.screenRoute) {
-                            popUpTo(BottomNavItem.LOGIN.screenRoute) {
+                        navController.navigate(BottomNavItem.ChatList.screenRoute) {
+                            popUpTo(BottomNavItem.Login.screenRoute) {
                                 inclusive = true
                             }
                         }
                     }
                 )
             }
-            composable(route = BottomNavItem.SETTING.screenRoute) {
+            composable(route = BottomNavItem.Setting.screenRoute) {
                 SettingScreen(
                     onLogoutRequest = {
-                        navController.navigate(BottomNavItem.LOGIN.screenRoute) {
+                        navController.navigate(BottomNavItem.Login.screenRoute) {
                             popUpTo(navController.graph.id) {
                                 inclusive = true
                             }
@@ -211,12 +135,12 @@ fun ChatChatScreen(
                 )
             }
 
-            composable(route = BottomNavItem.FINDUSER.screenRoute) {
+            composable(route = BottomNavItem.FindUser.screenRoute) {
                 FindUserScreen(
                     onProcessComplete = {
-                        navController.navigate(BottomNavItem.FRIENDLIST.screenRoute) {
+                        navController.navigate(BottomNavItem.FriendList.screenRoute) {
                             popUpTo(
-                                BottomNavItem.FRIENDLIST.screenRoute
+                                BottomNavItem.FriendList.screenRoute
                             ) {
                                 inclusive = true
                             }
@@ -228,7 +152,7 @@ fun ChatChatScreen(
             }
 
             composable(
-                route = "${BottomNavItem.CHATROOM.screenRoute}/{friend}",
+                route = "${BottomNavItem.ChatRoom.screenRoute}/{friend}",
                 arguments = listOf(
                     navArgument("friend") {
                         type = NavType.StringType
@@ -240,7 +164,7 @@ fun ChatChatScreen(
             }
 
             composable(
-                route = "${BottomNavItem.FRIENDINFO.screenRoute}/{friend}",
+                route = "${BottomNavItem.FriendInfo.screenRoute}/{friend}",
                 arguments = listOf(
                     navArgument("friend") {
                         type = NavType.StringType
@@ -250,12 +174,12 @@ fun ChatChatScreen(
             ) {
                 FriendInfoScreen(
                     onCloseKeyPressed = { navController.navigateUp() },
-                    onChatRoomClick = { navController.navigate("${BottomNavItem.CHATROOM.screenRoute}/$it") }
+                    onChatRoomClick = { navController.navigate("${BottomNavItem.ChatRoom.screenRoute}/$it") }
                 )
             }
 
             composable(
-                route = "${BottomNavItem.MYINFO.screenRoute}/{myInfo}",
+                route = "${BottomNavItem.MyInfo.screenRoute}/{myInfo}",
                 arguments = listOf(
                     navArgument("myInfo") {
                         type = NavType.StringType
@@ -266,12 +190,12 @@ fun ChatChatScreen(
                 MyInfoScreen(
                     onCloseKeyPressed = { navController.navigateUp() },
                     onChatRoomClick = {},
-                    onProfileEditClick = { navController.navigate("${BottomNavItem.MYINFOEDIT.screenRoute}/$it") }
+                    onProfileEditClick = { navController.navigate("${BottomNavItem.MyInfoEdit.screenRoute}/$it") }
                 )
             }
 
             composable(
-                route = "${BottomNavItem.MYINFOEDIT.screenRoute}/{myInfo}",
+                route = "${BottomNavItem.MyInfoEdit.screenRoute}/{myInfo}",
                 arguments = listOf(
                     navArgument("myInfo") {
                         type = NavType.StringType
@@ -285,7 +209,7 @@ fun ChatChatScreen(
             }
 
             composable(
-                route = BottomNavItem.FRIENDEDIT.screenRoute
+                route = BottomNavItem.FriendInfoEdit.screenRoute
             ) {
                 FriendEditScreen(
                     onBackPressKeyClick = { navController.navigateUp() }
@@ -293,17 +217,17 @@ fun ChatChatScreen(
             }
 
             composable(
-                route = BottomNavItem.FRIENDMANAGE.screenRoute
+                route = BottomNavItem.FriendManage.screenRoute
             ) {
                 FriendManageScreen(
                     onBackPressKeyClick = { navController.navigateUp() },
-                    onBlockedClick = { navController.navigate(BottomNavItem.MANAGEBLOCKED.screenRoute) },
-                    onHideClick = { navController.navigate(BottomNavItem.MANAGEHIDE.screenRoute) }
+                    onBlockedClick = { navController.navigate(BottomNavItem.BlockedUserManage.screenRoute) },
+                    onHideClick = { navController.navigate(BottomNavItem.HidenUserManage.screenRoute) }
                 )
             }
 
             composable(
-                route = BottomNavItem.MANAGEHIDE.screenRoute
+                route = BottomNavItem.HidenUserManage.screenRoute
             ) {
                 HideManageScreen(
                     onBackPressKeyClick = { navController.navigateUp() }
@@ -311,7 +235,7 @@ fun ChatChatScreen(
             }
 
             composable(
-                route = BottomNavItem.MANAGEBLOCKED.screenRoute
+                route = BottomNavItem.BlockedUserManage.screenRoute
             ) {
                 BlockManageScreen(
                     onBackPressKeyClick = { navController.navigateUp() }
@@ -327,13 +251,13 @@ fun BottomNavigation(
     modifier: Modifier = Modifier
 ) {
     val items = listOf(
-        BottomNavItem.FRIENDLIST,
-        BottomNavItem.CHATLIST,
-        BottomNavItem.SETTING
+        BottomNavItem.FriendList,
+        BottomNavItem.ChatList,
+        BottomNavItem.Setting
     )
     NavigationBar(
         modifier = modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -360,19 +284,103 @@ fun BottomNavigation(
                         restoreState = true
                     }
                 },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = NavigationBarDefaults.containerColor
-                ),
                 label = {
                     val label = when (item.screenRoute) {
-                        FRIENDLIST -> { "친구" }
-                        CHATLIST -> { "채팅" }
-                        SETTING -> { "설정" }
-                        else -> { "" }
+                        FRIENDLIST -> {
+                            stringResource(R.string.navigation_bar_label_friend)
+                        }
+
+                        CHATLIST -> {
+                            stringResource(R.string.navigation_bar_label_chat)
+                        }
+
+                        SETTING -> {
+                            stringResource(R.string.navigation_bar_label_setting)
+                        }
+
+                        else -> {
+                            ""
+                        }
                     }
                     Text(text = label)
                 }
             )
         }
     }
+}
+
+sealed class BottomNavItem(
+    val icons: ImageVector,
+    val screenRoute: String
+) {
+
+    data object Login : BottomNavItem(
+        Icons.Outlined.Settings,
+        LOGIN
+    )
+
+    data object Signin : BottomNavItem(
+        Icons.Outlined.Settings,
+        SIGNIN
+    )
+
+    data object FriendList : BottomNavItem(
+        Icons.Outlined.AccountCircle,
+        FRIENDLIST
+    )
+
+    data object ChatList : BottomNavItem(
+        Icons.Outlined.Email,
+        CHATLIST
+    )
+
+    data object Setting : BottomNavItem(
+        Icons.Outlined.Settings,
+        SETTING
+    )
+
+    data object FindUser : BottomNavItem(
+        Icons.Outlined.Settings,
+        FINDUSER
+    )
+
+    data object ChatRoom : BottomNavItem(
+        Icons.Outlined.Menu,
+        CHATROOM
+    )
+
+    data object MyInfo : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        MYINFO
+    )
+
+    data object FriendInfo : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        FRIENDINFO
+    )
+
+    data object MyInfoEdit : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        MYINFOEDIT
+    )
+
+    data object FriendInfoEdit : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        FRIENDEDIT
+    )
+
+    data object FriendManage : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        FRIENDMANAGE
+    )
+
+    data object HidenUserManage : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        HIDENUSERMANAGE
+    )
+
+    data object BlockedUserManage : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        BLOCKEDUSERMANAGE
+    )
 }
