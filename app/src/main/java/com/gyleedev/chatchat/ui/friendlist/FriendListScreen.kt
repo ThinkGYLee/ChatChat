@@ -179,7 +179,10 @@ fun FriendListScreen(
                             .padding(bottom = 8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.friend_list_header_favorite, favorites.itemCount),
+                            text = stringResource(
+                                R.string.friend_list_header_favorite,
+                                favorites.itemCount
+                            ),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }
@@ -202,7 +205,9 @@ fun FriendListScreen(
                                 dialogRelatedUserLocalData = favorites[it]
                                 openFriendDialog = true
                             },
-                            relatedUserLocalData = requireNotNull(favorites[it]),
+                            picture = requireNotNull(favorites[it]).picture,
+                            name = requireNotNull(favorites[it]).name,
+                            status = requireNotNull(favorites[it]).status,
                             modifier = Modifier.animateItem()
                         )
 
@@ -227,7 +232,10 @@ fun FriendListScreen(
                         )
                     ) {
                         Text(
-                            text = stringResource(R.string.friend_list_header_friend, friends.itemCount),
+                            text = stringResource(
+                                R.string.friend_list_header_friend,
+                                friends.itemCount
+                            ),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }
@@ -246,7 +254,9 @@ fun FriendListScreen(
                             dialogRelatedUserLocalData = friends[it]
                             openFriendDialog = true
                         },
-                        relatedUserLocalData = requireNotNull(friends[it]),
+                        picture = requireNotNull(friends[it]).picture,
+                        name = requireNotNull(friends[it]).name,
+                        status = requireNotNull(friends[it]).status,
                         modifier = Modifier.animateItem()
                     )
                 }
@@ -322,7 +332,9 @@ fun MyUserData(
 fun FriendData(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    relatedUserLocalData: RelatedUserLocalData,
+    picture: String,
+    name: String,
+    status: String,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -337,7 +349,7 @@ fun FriendData(
     ) {
         Box(modifier = Modifier.wrapContentSize()) {
             GlideImage(
-                imageModel = { relatedUserLocalData.picture.ifBlank { R.drawable.baseline_person_24 } },
+                imageModel = { picture.ifBlank { R.drawable.baseline_person_24 } },
                 imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
                     .size(40.dp)
@@ -361,10 +373,10 @@ fun FriendData(
         }
         Spacer(modifier = Modifier.width(20.dp))
         Column(horizontalAlignment = Alignment.Start) {
-            Text(text = relatedUserLocalData.name, style = MaterialTheme.typography.bodyMedium)
-            if (relatedUserLocalData.status.isNotBlank()) {
+            Text(text = name, style = MaterialTheme.typography.bodyMedium)
+            if (status.isNotBlank()) {
                 Text(
-                    text = relatedUserLocalData.status,
+                    text = status,
                     style = MaterialTheme.typography.labelSmall
                 )
             }
