@@ -43,6 +43,7 @@ import com.gyleedev.chatchat.ui.login.LoginScreen
 import com.gyleedev.chatchat.ui.myinfo.MyInfoScreen
 import com.gyleedev.chatchat.ui.myinfoedit.MyInfoEditScreen
 import com.gyleedev.chatchat.ui.setting.SettingScreen
+import com.gyleedev.chatchat.ui.setting.changelanguage.ChangeLanguageScreen
 import com.gyleedev.chatchat.ui.signin.SignInScreen
 
 @Composable
@@ -130,6 +131,9 @@ fun ChatChatScreen(
                                 inclusive = true
                             }
                         }
+                    },
+                    onLanguageRequest = {
+                        navController.navigate(BottomNavItem.ChangeLanguage.screenRoute)
                     },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -239,6 +243,14 @@ fun ChatChatScreen(
             ) {
                 BlockManageScreen(
                     onBackPressKeyClick = { navController.navigateUp() }
+                )
+            }
+
+            composable(
+                route = BottomNavItem.ChangeLanguage.screenRoute
+            ) {
+                ChangeLanguageScreen(
+                    onBackPress = { navController.navigateUp() }
                 )
             }
         }
@@ -382,5 +394,10 @@ sealed class BottomNavItem(
     data object BlockedUserManage : BottomNavItem(
         Icons.Outlined.ThumbUp,
         BLOCKEDUSERMANAGE
+    )
+
+    data object ChangeLanguage : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        CHANGELANGUAGE
     )
 }
