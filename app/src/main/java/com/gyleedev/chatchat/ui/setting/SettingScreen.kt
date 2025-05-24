@@ -46,6 +46,7 @@ import com.gyleedev.chatchat.R
 @Composable
 fun SettingScreen(
     onLogoutRequest: () -> Unit,
+    onLanguageRequest: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
@@ -67,7 +68,18 @@ fun SettingScreen(
                 if (it is SettingItems.Header) {
                     SettingHeader(it.title)
                 } else if (it is SettingItems.Item) {
-                    SettingItem(it)
+                    SettingItem(
+                        onClick = {
+                            when (it) {
+                                SettingEvent.LANGUAGE -> onLanguageRequest()
+                                SettingEvent.ACCOUNT -> {}
+                                SettingEvent.MYINFORMATION -> {}
+                                SettingEvent.THEME -> {}
+                                SettingEvent.CHAT -> {}
+                            }
+                        },
+                        settingItems = it
+                    )
                 }
             }
         }
@@ -138,6 +150,7 @@ fun SettingHeader(
 
 @Composable
 fun SettingItem(
+    onClick: (SettingEvent) -> Unit,
     settingItems: SettingItems.Item,
     modifier: Modifier = Modifier
 ) {
@@ -145,7 +158,9 @@ fun SettingItem(
         modifier = modifier
             .fillMaxWidth()
             .height(60.dp)
-            .clickable {}
+            .clickable {
+                onClick(settingItems.event)
+            }
             .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
