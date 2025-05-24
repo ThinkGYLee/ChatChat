@@ -131,4 +131,19 @@
     <string name="block_friend_action">친구 차단</string>
     <string name="chatroom_text_me">나</string>
     <string name="chatroom_text_reply_to">%s님에게 답장</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_english">English</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_persian">فارسی</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_arabic">العربية</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_indonesian">Bahasa Indonesia</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文</string>
+    <string name="language_default">시스템 기본값</string>
 </resources>
