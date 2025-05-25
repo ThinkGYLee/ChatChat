@@ -44,6 +44,7 @@ import com.gyleedev.chatchat.ui.myinfo.MyInfoScreen
 import com.gyleedev.chatchat.ui.myinfoedit.MyInfoEditScreen
 import com.gyleedev.chatchat.ui.setting.SettingScreen
 import com.gyleedev.chatchat.ui.setting.changelanguage.ChangeLanguageScreen
+import com.gyleedev.chatchat.ui.setting.changetheme.ChangeThemeScreen
 import com.gyleedev.chatchat.ui.signin.SignInScreen
 
 @Composable
@@ -134,6 +135,9 @@ fun ChatChatScreen(
                     },
                     onLanguageRequest = {
                         navController.navigate(BottomNavItem.ChangeLanguage.screenRoute)
+                    },
+                    onThemeRequest = {
+                        navController.navigate(BottomNavItem.ChangeTheme.screenRoute)
                     },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -251,6 +255,14 @@ fun ChatChatScreen(
             ) {
                 ChangeLanguageScreen(
                     onBackPress = { navController.navigateUp() }
+                )
+            }
+
+            composable(
+                route = BottomNavItem.ChangeTheme.screenRoute
+            ) {
+                ChangeThemeScreen(
+                    onBackClick = { navController.navigateUp() }
                 )
             }
         }
@@ -399,5 +411,10 @@ sealed class BottomNavItem(
     data object ChangeLanguage : BottomNavItem(
         Icons.Outlined.ThumbUp,
         CHANGELANGUAGE
+    )
+
+    data object ChangeTheme : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        CHANGETHEME
     )
 }
