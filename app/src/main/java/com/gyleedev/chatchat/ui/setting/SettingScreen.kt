@@ -16,6 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,11 +51,13 @@ import com.gyleedev.chatchat.R
 @Composable
 fun SettingScreen(
     onLogoutRequest: () -> Unit,
+    onLanguageRequest: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
     var openDialog by remember { mutableStateOf(false) }
-    val items by viewModel.items.collectAsStateWithLifecycle()
+    val keys by viewModel.keys.collectAsStateWithLifecycle()
+    val items = settingItemMapper(keys)
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -67,7 +74,18 @@ fun SettingScreen(
                 if (it is SettingItems.Header) {
                     SettingHeader(it.title)
                 } else if (it is SettingItems.Item) {
-                    SettingItem(it)
+                    SettingItem(
+                        onClick = {
+                            when (it) {
+                                SettingEvent.LANGUAGE -> onLanguageRequest()
+                                SettingEvent.ACCOUNT -> {}
+                                SettingEvent.MYINFORMATION -> {}
+                                SettingEvent.THEME -> {}
+                                SettingEvent.CHAT -> {}
+                            }
+                        },
+                        settingItems = it
+                    )
                 }
             }
         }
@@ -138,6 +156,7 @@ fun SettingHeader(
 
 @Composable
 fun SettingItem(
+    onClick: (SettingEvent) -> Unit,
     settingItems: SettingItems.Item,
     modifier: Modifier = Modifier
 ) {
@@ -145,7 +164,9 @@ fun SettingItem(
         modifier = modifier
             .fillMaxWidth()
             .height(60.dp)
-            .clickable {}
+            .clickable {
+                onClick(settingItems.event)
+            }
             .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -165,5 +186,44 @@ fun SettingItem(
             modifier = Modifier.size(16.dp),
             tint = LocalContentColor.current.copy(alpha = 0.6f)
         )
+    }
+}
+
+private fun settingItemMapper(list: List<SettingKey>): List<SettingItems> {
+    return list.map {
+        when (it) {
+            SettingKey.PERSONALINFO -> SettingItems.Header(title = R.string.setting_personal_info_header)
+            SettingKey.ACCOUNT -> SettingItems.Item(
+                title = R.string.setting_account_manage_item,
+                Icons.Default.ManageAccounts,
+                SettingEvent.ACCOUNT
+            )
+
+            SettingKey.MYINFORMATION -> SettingItems.Item(
+                title = R.string.setting_my_info_item,
+                Icons.Default.AccountBox,
+                SettingEvent.MYINFORMATION
+            )
+
+            SettingKey.GENERALSETTING -> SettingItems.Header(title = R.string.setting_general_setting_header)
+            SettingKey.LANGUAGE -> SettingItems.Item(
+                title = R.string.setting_language_item,
+                Icons.Default.Language,
+                SettingEvent.LANGUAGE
+            )
+
+            SettingKey.THEME -> SettingItems.Item(
+                title = R.string.setting_theme_item,
+                Icons.Default.DarkMode,
+                SettingEvent.THEME
+            )
+
+            SettingKey.DATAMANAGE -> SettingItems.Header(title = R.string.setting_data_manage_header)
+            SettingKey.CHAT -> SettingItems.Item(
+                title = R.string.setting_chat_item,
+                Icons.Default.ChatBubbleOutline,
+                SettingEvent.CHAT
+            )
+        }
     }
 }

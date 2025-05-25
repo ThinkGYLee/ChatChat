@@ -10,6 +10,7 @@ sealed interface SettingItems {
 
     data class Item(
         val title: Int,
-        val icon: ImageVector
+        val icon: ImageVector,
+        val event: SettingEvent
     ) : SettingItems
 }

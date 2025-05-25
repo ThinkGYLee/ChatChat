@@ -1,13 +1,6 @@
 package com.gyleedev.chatchat.ui.setting
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.ChatBubbleOutline
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.chatchat.R
 import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.usecase.LogoutProcessUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,12 +13,13 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(
     private val logoutProcessUseCase: LogoutProcessUseCase
 ) : BaseViewModel() {
-    private val _items = MutableStateFlow<List<SettingItems>>(emptyList<SettingItems>())
-    val items: StateFlow<List<SettingItems>> = _items
+
+    private val _keys = MutableStateFlow<List<SettingKey>>(emptyList<SettingKey>())
+    val keys: StateFlow<List<SettingKey>> = _keys
 
     init {
         viewModelScope.launch {
-            _items.emit(settingItemList)
+            _keys.emit(keyList)
         }
     }
 
@@ -36,15 +30,15 @@ class SettingViewModel @Inject constructor(
     }
 
     companion object {
-        val settingItemList = listOf<SettingItems>(
-            SettingItems.Header(title = R.string.setting_personal_info_header),
-            SettingItems.Item(title = R.string.setting_account_manage_item, Icons.Default.ManageAccounts),
-            SettingItems.Item(title = R.string.setting_my_info_item, Icons.Default.AccountBox),
-            SettingItems.Header(title = R.string.setting_general_setting_header),
-            SettingItems.Item(title = R.string.setting_language_item, Icons.Default.Language),
-            SettingItems.Item(title = R.string.setting_theme_item, Icons.Default.DarkMode),
-            SettingItems.Header(title = R.string.setting_data_manage_header),
-            SettingItems.Item(title = R.string.setting_chat_item, Icons.Default.ChatBubbleOutline)
+        val keyList = listOf<SettingKey>(
+            SettingKey.PERSONALINFO,
+            SettingKey.ACCOUNT,
+            SettingKey.MYINFORMATION,
+            SettingKey.GENERALSETTING,
+            SettingKey.LANGUAGE,
+            SettingKey.THEME,
+            SettingKey.DATAMANAGE,
+            SettingKey.CHAT
         )
     }
 }
