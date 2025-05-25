@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.gyleedev.chatchat.domain.UserData
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -10,6 +11,8 @@ class PreferenceUtil(@ApplicationContext context: Context) {
 
     private val myDataPreference: SharedPreferences =
         context.getSharedPreferences("MyData", Context.MODE_PRIVATE)
+
+    private val themePreferences = context.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
 
     fun getMyData(): UserData {
         return UserData(
@@ -20,11 +23,20 @@ class PreferenceUtil(@ApplicationContext context: Context) {
             status = myDataPreference.getString("Status", "default status") as String
         )
     }
+
     fun setMyData(user: UserData) {
         myDataPreference.edit { putString("Email", user.email) }
         myDataPreference.edit { putString("Name", user.name) }
         myDataPreference.edit { putString("Uid", user.uid) }
         myDataPreference.edit { putString("Picture", user.picture) }
         myDataPreference.edit { putString("Status", user.status) }
+    }
+
+    fun getTheme(): Int {
+        return themePreferences.getInt("selected_theme", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+    }
+
+    fun setTheme(mode: Int) {
+        themePreferences.edit { putInt("selectedTheme", mode) }
     }
 }
