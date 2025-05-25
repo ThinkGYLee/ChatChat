@@ -147,4 +147,9 @@
     <string name="language_japanese">日本語</string>
     <string name="language_chinese">中文</string>
     <string name="language_default">النظام الافتراضي</string>
+    <string name="setting_language_title">اللغة</string>
+    <string name="setting_theme_title">السمة</string>
+    <string name="theme_light">الوضع الفاتح</string>
+    <string name="theme_dark">الوضع الداكن</string>
+    <string name="theme_system">النظام الافتراضي</string>
 </resources> 

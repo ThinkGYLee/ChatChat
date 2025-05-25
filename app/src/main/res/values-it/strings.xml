@@ -147,4 +147,9 @@
     <string name="language_japanese">日本語</string>
     <string name="language_chinese">中文</string>
     <string name="language_default">Predefinito del sistema</string>
+    <string name="setting_language_title">Lingua</string>
+    <string name="setting_theme_title">Tema</string>
+    <string name="theme_light">Modalità chiara</string>
+    <string name="theme_dark">Modalità scura</string>
+    <string name="theme_system">Predefinito di sistema</string>
 </resources> 

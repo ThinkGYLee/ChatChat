@@ -52,6 +52,7 @@ import com.gyleedev.chatchat.R
 fun SettingScreen(
     onLogoutRequest: () -> Unit,
     onLanguageRequest: () -> Unit,
+    onThemeRequest: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
@@ -80,7 +81,7 @@ fun SettingScreen(
                                 SettingEvent.LANGUAGE -> onLanguageRequest()
                                 SettingEvent.ACCOUNT -> {}
                                 SettingEvent.MYINFORMATION -> {}
-                                SettingEvent.THEME -> {}
+                                SettingEvent.THEME -> onThemeRequest()
                                 SettingEvent.CHAT -> {}
                             }
                         },

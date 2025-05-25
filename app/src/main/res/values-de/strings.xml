@@ -147,4 +147,9 @@
     <string name="language_japanese">日本語</string>
     <string name="language_chinese">中文</string>
     <string name="language_default">Systemstandard</string>
+    <string name="setting_language_title">Sprache</string>
+    <string name="setting_theme_title">Design</string>
+    <string name="theme_light">Heller Modus</string>
+    <string name="theme_dark">Dunkler Modus</string>
+    <string name="theme_system">Systemstandard</string>
 </resources> 
