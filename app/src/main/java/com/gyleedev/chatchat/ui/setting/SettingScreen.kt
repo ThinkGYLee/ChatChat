@@ -194,29 +194,34 @@ private fun settingItemMapper(list: List<SettingKey>): List<SettingItems> {
         when (it) {
             SettingKey.PERSONALINFO -> SettingItems.Header(title = R.string.setting_personal_info_header)
             SettingKey.ACCOUNT -> SettingItems.Item(
-                title = R.string.setting_account_manage_item, Icons.Default.ManageAccounts,
+                title = R.string.setting_account_manage_item,
+                Icons.Default.ManageAccounts,
                 SettingEvent.ACCOUNT
             )
 
             SettingKey.MYINFORMATION -> SettingItems.Item(
-                title = R.string.setting_my_info_item, Icons.Default.AccountBox,
+                title = R.string.setting_my_info_item,
+                Icons.Default.AccountBox,
                 SettingEvent.MYINFORMATION
             )
 
             SettingKey.GENERALSETTING -> SettingItems.Header(title = R.string.setting_general_setting_header)
             SettingKey.LANGUAGE -> SettingItems.Item(
-                title = R.string.setting_language_item, Icons.Default.Language,
+                title = R.string.setting_language_item,
+                Icons.Default.Language,
                 SettingEvent.LANGUAGE
             )
 
             SettingKey.THEME -> SettingItems.Item(
-                title = R.string.setting_theme_item, Icons.Default.DarkMode,
+                title = R.string.setting_theme_item,
+                Icons.Default.DarkMode,
                 SettingEvent.THEME
             )
 
             SettingKey.DATAMANAGE -> SettingItems.Header(title = R.string.setting_data_manage_header)
             SettingKey.CHAT -> SettingItems.Item(
-                title = R.string.setting_chat_item, Icons.Default.ChatBubbleOutline,
+                title = R.string.setting_chat_item,
+                Icons.Default.ChatBubbleOutline,
                 SettingEvent.CHAT
             )
         }
