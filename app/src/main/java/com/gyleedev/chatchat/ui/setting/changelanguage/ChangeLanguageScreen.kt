@@ -34,24 +34,6 @@ import androidx.core.os.LocaleListCompat
 import com.gyleedev.chatchat.R
 import java.util.Locale
 
-val languageList = listOf(
-    R.string.language_default,
-    R.string.language_arabic,
-    R.string.language_chinese,
-    R.string.language_english,
-    R.string.language_french,
-    R.string.language_german,
-    R.string.language_indonesian,
-    R.string.language_italian,
-    R.string.language_japanese,
-    R.string.language_korean,
-    R.string.language_persian,
-    R.string.language_portuguese,
-    R.string.language_spanish,
-    R.string.language_turkish,
-    R.string.language_vietnamese
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChangeLanguageScreen(
@@ -63,11 +45,29 @@ fun ChangeLanguageScreen(
         mutableStateOf(getCurrentLanguage(context))
     }
 
+    val languageList = listOf(
+        R.string.language_default,
+        R.string.language_arabic,
+        R.string.language_chinese,
+        R.string.language_english,
+        R.string.language_french,
+        R.string.language_german,
+        R.string.language_indonesian,
+        R.string.language_italian,
+        R.string.language_japanese,
+        R.string.language_korean,
+        R.string.language_persian,
+        R.string.language_portuguese,
+        R.string.language_spanish,
+        R.string.language_turkish,
+        R.string.language_vietnamese
+    )
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(R.string.setting_text)) },
+                title = { Text(text = stringResource(R.string.setting_language_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackPress) {
                         Icon(
