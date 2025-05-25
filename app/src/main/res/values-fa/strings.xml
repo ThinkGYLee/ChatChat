@@ -147,4 +147,9 @@
     <string name="language_japanese">日本語</string>
     <string name="language_chinese">中文</string>
     <string name="language_default">پیش‌فرض سیستم</string>
+    <string name="setting_language_title">زبان</string>
+    <string name="setting_theme_title">تم</string>
+    <string name="theme_light">حالت روشن</string>
+    <string name="theme_dark">حالت تاریک</string>
+    <string name="theme_system">پیش‌فرض سیستم</string>
 </resources> 
