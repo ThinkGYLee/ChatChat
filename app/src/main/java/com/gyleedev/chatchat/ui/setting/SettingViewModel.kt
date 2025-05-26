@@ -1,8 +1,8 @@
 package com.gyleedev.chatchat.ui.setting
 
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.usecase.LogoutProcessUseCase
+import com.gyleedev.core.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
