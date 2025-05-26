@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.2"
+agp = "8.9.3"
 kotlin = "2.1.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -7,11 +7,11 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2025.05.00"
+composeBom = "2025.05.01"
 spotless = "6.11.0"
 firebase = "4.4.2"
-firebaseBom = "33.13.0"
-firebaseAuth = "23.2.0"
+firebaseBom = "33.14.0"
+firebaseAuth = "23.2.1"
 playServicesAuth = "21.3.0"
 ksp = "2.1.21-2.0.1"
 hilt = "2.56.1"
@@ -24,6 +24,9 @@ paging = "3.3.6"
 crashlytics = "3.0.3"
 jsoup = "1.18.3"
 appcompat = "1.7.0"
+material = "1.12.0"
+jetbrainsKotlinJvm = "2.1.21"
+androidTools = "31.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -67,6 +70,16 @@ paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.re
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 appcompat = {module = "androidx.appcompat:appcompat", version.ref = "appcompat"}
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
+# gradle
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "room" }
+compose-compiler-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+
 
 
 [plugins]
@@ -79,3 +92,5 @@ firebase = { id = "com.google.gms.google-services", version.ref = "firebase" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }

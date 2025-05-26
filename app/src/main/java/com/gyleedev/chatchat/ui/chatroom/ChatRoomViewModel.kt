@@ -8,7 +8,6 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.gyleedev.chatchat.core.BaseViewModel
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
@@ -29,6 +28,7 @@ import com.gyleedev.chatchat.domain.usecase.SendMessageUseCase
 import com.gyleedev.chatchat.domain.usecase.UserToFriendUseCase
 import com.gyleedev.chatchat.util.FirebaseServerTimeHelper
 import com.gyleedev.chatchat.util.NetworkManager
+import com.gyleedev.core.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -1,4 +1,7 @@
 pluginManagement {
+
+    includeBuild("build-logic")
+
     repositories {
         google {
             content {
@@ -21,4 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Chat Chat"
 include(":app")
- 
+include(":core")
