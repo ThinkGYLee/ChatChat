@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.domain
+package com.gyleedev.core
 
 enum class FetchState {
     BAD_INTERNET,
