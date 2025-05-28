@@ -73,6 +73,7 @@ appcompat = {module = "androidx.appcompat:appcompat", version.ref = "appcompat"}
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 # gradle
+hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" }
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
