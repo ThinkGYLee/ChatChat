@@ -29,7 +29,7 @@ gradlePlugin {
     plugins {
         register("androidHilt") {
             id = "chat.android.hilt"
-            implementationClass = "com.gyleedev.build_logic.HiltKotlinPlugin"
+            implementationClass = "com.gyleedev.buildlogic.HiltKotlinPlugin"
         }
     }
 }
