@@ -27,9 +27,13 @@ dependencies {
 
 gradlePlugin {
     plugins {
+        register("kotlinHilt") {
+            id = "chat.kotlin.hilt"
+            implementationClass = "com.gyleedev.buildlogic.HiltKotlinPlugin"
+        }
         register("androidHilt") {
             id = "chat.android.hilt"
-            implementationClass = "com.gyleedev.buildlogic.HiltKotlinPlugin"
+            implementationClass = "com.gyleedev.buildlogic.HiltAndroidPlugin"
         }
     }
 }
