@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.jetbrains.kotlin.parcelize)
+    id("chat.android.hilt")
 }
 
 android {
