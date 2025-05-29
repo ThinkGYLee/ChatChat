@@ -1,5 +1,6 @@
 plugins {
     `kotlin-dsl`
+    `kotlin-dsl-precompiled-script-plugins`
 }
 
 java {
@@ -34,6 +35,10 @@ gradlePlugin {
         register("androidHilt") {
             id = "chat.android.hilt"
             implementationClass = "com.gyleedev.buildlogic.HiltAndroidPlugin"
+        }
+        register("kotlinAndroid") {
+            id = "chat.android.kotlin"
+            implementationClass = "com.gyleedev.buildlogic.KotlinAndroidPlugin"
         }
     }
 }
