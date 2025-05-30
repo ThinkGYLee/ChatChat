@@ -40,9 +40,9 @@ gradlePlugin {
             id = "chat.android.kotlin"
             implementationClass = "com.gyleedev.buildlogic.KotlinAndroidPlugin"
         }
-        register("composeAndroid") {
-            id = "chat.android.compose"
-            implementationClass = "com.gyleedev.buildlogic.ComposeAndroidPlugin"
+        register("uiAndroid") {
+            id = "chat.android.ui"
+            implementationClass = "com.gyleedev.buildlogic.UiAndroidPlugin"
         }
         register("coroutineAndroid") {
             id = "chat.android.coroutine"
@@ -51,6 +51,14 @@ gradlePlugin {
         register("firebaseAndroid") {
             id = "chat.android.firebase"
             implementationClass = "com.gyleedev.buildlogic.FirebaseAndroidPlugin"
+        }
+        register("applicationAndroid") {
+            id = "chat.android.application"
+            implementationClass = "com.gyleedev.buildlogic.ApplicationAndroidPlugin"
+        }
+        register("roomAndroid") {
+            id = "chat.android.room"
+            implementationClass = "com.gyleedev.buildlogic.RoomAndroidPlugin"
         }
     }
 }
