@@ -6,7 +6,7 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 
-internal fun Project.configureComposeAndroid() {
+internal fun Project.configureUiAndroid() {
     with(plugins) {
         apply("org.jetbrains.kotlin.plugin.compose")
     }
@@ -17,7 +17,6 @@ internal fun Project.configureComposeAndroid() {
             val bom = libs.findLibrary("androidx.compose.bom").get()
             add("implementation", platform(bom))
             add("androidTestImplementation", platform(bom))
-
             add("implementation", libs.findLibrary("androidx.activity.compose").get())
             add("implementation", libs.findLibrary("androidx.ui").get())
             add("implementation", libs.findLibrary("androidx.ui.graphics").get())
@@ -35,6 +34,13 @@ internal fun Project.configureComposeAndroid() {
             add("implementation", libs.findLibrary("androidx.junit").get())
             add("implementation", libs.findLibrary("androidx.espresso.core").get())
             add("implementation", libs.findLibrary("androidx.lifecycle.runtime.ktx").get())
+            add("implementation", libs.findLibrary("appcompat").get())
+            add("implementation", libs.findLibrary("material").get())
+            add("implementation", libs.findLibrary("androidx.core.splash").get())
+            add("implementation", libs.findLibrary("landscapist.glide").get())
+            add("implementation", libs.findLibrary("landscapist.placeholder").get())
+            add("implementation", libs.findLibrary("paging.runtime.ktx").get())
+            add("implementation", libs.findLibrary("paging.compose").get())
         }
     }
 
@@ -45,10 +51,10 @@ internal fun Project.configureComposeAndroid() {
 }
 
 
-internal class ComposeAndroidPlugin : Plugin<Project> {
+internal class UiAndroidPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            configureComposeAndroid()
+            configureUiAndroid()
         }
     }
 }
