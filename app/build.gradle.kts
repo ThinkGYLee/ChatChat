@@ -13,6 +13,7 @@ plugins {
     id("chat.android.hilt")
     id("chat.kotlin.hilt")
     id("chat.android.kotlin")
+    id("chat.android.compose")
 }
 
 android {
