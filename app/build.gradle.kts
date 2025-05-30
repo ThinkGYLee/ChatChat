@@ -40,6 +40,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":util"))
     implementation(libs.google.gson)
     implementation(libs.jsoup)
 }
