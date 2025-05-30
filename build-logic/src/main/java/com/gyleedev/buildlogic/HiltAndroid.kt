@@ -12,9 +12,10 @@ internal fun Project.configureHiltAndroid() {
 
     val libs = extensions.libs
     dependencies {
-        "implementation"(libs.findLibrary("dagger.hilt.android").get())
-        "ksp"(libs.findLibrary("dagger.hilt.compiler").get())
-        "kspAndroidTest"(libs.findLibrary("dagger.hilt.compiler").get())
+        "implementation"(libs.findLibrary("hilt.android").get())
+        "ksp"(libs.findLibrary("hilt.android.compiler").get())
+        "kspAndroidTest"(libs.findLibrary("hilt.android.compiler").get())
+        "implementation"(libs.findLibrary("dagger.hilt.navigation").get())
     }
 }
 
