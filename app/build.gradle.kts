@@ -15,6 +15,7 @@ plugins {
     id("chat.android.kotlin")
     id("chat.android.compose")
     id("chat.android.coroutine")
+    id("chat.android.firebase")
 }
 
 android {
