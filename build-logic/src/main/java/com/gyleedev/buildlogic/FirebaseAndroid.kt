@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
 internal fun Project.configureFirebaseAndroid() {
-    with(plugins) {
+    with(pluginManager) {
         apply("com.google.gms.google-services")
         apply("com.google.firebase.crashlytics")
     }
@@ -13,7 +13,7 @@ internal fun Project.configureFirebaseAndroid() {
     val libs = extensions.libs
     androidExtension.apply {
         dependencies {
-            val bom = libs.findLibrary("androidx.compose.bom").get()
+            val bom = libs.findLibrary("firebase.bom").get()
             add("implementation", platform(bom))
             add("implementation", libs.findLibrary("firebase.bom").get())
             add("implementation", libs.findLibrary("firebase.analystics").get())
