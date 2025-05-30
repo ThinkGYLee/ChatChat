@@ -40,5 +40,9 @@ gradlePlugin {
             id = "chat.android.kotlin"
             implementationClass = "com.gyleedev.buildlogic.KotlinAndroidPlugin"
         }
+        register("composeAndroid") {
+            id = "chat.android.compose"
+            implementationClass = "com.gyleedev.buildlogic.ComposeAndroidPlugin"
+        }
     }
 }
