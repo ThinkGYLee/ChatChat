@@ -48,7 +48,7 @@ internal fun Project.configureComposeAndroid() {
 internal class ComposeAndroidPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            configureKotlinAndroid()
+            configureComposeAndroid()
         }
     }
 }
