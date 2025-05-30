@@ -44,5 +44,9 @@ gradlePlugin {
             id = "chat.android.compose"
             implementationClass = "com.gyleedev.buildlogic.ComposeAndroidPlugin"
         }
+        register("coroutineAndroid") {
+            id = "chat.android.coroutine"
+            implementationClass = "com.gyleedev.buildlogic.CoroutineAndroidPlugin"
+        }
     }
 }
