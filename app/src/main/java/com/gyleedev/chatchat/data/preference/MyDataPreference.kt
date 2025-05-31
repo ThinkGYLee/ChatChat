@@ -1,20 +1,22 @@
-package com.gyleedev.chatchat.util
+package com.gyleedev.chatchat.data.preference
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.gyleedev.chatchat.domain.UserData
 import dagger.hilt.android.qualifiers.ApplicationContext
 
-class PreferenceUtil(@ApplicationContext context: Context) {
+interface MyDataPreference {
+    fun getMyData(): UserData
+    fun setMyData(user: UserData)
+}
+
+class MyDataPreferenceImpl(@ApplicationContext context: Context) : MyDataPreference {
 
     private val myDataPreference: SharedPreferences =
         context.getSharedPreferences("MyData", Context.MODE_PRIVATE)
 
-    private val themePreferences = context.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-
-    fun getMyData(): UserData {
+    override fun getMyData(): UserData {
         return UserData(
             email = myDataPreference.getString("Email", "default email") as String,
             uid = myDataPreference.getString("Uid", "default uid") as String,
@@ -24,19 +26,11 @@ class PreferenceUtil(@ApplicationContext context: Context) {
         )
     }
 
-    fun setMyData(user: UserData) {
+    override fun setMyData(user: UserData) {
         myDataPreference.edit { putString("Email", user.email) }
         myDataPreference.edit { putString("Name", user.name) }
         myDataPreference.edit { putString("Uid", user.uid) }
         myDataPreference.edit { putString("Picture", user.picture) }
         myDataPreference.edit { putString("Status", user.status) }
-    }
-
-    fun getTheme(): Int {
-        return themePreferences.getInt("selected_theme", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-    }
-
-    fun setTheme(mode: Int) {
-        themePreferences.edit { putInt("selectedTheme", mode) }
     }
 }
