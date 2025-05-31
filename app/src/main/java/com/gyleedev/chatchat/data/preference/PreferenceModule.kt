@@ -1,7 +1,6 @@
-package com.gyleedev.chatchat.di
+package com.gyleedev.chatchat.data.preference
 
 import android.content.Context
-import com.gyleedev.chatchat.util.PreferenceUtil
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +14,13 @@ object PreferenceModule {
 
     @Singleton
     @Provides
-    fun providePreferenceUtil(@ApplicationContext context: Context): PreferenceUtil {
-        return PreferenceUtil(context)
+    fun providesMyDataPreference(@ApplicationContext context: Context): MyDataPreference {
+        return MyDataPreferenceImpl(context)
+    }
+
+    @Singleton
+    @Provides
+    fun providesThemePreference(@ApplicationContext context: Context): ThemePreference {
+        return ThemePreferenceImpl(context)
     }
 }

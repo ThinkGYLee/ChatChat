@@ -27,6 +27,7 @@ import com.gyleedev.chatchat.data.database.entity.toRelationLocalData
 import com.gyleedev.chatchat.data.model.BlockedUser
 import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
 import com.gyleedev.chatchat.data.model.toRelatedUserLocalData
+import com.gyleedev.chatchat.data.preference.MyDataPreference
 import com.gyleedev.chatchat.domain.ChangeRelationResult
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.ProcessResult
@@ -37,7 +38,6 @@ import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toBlockedUser
 import com.gyleedev.chatchat.domain.toRemoteData
-import com.gyleedev.chatchat.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -117,7 +117,7 @@ class UserRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val favoriteDao: FavoriteDao,
     private val userAndFavoriteDao: UserAndFavoriteDao,
-    private val preferenceUtil: PreferenceUtil
+    private val myDataPreference: MyDataPreference
 ) : UserRepository {
 
     private val imageStorageReference = storage.getReference("image")
@@ -226,7 +226,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getMyDataFromRemote(): Flow<UserData?> = callbackFlow {
-        val myData = preferenceUtil.getMyData()
+        val myData = myDataPreference.getMyData()
         if (myData.uid != "default uid" && auth.currentUser != null) {
             trySend(myData)
         } else {
@@ -255,7 +255,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun getMyUserDataFromPreference(): UserData {
-        return preferenceUtil.getMyData()
+        return myDataPreference.getMyData()
     }
 
     override suspend fun addRelatedUserToRemote(
@@ -528,7 +528,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun resetMyUserData() {
-        preferenceUtil.setMyData(UserData())
+        myDataPreference.setMyData(UserData())
     }
 
     override suspend fun resetFriendData() {
@@ -536,7 +536,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun setMyUserInformation(userData: UserData) {
-        preferenceUtil.setMyData(userData)
+        myDataPreference.setMyData(userData)
     }
 
     override suspend fun deleteFriendRequest(relatedUserLocalData: RelatedUserLocalData): ChangeRelationResult {
