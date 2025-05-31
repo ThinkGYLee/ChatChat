@@ -4,12 +4,14 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
-internal fun Project.configureFirebaseAndroid() {
+internal fun Project.configureFirebaseAndroidPlugin() {
     with(pluginManager) {
         apply("com.google.gms.google-services")
         apply("com.google.firebase.crashlytics")
     }
+}
 
+internal fun Project.configureFirebaseAndroidLibrary() {
     val libs = extensions.libs
     androidExtension.apply {
         dependencies {
@@ -23,17 +25,24 @@ internal fun Project.configureFirebaseAndroid() {
             add("implementation", libs.findLibrary("firebase.database").get())
             add("implementation", libs.findLibrary("firebase.storage").get())
             add("implementation", libs.findLibrary("firebase.messaging").get())
-
         }
     }
 }
 
 
-internal class FirebaseAndroidPlugin : Plugin<Project> {
+internal class FirebaseAndroidPluginAndLibrary : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            configureFirebaseAndroid()
+            configureFirebaseAndroidPlugin()
+            configureFirebaseAndroidLibrary()
+        }
+    }
+}
 
+internal class FirebaseAndroidLibrary : Plugin<Project> {
+    override fun apply(target: Project) {
+        with(target) {
+            configureFirebaseAndroidLibrary()
         }
     }
 }
