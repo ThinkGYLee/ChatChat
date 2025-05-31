@@ -8,7 +8,7 @@ import com.gyleedev.chatchat.domain.ChatRoomDataWithAllRelatedUsersAndMessage
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
 import com.gyleedev.chatchat.domain.MessageType
-import com.gyleedev.chatchat.domain.usecase.GetChatRoomListUseCase
+import com.gyleedev.chatchat.domain.usecase.GetChatRoomDataWithRelatedUserUseCase
 import com.gyleedev.chatchat.domain.usecase.GetLastMessageUseCase
 import com.gyleedev.core.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatListViewModel @Inject constructor(
-    getChatRoomListUseCase: GetChatRoomListUseCase,
+    getChatRoomDataWithRelatedUserUseCase: GetChatRoomDataWithRelatedUserUseCase,
     getLastMessageUseCase: GetLastMessageUseCase
 ) : BaseViewModel() {
 
@@ -30,7 +30,7 @@ class ChatListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getChatRoomListUseCase().cachedIn(viewModelScope).collectLatest { chatRoomAndRelatedUsers ->
+            getChatRoomDataWithRelatedUserUseCase().cachedIn(viewModelScope).collectLatest { chatRoomAndRelatedUsers ->
                 _chatRoomList.emit(
                     chatRoomAndRelatedUsers.map {
                         ChatRoomDataWithAllRelatedUsersAndMessage(
