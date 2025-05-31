@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.util
+package com.gyleedev.util
 
 import android.net.ConnectivityManager
 import android.net.Network
@@ -6,6 +6,7 @@ import android.net.NetworkCapabilities
 import javax.inject.Inject
 
 class NetworkManager @Inject constructor(private val connectivityManager: ConnectivityManager) {
+    @Suppress("MissingPermission")
     fun checkNetworkState(): Boolean {
         val network: Network = connectivityManager.activeNetwork ?: return false
         val actNetwork: NetworkCapabilities =

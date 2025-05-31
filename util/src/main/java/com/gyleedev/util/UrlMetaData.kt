@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.domain
+package com.gyleedev.util
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

@@ -1,6 +1,6 @@
-package com.gyleedev.chatchat.util
+package com.gyleedev.util
 
-import com.gyleedev.chatchat.domain.UrlMetaData
+
 import org.jsoup.Jsoup
 
 fun getMedaData(comment: String): UrlMetaData {
