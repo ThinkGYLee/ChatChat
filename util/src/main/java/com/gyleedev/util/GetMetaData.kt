@@ -1,16 +1,15 @@
-package com.gyleedev.chatchat.util
+package com.gyleedev.util
 
-import com.gyleedev.chatchat.domain.UrlMetaData
 import org.jsoup.Jsoup
 
-fun getMedaData(comment: String): UrlMetaData {
+fun getMetaData(comment: String): UriMetaData {
     try {
         val document = Jsoup.connect(detectUrl(comment)).get()
         val link = document.select("a").first()
         val absHref = link?.attr("abs:href")
         val doc = absHref?.let { Jsoup.connect(it).get() }
         val elements = doc?.select("meta[property^=og:]")
-        val metaData = UrlMetaData(url = comment)
+        val metaData = UriMetaData(url = comment)
         elements.let {
             it?.forEach { el ->
                 when (el.attr("property")) {
@@ -48,6 +47,6 @@ fun getMedaData(comment: String): UrlMetaData {
         }
         return metaData
     } catch (e: Error) {
-        return UrlMetaData()
+        return UriMetaData()
     }
 }

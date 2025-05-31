@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.util
+package com.gyleedev.util
 
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

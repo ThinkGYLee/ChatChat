@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.util
+package com.gyleedev.util
 
 import android.text.SpannableString
 import android.text.util.Linkify
