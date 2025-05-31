@@ -20,7 +20,7 @@ android {
     }
 }
 
-dependencies{
+dependencies {
     implementation(libs.google.gson)
     implementation(libs.jsoup)
 }

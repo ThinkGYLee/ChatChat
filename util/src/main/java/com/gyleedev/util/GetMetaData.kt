@@ -1,6 +1,5 @@
 package com.gyleedev.util
 
-
 import org.jsoup.Jsoup
 
 fun getMetaData(comment: String): UriMetaData {
