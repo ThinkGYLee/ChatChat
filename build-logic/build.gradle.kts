@@ -48,9 +48,13 @@ gradlePlugin {
             id = "chat.android.coroutine"
             implementationClass = "com.gyleedev.buildlogic.CoroutineAndroidPlugin"
         }
-        register("firebaseAndroid") {
-            id = "chat.android.firebase"
-            implementationClass = "com.gyleedev.buildlogic.FirebaseAndroidPlugin"
+        register("firebaseAndroidPluginAndLibrary") {
+            id = "chat.android.firebase.plugin"
+            implementationClass = "com.gyleedev.buildlogic.FirebaseAndroidPluginAndLibrary"
+        }
+        register("firebaseAndroidLibrary") {
+            id = "chat.android.firebase.library"
+            implementationClass = "com.gyleedev.buildlogic.FirebaseAndroidLibrary"
         }
         register("applicationAndroid") {
             id = "chat.android.application"
