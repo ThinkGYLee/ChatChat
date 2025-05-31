@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("chat.android.kotlin")
+    id("chat.android.firebase.library")
     alias(libs.plugins.jetbrains.kotlin.parcelize)
 }
 
