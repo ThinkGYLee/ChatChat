@@ -51,7 +51,7 @@ interface ChatRoomRepository {
 class ChatRoomRepositoryImpl @Inject constructor(
     private val chatRoomDao: ChatRoomDao,
     private val database: FirebaseDatabase,
-    private val auth: FirebaseAuth,
+    private val auth: FirebaseAuth
 ) : ChatRoomRepository {
     override fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean> =
         callbackFlow {
@@ -196,5 +196,4 @@ class ChatRoomRepositoryImpl @Inject constructor(
     override fun getChatRoomListWithPaging(): PagingSource<Int, ChatRoomEntity> {
         return chatRoomDao.getChatRoomsWithPaging()
     }
-
 }
