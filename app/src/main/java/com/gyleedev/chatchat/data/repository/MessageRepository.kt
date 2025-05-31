@@ -25,7 +25,7 @@ import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.ProcessResult
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toRemoteModel
-import com.gyleedev.chatchat.util.PreferenceUtil
+import com.gyleedev.chatchat.data.preference.MyDataPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -70,7 +70,7 @@ class MessageRepositoryImpl @Inject constructor(
     private val database: FirebaseDatabase,
     storage: FirebaseStorage,
     private val messageDao: MessageDao,
-    private val preferenceUtil: PreferenceUtil
+    private val myDataPreference: MyDataPreference
 ) : MessageRepository {
 
     private val imageStorageReference = storage.getReference("image")
@@ -260,7 +260,7 @@ class MessageRepositoryImpl @Inject constructor(
     // 작성자가 다른사람이면 로컬에서만 삭제
     override suspend fun deleteMessageRequest(message: MessageData): Flow<ProcessResult> =
         callbackFlow {
-            if (message.writer == preferenceUtil.getMyData().uid) {
+            if (message.writer == myDataPreference.getMyData().uid) {
                 val remoteRequest = deleteRemoteMessage(message).first()
                 if (remoteRequest == ProcessResult.Success) {
                     val messageEntity = getMessage(message).firstOrNull()
