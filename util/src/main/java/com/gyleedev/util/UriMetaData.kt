@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 // 기본값 설정 안해주면 crash남
 
 @Parcelize
-data class UrlMetaData(
+data class UriMetaData(
     var title: String = "",
     var name: String = "",
     var description: String = "",
