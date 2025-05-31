@@ -1,5 +1,6 @@
 package com.gyleedev.chatchat.data.repository
 
+import androidx.paging.PagingSource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -43,10 +44,8 @@ interface ChatRoomRepository {
     suspend fun makeNewChatRoom(rid: String, receiver: String): Long
 
     suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData
-
-    // User 정보와 혼합 처리 -> UseCase 단에서 처리
-    // suspend fun getChatRoomListFromLocal(): Flow<PagingData<ChatRoomDataWithRelatedUsers>>
     suspend fun resetChatRoomData()
+    fun getChatRoomListWithPaging(): PagingSource<Int, ChatRoomEntity>
 }
 
 class ChatRoomRepositoryImpl @Inject constructor(
@@ -192,6 +191,10 @@ class ChatRoomRepositoryImpl @Inject constructor(
 
     override suspend fun resetChatRoomData() {
         chatRoomDao.resetChatRoomDatabase()
+    }
+
+    override fun getChatRoomListWithPaging(): PagingSource<Int, ChatRoomEntity> {
+        return chatRoomDao.getChatRoomsWithPaging()
     }
 
 }
