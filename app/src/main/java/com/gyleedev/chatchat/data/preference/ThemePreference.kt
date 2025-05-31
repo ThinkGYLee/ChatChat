@@ -9,7 +9,7 @@ interface ThemePreference {
     fun setTheme(mode: Int)
 }
 
-class ThemePreferenceImpl(@ApplicationContext context: Context): ThemePreference {
+class ThemePreferenceImpl(@ApplicationContext context: Context) : ThemePreference {
 
     private val themePreferences = context.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
 

@@ -18,6 +18,7 @@ import com.gyleedev.chatchat.data.database.entity.MessageEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.data.database.entity.toUpdateEntity
+import com.gyleedev.chatchat.data.preference.MyDataPreference
 import com.gyleedev.chatchat.domain.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.MessageData
 import com.gyleedev.chatchat.domain.MessageSendState
@@ -25,7 +26,6 @@ import com.gyleedev.chatchat.domain.MessageType
 import com.gyleedev.chatchat.domain.ProcessResult
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toRemoteModel
-import com.gyleedev.chatchat.data.preference.MyDataPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

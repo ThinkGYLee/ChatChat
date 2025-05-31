@@ -27,6 +27,7 @@ import com.gyleedev.chatchat.data.database.entity.toRelationLocalData
 import com.gyleedev.chatchat.data.model.BlockedUser
 import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
 import com.gyleedev.chatchat.data.model.toRelatedUserLocalData
+import com.gyleedev.chatchat.data.preference.MyDataPreference
 import com.gyleedev.chatchat.domain.ChangeRelationResult
 import com.gyleedev.chatchat.domain.LogInResult
 import com.gyleedev.chatchat.domain.ProcessResult
@@ -37,7 +38,6 @@ import com.gyleedev.chatchat.domain.UserData
 import com.gyleedev.chatchat.domain.UserRelationState
 import com.gyleedev.chatchat.domain.toBlockedUser
 import com.gyleedev.chatchat.domain.toRemoteData
-import com.gyleedev.chatchat.data.preference.MyDataPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
