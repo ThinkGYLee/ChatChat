@@ -6,7 +6,7 @@ plugins {
     id("chat.kotlin.hilt")
     id("chat.android.ui")
     id("chat.android.coroutine")
-    id("chat.android.firebase")
+    id("chat.android.firebase.plugin")
     id("chat.android.room")
     alias(libs.plugins.spotless)
     alias(libs.plugins.jetbrains.kotlin.parcelize)
