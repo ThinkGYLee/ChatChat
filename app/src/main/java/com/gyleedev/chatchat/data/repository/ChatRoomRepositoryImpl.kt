@@ -1,6 +1,9 @@
 package com.gyleedev.chatchat.data.repository
 
-import androidx.paging.PagingSource
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,6 +22,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
 
@@ -167,7 +171,16 @@ class ChatRoomRepositoryImpl @Inject constructor(
         chatRoomDao.resetChatRoomDatabase()
     }
 
-    override fun getChatRoomListWithPaging(): PagingSource<Int, ChatRoomEntity> {
-        return chatRoomDao.getChatRoomsWithPaging()
+    override fun getChatRoomListWithPaging(): Flow<PagingData<ChatRoomLocalData>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                chatRoomDao.getChatRoomsWithPaging()
+            }
+        ).flow.map {
+            it.map {
+                it.toModel()
+            }
+        }
     }
 }
