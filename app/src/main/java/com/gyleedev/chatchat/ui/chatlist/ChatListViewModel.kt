@@ -26,22 +26,32 @@ class ChatListViewModel @Inject constructor(
 
     private val _chatRoomList =
         MutableStateFlow<PagingData<ChatRoomDataWithAllRelatedUsersAndMessage>>(PagingData.empty())
-    val chatRoomList: StateFlow<PagingData<ChatRoomDataWithAllRelatedUsersAndMessage>> = _chatRoomList
+    val chatRoomList: StateFlow<PagingData<ChatRoomDataWithAllRelatedUsersAndMessage>> =
+        _chatRoomList
 
     init {
         viewModelScope.launch {
-            getChatRoomDataWithRelatedUserUseCase().cachedIn(viewModelScope).collectLatest { chatRoomAndRelatedUsers ->
-                _chatRoomList.emit(
-                    chatRoomAndRelatedUsers.map {
-                        ChatRoomDataWithAllRelatedUsersAndMessage(
-                            chatRoomLocalData = it.chatRoomLocalData,
-                            relatedUserLocalData = it.relatedUserLocalData,
-                            lastMessageData = getLastMessageUseCase(it.chatRoomLocalData)
-                                ?: MessageData("", "", "", type = MessageType.Text, 0L, MessageSendState.COMPLETE)
-                        )
-                    }
-                )
-            }
+            getChatRoomDataWithRelatedUserUseCase().cachedIn(viewModelScope)
+                .collectLatest { chatRoomAndRelatedUsers ->
+                    _chatRoomList.emit(
+                        chatRoomAndRelatedUsers.map {
+                            ChatRoomDataWithAllRelatedUsersAndMessage(
+                                chatRoomLocalData = it.chatRoomLocalData,
+                                relatedUserLocalData = it.relatedUserLocalData,
+                                lastMessageData = getLastMessageUseCase(it.chatRoomLocalData)
+                                    ?: MessageData(
+                                        chatRoomId = "",
+                                        messageId = 0L,
+                                        writer = "",
+                                        comment = "",
+                                        type = MessageType.Text,
+                                        time = 0L,
+                                        MessageSendState.COMPLETE
+                                    )
+                            )
+                        }
+                    )
+                }
         }
     }
 }
