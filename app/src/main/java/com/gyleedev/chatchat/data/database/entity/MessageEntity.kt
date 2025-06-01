@@ -3,9 +3,9 @@ package com.gyleedev.chatchat.data.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.gyleedev.chatchat.domain.model.MessageData
-import com.gyleedev.chatchat.domain.model.MessageSendState
-import com.gyleedev.chatchat.domain.model.MessageType
+import com.gyleedev.domain.model.MessageData
+import com.gyleedev.domain.model.MessageSendState
+import com.gyleedev.domain.model.MessageType
 
 @Entity(
     tableName = "message"
@@ -45,6 +45,7 @@ data class MessageEntity(
 
 fun MessageEntity.toModel(): MessageData {
     return MessageData(
+        messageId = id,
         chatRoomId = rid,
         writer = writer,
         comment = comment,
@@ -60,7 +61,7 @@ fun MessageEntity.toModel(): MessageData {
 
 fun MessageData.toEntity(roomId: Long): MessageEntity {
     return MessageEntity(
-        id = 0,
+        id = if (messageId != 0L) messageId else 0L,
         rid = chatRoomId,
         writer = writer,
         comment = comment,

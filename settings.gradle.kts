@@ -24,3 +24,4 @@ rootProject.name = "ChatChat"
 include(":app")
 include(":core")
 include(":util")
+include(":domain")

@@ -25,20 +25,20 @@ import com.gyleedev.chatchat.data.database.entity.toLocalData
 import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.data.database.entity.toRelationLocalData
 import com.gyleedev.chatchat.data.preference.MyDataPreference
-import com.gyleedev.chatchat.domain.model.BlockedUser
-import com.gyleedev.chatchat.domain.model.ChangeRelationResult
-import com.gyleedev.chatchat.domain.model.LogInResult
-import com.gyleedev.chatchat.domain.model.ProcessResult
-import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.model.RelatedUserRemoteData
-import com.gyleedev.chatchat.domain.model.SearchUserResult
-import com.gyleedev.chatchat.domain.model.SignInResult
-import com.gyleedev.chatchat.domain.model.UserData
-import com.gyleedev.chatchat.domain.model.UserRelationState
-import com.gyleedev.chatchat.domain.model.toBlockedUser
-import com.gyleedev.chatchat.domain.model.toRelatedUserLocalData
-import com.gyleedev.chatchat.domain.model.toRemoteData
-import com.gyleedev.chatchat.domain.repository.UserRepository
+import com.gyleedev.domain.model.BlockedUser
+import com.gyleedev.domain.model.ChangeRelationResult
+import com.gyleedev.domain.model.LogInResult
+import com.gyleedev.domain.model.ProcessResult
+import com.gyleedev.domain.model.RelatedUserLocalData
+import com.gyleedev.domain.model.RelatedUserRemoteData
+import com.gyleedev.domain.model.SearchUserResult
+import com.gyleedev.domain.model.SignInResult
+import com.gyleedev.domain.model.UserData
+import com.gyleedev.domain.model.UserRelationState
+import com.gyleedev.domain.model.toBlockedUser
+import com.gyleedev.domain.model.toRelatedUserLocalData
+import com.gyleedev.domain.model.toRemoteData
+import com.gyleedev.domain.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -373,8 +373,12 @@ class UserRepositoryImpl @Inject constructor(
         return userDao.getRelatedUsers().map { it.toRelationLocalData() }
     }
 
-    override fun getRelatedUserListFromLocal(): Flow<List<UserEntity>> {
-        return userDao.getAllRelatedUsersAsFlow().flowOn(Dispatchers.IO)
+    override fun getRelatedUserListFromLocal(): Flow<List<RelatedUserLocalData>> {
+        return userDao.getAllRelatedUsersAsFlow().map { list ->
+            list.map { entity ->
+                entity.toRelationLocalData()
+            }
+        }.flowOn(Dispatchers.IO)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -397,14 +401,15 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override suspend fun updateRelatedUserInfoWithUserEntity(userEntity: UserEntity) {
-        val remoteData = getUserInfoFromRemote(userEntity.uid).first()
-        if (remoteData != userEntity.toModel()) {
+    override suspend fun updateRelatedUserInfoWithUserEntity(relatedUserLocalData: RelatedUserLocalData) {
+        val entity = relatedUserLocalData.toEntity()
+        val remoteData = getUserInfoFromRemote(entity.uid).first()
+        if (remoteData != entity.toModel()) {
             userDao.updateUser(
-                userEntity.copy(
-                    name = remoteData!!.name.ifBlank { userEntity.name },
-                    status = remoteData.status.ifBlank { userEntity.status },
-                    picture = remoteData.picture.ifBlank { userEntity.picture }
+                entity.copy(
+                    name = remoteData!!.name.ifBlank { entity.name },
+                    status = remoteData.status.ifBlank { entity.status },
+                    picture = remoteData.picture.ifBlank { entity.picture }
                 )
             )
         }

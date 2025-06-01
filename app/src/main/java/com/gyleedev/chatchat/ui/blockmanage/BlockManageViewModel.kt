@@ -3,11 +3,11 @@ package com.gyleedev.chatchat.ui.blockmanage
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.usecase.GetBlockedFriendsUseCase
-import com.gyleedev.chatchat.domain.usecase.GetBlockedFriendsWithNameUseCase
-import com.gyleedev.chatchat.domain.usecase.UserToFriendUseCase
 import com.gyleedev.core.BaseViewModel
+import com.gyleedev.domain.model.RelatedUserLocalData
+import com.gyleedev.domain.usecase.GetBlockedFriendsUseCase
+import com.gyleedev.domain.usecase.GetBlockedFriendsWithNameUseCase
+import com.gyleedev.domain.usecase.UserToFriendUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

@@ -3,9 +3,9 @@ package com.gyleedev.chatchat.data.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.model.UserData
-import com.gyleedev.chatchat.domain.model.UserRelationState
+import com.gyleedev.domain.model.RelatedUserLocalData
+import com.gyleedev.domain.model.UserData
+import com.gyleedev.domain.model.UserRelationState
 
 @Entity(
     tableName = "user"

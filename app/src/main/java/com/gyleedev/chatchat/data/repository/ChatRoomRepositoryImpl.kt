@@ -1,6 +1,9 @@
 package com.gyleedev.chatchat.data.repository
 
-import androidx.paging.PagingSource
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -9,16 +12,17 @@ import com.google.firebase.database.ValueEventListener
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
 import com.gyleedev.chatchat.data.database.entity.toModel
-import com.gyleedev.chatchat.domain.model.ChatRoomData
-import com.gyleedev.chatchat.domain.model.ChatRoomLocalData
-import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.model.UserChatRoomData
-import com.gyleedev.chatchat.domain.repository.ChatRoomRepository
+import com.gyleedev.domain.model.ChatRoomData
+import com.gyleedev.domain.model.ChatRoomLocalData
+import com.gyleedev.domain.model.RelatedUserLocalData
+import com.gyleedev.domain.model.UserChatRoomData
+import com.gyleedev.domain.repository.ChatRoomRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
 
@@ -167,7 +171,16 @@ class ChatRoomRepositoryImpl @Inject constructor(
         chatRoomDao.resetChatRoomDatabase()
     }
 
-    override fun getChatRoomListWithPaging(): PagingSource<Int, ChatRoomEntity> {
-        return chatRoomDao.getChatRoomsWithPaging()
+    override fun getChatRoomListWithPaging(): Flow<PagingData<ChatRoomLocalData>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = {
+                chatRoomDao.getChatRoomsWithPaging()
+            }
+        ).flow.map {
+            it.map {
+                it.toModel()
+            }
+        }
     }
 }

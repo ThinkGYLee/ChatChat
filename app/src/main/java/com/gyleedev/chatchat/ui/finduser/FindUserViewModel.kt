@@ -1,13 +1,13 @@
 package com.gyleedev.chatchat.ui.finduser
 
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.chatchat.domain.model.ChangeRelationResult
-import com.gyleedev.chatchat.domain.model.SearchUserResult
-import com.gyleedev.chatchat.domain.model.UserData
-import com.gyleedev.chatchat.domain.usecase.AddFriendRequestUseCase
-import com.gyleedev.chatchat.domain.usecase.BlockUnknownUserUseCase
-import com.gyleedev.chatchat.domain.usecase.GetUserDataUseCase
 import com.gyleedev.core.BaseViewModel
+import com.gyleedev.domain.model.ChangeRelationResult
+import com.gyleedev.domain.model.SearchUserResult
+import com.gyleedev.domain.model.UserData
+import com.gyleedev.domain.usecase.AddFriendRequestUseCase
+import com.gyleedev.domain.usecase.BlockUnknownUserUseCase
+import com.gyleedev.domain.usecase.GetUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

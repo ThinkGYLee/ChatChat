@@ -14,19 +14,18 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.gyleedev.chatchat.data.database.dao.MessageDao
-import com.gyleedev.chatchat.data.database.entity.MessageEntity
 import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.data.database.entity.toUpdateEntity
 import com.gyleedev.chatchat.data.preference.MyDataPreference
-import com.gyleedev.chatchat.domain.model.ChatRoomLocalData
-import com.gyleedev.chatchat.domain.model.MessageData
-import com.gyleedev.chatchat.domain.model.MessageSendState
-import com.gyleedev.chatchat.domain.model.MessageType
-import com.gyleedev.chatchat.domain.model.ProcessResult
-import com.gyleedev.chatchat.domain.model.UserRelationState
-import com.gyleedev.chatchat.domain.model.toRemoteModel
-import com.gyleedev.chatchat.domain.repository.MessageRepository
+import com.gyleedev.domain.model.ChatRoomLocalData
+import com.gyleedev.domain.model.MessageData
+import com.gyleedev.domain.model.MessageSendState
+import com.gyleedev.domain.model.MessageType
+import com.gyleedev.domain.model.ProcessResult
+import com.gyleedev.domain.model.UserRelationState
+import com.gyleedev.domain.model.toRemoteModel
+import com.gyleedev.domain.repository.MessageRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -157,10 +156,10 @@ class MessageRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLastMessage(chatRoomId: String): MessageEntity? {
+    override suspend fun getLastMessage(chatRoomId: String): MessageData? {
         return withContext(Dispatchers.IO) {
             try {
-                messageDao.getLastMessage(chatRoomId)
+                messageDao.getLastMessage(chatRoomId).toModel()
             } catch (e: Exception) {
                 println(e)
                 null
@@ -179,12 +178,14 @@ class MessageRepositoryImpl @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun getMessage(message: MessageData): Flow<MessageEntity> {
+    override fun getMessage(message: MessageData): Flow<MessageData> {
         return messageDao.getMessage(
             rid = message.chatRoomId,
             writer = message.writer,
             time = message.time
-        ).flowOn(Dispatchers.IO)
+        ).flowOn(Dispatchers.IO).map {
+            it.toModel()
+        }
     }
 
     override suspend fun deleteLocalMessage(messageId: Long) {
@@ -239,14 +240,14 @@ class MessageRepositoryImpl @Inject constructor(
                 val remoteRequest = deleteRemoteMessage(message).first()
                 if (remoteRequest == ProcessResult.Success) {
                     val messageEntity = getMessage(message).firstOrNull()
-                    messageEntity?.let { deleteLocalMessage(it.id) }
+                    messageEntity?.let { deleteLocalMessage(it.messageId) }
                     trySend(ProcessResult.Success)
                 } else {
                     trySend(ProcessResult.Failure)
                 }
             } else {
                 val messageEntity = getMessage(message).firstOrNull()
-                messageEntity?.let { deleteLocalMessage(it.id) }
+                messageEntity?.let { deleteLocalMessage(it.messageId) }
                 trySend(ProcessResult.Success)
             }
             awaitClose()

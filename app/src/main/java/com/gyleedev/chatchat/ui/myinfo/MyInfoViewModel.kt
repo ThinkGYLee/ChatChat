@@ -2,9 +2,9 @@ package com.gyleedev.chatchat.ui.myinfo
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.chatchat.domain.model.UserData
-import com.gyleedev.chatchat.domain.usecase.GetMyDataFromRemoteUseCase
 import com.gyleedev.core.BaseViewModel
+import com.gyleedev.domain.model.UserData
+import com.gyleedev.domain.usecase.GetMyDataFromRemoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

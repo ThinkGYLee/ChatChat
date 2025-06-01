@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.gyleedev.chatchat.data.database.entity.UserEntity
-import com.gyleedev.chatchat.domain.model.UserRelationState
+import com.gyleedev.domain.model.UserRelationState
 import kotlinx.coroutines.flow.Flow
 
 @Dao
