@@ -1,7 +1,6 @@
 package com.gyleedev.chatchat.domain.repository
 
 import androidx.paging.PagingData
-import com.gyleedev.chatchat.data.database.entity.UserEntity
 import com.gyleedev.chatchat.domain.model.ChangeRelationResult
 import com.gyleedev.chatchat.domain.model.LogInResult
 import com.gyleedev.chatchat.domain.model.ProcessResult
@@ -45,8 +44,8 @@ interface UserRepository {
 
     suspend fun updateMyUserInfo(user: UserData): Flow<Boolean>
     suspend fun getUserInfoFromRemote(uid: String): Flow<UserData?>
-    fun getRelatedUserListFromLocal(): Flow<List<UserEntity>>
-    suspend fun updateRelatedUserInfoWithUserEntity(userEntity: UserEntity)
+    fun getRelatedUserListFromLocal(): Flow<List<RelatedUserLocalData>>
+    suspend fun updateRelatedUserInfoWithUserEntity(userData: RelatedUserLocalData)
     suspend fun updateUserInfoByUid(uid: String)
     suspend fun resetFriendData()
     suspend fun resetMyUserData()
