@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class RetrieveAndInsertChatRoomDataFromRemote @Inject constructor(
+class RetrieveAndInsertChatRoomDataFromRemoteUseCase @Inject constructor(
     private val repository: ChatRoomRepository
 ) {
     suspend operator fun invoke(relatedUserLocalData: RelatedUserLocalData): ChatRoomData? {

@@ -9,14 +9,14 @@ import javax.inject.Inject
 class GetChatRoomRemoteDataUseCase @Inject constructor(
     private val checkChatRoomExistsUseCase: CheckChatRoomExistsUseCase,
     private val createChatRoomsUseCase: CreateChatRoomsUseCase,
-    private val retrieveAndInsertChatRoomDataFromRemote: RetrieveAndInsertChatRoomDataFromRemote
+    private val retrieveAndInsertChatRoomDataFromRemoteUseCase: RetrieveAndInsertChatRoomDataFromRemoteUseCase
 ) {
     suspend operator fun invoke(relatedUserLocalData: RelatedUserLocalData): ChatRoomData? {
         return withContext(Dispatchers.IO) {
             // 존재하나 확인하기
             val checkRemote = checkChatRoomExistsUseCase(relatedUserLocalData)
             if (checkRemote) {
-                retrieveAndInsertChatRoomDataFromRemote(relatedUserLocalData)
+                retrieveAndInsertChatRoomDataFromRemoteUseCase(relatedUserLocalData)
             } else {
                 createChatRoomsUseCase(relatedUserLocalData)
             }
