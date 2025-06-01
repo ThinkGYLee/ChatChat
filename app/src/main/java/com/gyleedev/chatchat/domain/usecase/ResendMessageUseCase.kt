@@ -21,7 +21,7 @@ class ResendMessageUseCase @Inject constructor(
         withContext(Dispatchers.IO) {
             if (networkState) {
                 val messageId =
-                    getMessageFromLocalUseCase(messageData).firstOrNull()?.id
+                    getMessageFromLocalUseCase(messageData).firstOrNull()?.messageId
                 if (messageId != null) {
                     val request = try {
                         sendMessageToRemoteUseCase(messageData).first()

@@ -13,7 +13,7 @@ class CancelMessageUseCase @Inject constructor(
     suspend operator fun invoke(messageData: MessageData) {
         withContext(Dispatchers.IO) {
             val messageId =
-                getMessageFromLocalUseCase(messageData).firstOrNull()?.id
+                getMessageFromLocalUseCase(messageData).firstOrNull()?.messageId
             if (messageId != null) {
                 deleteMessageFromLocalUseCase(messageId)
             }
