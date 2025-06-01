@@ -373,8 +373,12 @@ class UserRepositoryImpl @Inject constructor(
         return userDao.getRelatedUsers().map { it.toRelationLocalData() }
     }
 
-    override fun getRelatedUserListFromLocal(): Flow<List<UserEntity>> {
-        return userDao.getAllRelatedUsersAsFlow().flowOn(Dispatchers.IO)
+    override fun getRelatedUserListFromLocal(): Flow<List<RelatedUserLocalData>> {
+        return userDao.getAllRelatedUsersAsFlow().map { list ->
+            list.map { entity ->
+                entity.toRelationLocalData()
+            }
+        }.flowOn(Dispatchers.IO)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -397,14 +401,15 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override suspend fun updateRelatedUserInfoWithUserEntity(userEntity: UserEntity) {
-        val remoteData = getUserInfoFromRemote(userEntity.uid).first()
-        if (remoteData != userEntity.toModel()) {
+    override suspend fun updateRelatedUserInfoWithUserEntity(userData: RelatedUserLocalData) {
+        val entity = userData.toEntity()
+        val remoteData = getUserInfoFromRemote(entity.uid).first()
+        if (remoteData != entity.toModel()) {
             userDao.updateUser(
-                userEntity.copy(
-                    name = remoteData!!.name.ifBlank { userEntity.name },
-                    status = remoteData.status.ifBlank { userEntity.status },
-                    picture = remoteData.picture.ifBlank { userEntity.picture }
+                entity.copy(
+                    name = remoteData!!.name.ifBlank { entity.name },
+                    status = remoteData.status.ifBlank { entity.status },
+                    picture = remoteData.picture.ifBlank { entity.picture }
                 )
             )
         }
