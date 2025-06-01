@@ -19,11 +19,11 @@ interface MessageRepository {
         userRelationState: UserRelationState
     ): Flow<MessageData?>
 
-    suspend fun getLastMessage(chatRoomId: String): MessageEntity?
+    suspend fun getLastMessage(chatRoomId: String): MessageData?
 
     fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
 
-    fun getMessage(message: MessageData): Flow<MessageEntity>
+    fun getMessage(message: MessageData): Flow<MessageData>
 
     suspend fun deleteLocalMessage(messageId: Long)
 
