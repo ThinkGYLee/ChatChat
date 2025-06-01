@@ -2,9 +2,9 @@ package com.gyleedev.chatchat.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.chatchat.domain.model.UserState
-import com.gyleedev.chatchat.domain.usecase.FetchUserExistsUseCase
-import com.gyleedev.chatchat.domain.usecase.UpdateRelatedUserListUseCase
+import com.gyleedev.domain.model.UserState
+import com.gyleedev.domain.usecase.FetchUserExistsUseCase
+import com.gyleedev.domain.usecase.UpdateRelatedUserListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

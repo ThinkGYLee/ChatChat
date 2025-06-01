@@ -1,6 +1,6 @@
 package com.gyleedev.domain.usecase
 
-import com.gyleedev.chatchat.domain.model.MessageData
+import com.gyleedev.domain.model.MessageData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
@@ -13,7 +13,7 @@ class CancelMessageUseCase @Inject constructor(
     suspend operator fun invoke(messageData: MessageData) {
         withContext(Dispatchers.IO) {
             val messageId =
-                getMessageFromLocalUseCase(messageData).firstOrNull()?.id
+                getMessageFromLocalUseCase(messageData).firstOrNull()?.messageId
             if (messageId != null) {
                 deleteMessageFromLocalUseCase(messageId)
             }

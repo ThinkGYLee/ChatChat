@@ -1,6 +1,6 @@
 package com.gyleedev.domain.usecase
 
-import com.gyleedev.chatchat.domain.repository.ChatRoomRepository
+import com.gyleedev.domain.repository.ChatRoomRepository
 import javax.inject.Inject
 
 class CreateChatRoomUseCase @Inject constructor(

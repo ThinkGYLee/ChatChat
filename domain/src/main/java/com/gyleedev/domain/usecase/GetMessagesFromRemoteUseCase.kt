@@ -1,9 +1,9 @@
 package com.gyleedev.domain.usecase
 
-import com.gyleedev.chatchat.domain.model.ChatRoomLocalData
-import com.gyleedev.chatchat.domain.model.MessageData
-import com.gyleedev.chatchat.domain.model.UserRelationState
-import com.gyleedev.chatchat.domain.repository.MessageRepository
+import com.gyleedev.domain.model.ChatRoomLocalData
+import com.gyleedev.domain.model.MessageData
+import com.gyleedev.domain.model.UserRelationState
+import com.gyleedev.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

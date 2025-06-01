@@ -1,7 +1,7 @@
 package com.gyleedev.domain.usecase
 
-import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.repository.UserRepository
+import com.gyleedev.domain.model.RelatedUserLocalData
+import com.gyleedev.domain.repository.UserRepository
 import javax.inject.Inject
 
 class DeleteFriendUseCase @Inject constructor(

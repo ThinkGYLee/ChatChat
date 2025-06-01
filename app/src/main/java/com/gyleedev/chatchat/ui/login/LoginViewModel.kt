@@ -1,8 +1,8 @@
 package com.gyleedev.chatchat.ui.login
 
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.chatchat.domain.model.LogInState
-import com.gyleedev.chatchat.domain.usecase.LoginProcessUseCase
+import com.gyleedev.domain.model.LogInState
+import com.gyleedev.domain.usecase.LoginProcessUseCase
 import com.gyleedev.core.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow

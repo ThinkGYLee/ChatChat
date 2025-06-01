@@ -1,8 +1,8 @@
 package com.gyleedev.domain.usecase
 
-import com.gyleedev.chatchat.domain.model.ChatRoomData
-import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.repository.ChatRoomRepository
+import com.gyleedev.domain.model.ChatRoomData
+import com.gyleedev.domain.model.RelatedUserLocalData
+import com.gyleedev.domain.repository.ChatRoomRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking

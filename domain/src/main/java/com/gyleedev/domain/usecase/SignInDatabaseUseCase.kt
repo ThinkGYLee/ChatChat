@@ -1,8 +1,8 @@
 package com.gyleedev.domain.usecase
 
-import com.gyleedev.chatchat.domain.model.SignInResult
-import com.gyleedev.chatchat.domain.model.UserData
-import com.gyleedev.chatchat.domain.repository.UserRepository
+import com.gyleedev.domain.model.SignInResult
+import com.gyleedev.domain.model.UserData
+import com.gyleedev.domain.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext

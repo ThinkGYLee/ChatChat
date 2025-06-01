@@ -1,6 +1,6 @@
 package com.gyleedev.chatchat.ui.chatroom
 
-import com.gyleedev.chatchat.domain.model.MessageData
+import com.gyleedev.domain.model.MessageData
 
 sealed interface SelectedMessageState {
 

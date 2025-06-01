@@ -1,6 +1,6 @@
 package com.gyleedev.domain.usecase
 
-import com.gyleedev.chatchat.domain.repository.MessageRepository
+import com.gyleedev.domain.repository.MessageRepository
 import javax.inject.Inject
 
 class DeleteMessageFromLocalUseCase @Inject constructor(

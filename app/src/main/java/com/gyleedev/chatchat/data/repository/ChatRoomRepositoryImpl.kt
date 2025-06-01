@@ -12,11 +12,11 @@ import com.google.firebase.database.ValueEventListener
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
 import com.gyleedev.chatchat.data.database.entity.toModel
-import com.gyleedev.chatchat.domain.model.ChatRoomData
-import com.gyleedev.chatchat.domain.model.ChatRoomLocalData
-import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.model.UserChatRoomData
-import com.gyleedev.chatchat.domain.repository.ChatRoomRepository
+import com.gyleedev.domain.model.ChatRoomData
+import com.gyleedev.domain.model.ChatRoomLocalData
+import com.gyleedev.domain.model.RelatedUserLocalData
+import com.gyleedev.domain.model.UserChatRoomData
+import com.gyleedev.domain.repository.ChatRoomRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

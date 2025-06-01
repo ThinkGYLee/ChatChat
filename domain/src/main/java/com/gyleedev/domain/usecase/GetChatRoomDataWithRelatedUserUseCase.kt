@@ -1,13 +1,10 @@
 package com.gyleedev.domain.usecase
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.gyleedev.chatchat.data.database.entity.toModel
-import com.gyleedev.chatchat.domain.model.ChatRoomDataWithRelatedUsers
-import com.gyleedev.chatchat.domain.repository.ChatRoomRepository
-import com.gyleedev.chatchat.domain.repository.UserRepository
+import com.gyleedev.domain.model.ChatRoomDataWithRelatedUsers
+import com.gyleedev.domain.repository.ChatRoomRepository
+import com.gyleedev.domain.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,15 +18,10 @@ class GetChatRoomDataWithRelatedUserUseCase @Inject constructor(
     suspend operator fun invoke(): Flow<PagingData<ChatRoomDataWithRelatedUsers>> {
         return withContext(Dispatchers.IO) {
             val relatedUsers = userRepository.getRelatedUsersForChatRoomList()
-            Pager(
-                config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                pagingSourceFactory = {
-                    chatRoomRepository.getChatRoomListWithPaging()
-                }
-            ).flow.map { value ->
-                value.map { chatRoom ->
+            chatRoomRepository.getChatRoomListWithPaging().map { pagingData ->
+                pagingData.map { chatRoom ->
                     ChatRoomDataWithRelatedUsers(
-                        chatRoomLocalData = chatRoom.toModel(),
+                        chatRoomLocalData = chatRoom,
                         relatedUserLocalData = relatedUsers.find { chatRoom.receiver == it.uid }!!
                     )
                 }

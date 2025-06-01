@@ -107,10 +107,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
-import com.gyleedev.chatchat.domain.model.MessageData
-import com.gyleedev.chatchat.domain.model.MessageSendState
-import com.gyleedev.chatchat.domain.model.MessageType
-import com.gyleedev.chatchat.domain.model.UserRelationState
+import com.gyleedev.domain.model.MessageData
+import com.gyleedev.domain.model.MessageSendState
+import com.gyleedev.domain.model.MessageType
+import com.gyleedev.domain.model.UserRelationState
 import com.gyleedev.util.UriMetaData
 import com.gyleedev.util.getMetaData
 import com.skydoves.landscapist.ImageOptions

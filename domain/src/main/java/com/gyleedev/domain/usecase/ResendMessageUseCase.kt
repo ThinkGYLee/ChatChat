@@ -2,8 +2,8 @@ package com.gyleedev.domain.usecase
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.gyleedev.chatchat.domain.model.MessageData
-import com.gyleedev.chatchat.domain.model.MessageSendState
+import com.gyleedev.domain.model.MessageData
+import com.gyleedev.domain.model.MessageSendState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -21,7 +21,7 @@ class ResendMessageUseCase @Inject constructor(
         withContext(Dispatchers.IO) {
             if (networkState) {
                 val messageId =
-                    getMessageFromLocalUseCase(messageData).firstOrNull()?.id
+                    getMessageFromLocalUseCase(messageData).firstOrNull()?.messageId
                 if (messageId != null) {
                     val request = try {
                         sendMessageToRemoteUseCase(messageData).first()

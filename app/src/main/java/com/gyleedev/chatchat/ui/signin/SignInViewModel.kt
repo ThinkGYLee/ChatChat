@@ -1,10 +1,10 @@
 package com.gyleedev.chatchat.ui.signin
 
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.chatchat.domain.model.SignInResult
-import com.gyleedev.chatchat.domain.model.UserData
-import com.gyleedev.chatchat.domain.usecase.SignInAuthUseCase
-import com.gyleedev.chatchat.domain.usecase.SignInDatabaseUseCase
+import com.gyleedev.domain.model.SignInResult
+import com.gyleedev.domain.model.UserData
+import com.gyleedev.domain.usecase.SignInAuthUseCase
+import com.gyleedev.domain.usecase.SignInDatabaseUseCase
 import com.gyleedev.core.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
