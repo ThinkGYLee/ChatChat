@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.domain
+package com.gyleedev.chatchat.domain.model
 
 sealed interface LogInResult {
     data object Success : LogInResult
