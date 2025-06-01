@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.ui.friendinfo
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.gyleedev.core.BaseViewModel
 import com.gyleedev.domain.model.RelatedUserLocalData
 import com.gyleedev.domain.usecase.BlockRelatedUserUseCase
 import com.gyleedev.domain.usecase.DeleteFriendUseCase
@@ -9,7 +10,6 @@ import com.gyleedev.domain.usecase.GetRelatedUserAndFavoriteDataUseCase
 import com.gyleedev.domain.usecase.HideFriendUseCase
 import com.gyleedev.domain.usecase.UpdateFavoriteByUserEntityIdUseCase
 import com.gyleedev.domain.usecase.UpdateFriendInfoUseCase
-import com.gyleedev.core.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

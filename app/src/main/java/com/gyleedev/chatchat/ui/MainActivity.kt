@@ -11,8 +11,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.gyleedev.domain.model.UserState
 import com.gyleedev.chatchat.ui.theme.ChatChatTheme
+import com.gyleedev.domain.model.UserState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

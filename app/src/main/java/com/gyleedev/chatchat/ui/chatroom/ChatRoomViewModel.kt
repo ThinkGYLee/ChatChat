@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.gyleedev.core.BaseViewModel
 import com.gyleedev.domain.model.ChatRoomLocalData
 import com.gyleedev.domain.model.MessageData
 import com.gyleedev.domain.model.MessageSendState
@@ -26,7 +27,6 @@ import com.gyleedev.domain.usecase.GetMyUidFromLogInDataUseCase
 import com.gyleedev.domain.usecase.ResendMessageUseCase
 import com.gyleedev.domain.usecase.SendMessageUseCase
 import com.gyleedev.domain.usecase.UserToFriendUseCase
-import com.gyleedev.core.BaseViewModel
 import com.gyleedev.util.FirebaseServerTimeHelper
 import com.gyleedev.util.NetworkManager
 import dagger.hilt.android.lifecycle.HiltViewModel

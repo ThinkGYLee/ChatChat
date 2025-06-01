@@ -2,6 +2,7 @@ package com.gyleedev.chatchat.ui.friendlist
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.gyleedev.core.BaseViewModel
 import com.gyleedev.domain.model.RelatedUserLocalData
 import com.gyleedev.domain.model.RelatedUserRemoteData
 import com.gyleedev.domain.model.UserData
@@ -16,7 +17,6 @@ import com.gyleedev.domain.usecase.GetMyDataFromRemoteUseCase
 import com.gyleedev.domain.usecase.GetMyRelatedUserListFromRemoteUseCase
 import com.gyleedev.domain.usecase.HideFriendUseCase
 import com.gyleedev.domain.usecase.UpdateFavoriteByUserEntityIdUseCase
-import com.gyleedev.core.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
