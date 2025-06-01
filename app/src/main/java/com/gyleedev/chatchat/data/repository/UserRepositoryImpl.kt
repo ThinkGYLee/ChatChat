@@ -401,8 +401,8 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override suspend fun updateRelatedUserInfoWithUserEntity(userData: RelatedUserLocalData) {
-        val entity = userData.toEntity()
+    override suspend fun updateRelatedUserInfoWithUserEntity(relatedUserLocalData: RelatedUserLocalData) {
+        val entity = relatedUserLocalData.toEntity()
         val remoteData = getUserInfoFromRemote(entity.uid).first()
         if (remoteData != entity.toModel()) {
             userDao.updateUser(

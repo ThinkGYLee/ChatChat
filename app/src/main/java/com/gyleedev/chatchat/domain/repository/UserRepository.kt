@@ -45,7 +45,7 @@ interface UserRepository {
     suspend fun updateMyUserInfo(user: UserData): Flow<Boolean>
     suspend fun getUserInfoFromRemote(uid: String): Flow<UserData?>
     fun getRelatedUserListFromLocal(): Flow<List<RelatedUserLocalData>>
-    suspend fun updateRelatedUserInfoWithUserEntity(userData: RelatedUserLocalData)
+    suspend fun updateRelatedUserInfoWithUserEntity(relatedUserLocalData: RelatedUserLocalData)
     suspend fun updateUserInfoByUid(uid: String)
     suspend fun resetFriendData()
     suspend fun resetMyUserData()
