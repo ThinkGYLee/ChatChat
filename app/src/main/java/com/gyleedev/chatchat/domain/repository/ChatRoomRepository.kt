@@ -1,7 +1,6 @@
 package com.gyleedev.chatchat.domain.repository
 
-import androidx.paging.PagingSource
-import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
+import androidx.paging.PagingData
 import com.gyleedev.chatchat.domain.model.ChatRoomData
 import com.gyleedev.chatchat.domain.model.ChatRoomLocalData
 import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
@@ -31,5 +30,5 @@ interface ChatRoomRepository {
 
     suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData
     suspend fun resetChatRoomData()
-    fun getChatRoomListWithPaging(): PagingSource<Int, ChatRoomEntity>
+    fun getChatRoomListWithPaging(): Flow<PagingData<ChatRoomLocalData>>
 }
