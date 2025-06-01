@@ -1,6 +1,6 @@
 package com.gyleedev.chatchat.domain.usecase
 
-import com.gyleedev.chatchat.data.repository.UserRepository
+import com.gyleedev.chatchat.domain.repository.UserRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 

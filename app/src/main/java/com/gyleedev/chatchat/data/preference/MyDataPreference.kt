@@ -3,7 +3,7 @@ package com.gyleedev.chatchat.data.preference
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.domain.model.UserData
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 interface MyDataPreference {

@@ -1,6 +1,6 @@
 package com.gyleedev.chatchat.domain.usecase
 
-import com.gyleedev.chatchat.domain.MessageData
+import com.gyleedev.chatchat.domain.model.MessageData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext

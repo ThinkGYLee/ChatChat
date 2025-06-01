@@ -39,8 +39,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
-import com.gyleedev.chatchat.domain.ChatRoomDataWithAllRelatedUsersAndMessage
-import com.gyleedev.chatchat.domain.MessageType
+import com.gyleedev.chatchat.domain.model.ChatRoomDataWithAllRelatedUsersAndMessage
+import com.gyleedev.chatchat.domain.model.MessageType
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage

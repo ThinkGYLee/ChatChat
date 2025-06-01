@@ -2,7 +2,7 @@ package com.gyleedev.chatchat.ui.myinfo
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.domain.model.UserData
 import com.gyleedev.chatchat.domain.usecase.GetMyDataFromRemoteUseCase
 import com.gyleedev.core.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

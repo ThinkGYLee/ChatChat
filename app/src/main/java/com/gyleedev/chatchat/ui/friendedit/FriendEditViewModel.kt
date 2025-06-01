@@ -3,7 +3,7 @@ package com.gyleedev.chatchat.ui.friendedit
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.gyleedev.chatchat.domain.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.usecase.GetFriendsUseCase
 import com.gyleedev.chatchat.domain.usecase.GetFriendsWithNameUseCase
 import com.gyleedev.chatchat.domain.usecase.HideFriendUseCase

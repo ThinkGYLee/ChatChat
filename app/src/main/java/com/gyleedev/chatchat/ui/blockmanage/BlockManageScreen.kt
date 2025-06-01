@@ -60,8 +60,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.chatchat.R
-import com.gyleedev.chatchat.domain.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.UserRelationState
+import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.model.UserRelationState
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage

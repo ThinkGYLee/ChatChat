@@ -1,7 +1,7 @@
 package com.gyleedev.chatchat.domain.usecase
 
-import com.gyleedev.chatchat.domain.ChatRoomData
-import com.gyleedev.chatchat.domain.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.model.ChatRoomData
+import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

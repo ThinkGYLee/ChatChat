@@ -1,6 +1,6 @@
 package com.gyleedev.chatchat.ui.chatroom
 
-import com.gyleedev.chatchat.domain.UserRelationState
+import com.gyleedev.chatchat.domain.model.UserRelationState
 
 sealed interface ChatRoomUiState {
 

@@ -4,10 +4,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.gyleedev.chatchat.domain.ChatRoomDataWithAllRelatedUsersAndMessage
-import com.gyleedev.chatchat.domain.MessageData
-import com.gyleedev.chatchat.domain.MessageSendState
-import com.gyleedev.chatchat.domain.MessageType
+import com.gyleedev.chatchat.domain.model.ChatRoomDataWithAllRelatedUsersAndMessage
+import com.gyleedev.chatchat.domain.model.MessageData
+import com.gyleedev.chatchat.domain.model.MessageSendState
+import com.gyleedev.chatchat.domain.model.MessageType
 import com.gyleedev.chatchat.domain.usecase.GetChatRoomDataWithRelatedUserUseCase
 import com.gyleedev.chatchat.domain.usecase.GetLastMessageUseCase
 import com.gyleedev.core.BaseViewModel

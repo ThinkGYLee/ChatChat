@@ -1,16 +1,19 @@
 package com.gyleedev.chatchat.domain.usecase
 
-import com.gyleedev.chatchat.data.repository.MessageRepository
-import com.gyleedev.chatchat.domain.ChatRoomLocalData
-import com.gyleedev.chatchat.domain.MessageData
-import com.gyleedev.chatchat.domain.UserRelationState
+import com.gyleedev.chatchat.domain.model.ChatRoomLocalData
+import com.gyleedev.chatchat.domain.model.MessageData
+import com.gyleedev.chatchat.domain.model.UserRelationState
+import com.gyleedev.chatchat.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetMessagesFromRemoteUseCase @Inject constructor(
     private val repository: MessageRepository
 ) {
-    operator fun invoke(chatRoom: ChatRoomLocalData, userRelationState: UserRelationState): Flow<MessageData?> {
+    operator fun invoke(
+        chatRoom: ChatRoomLocalData,
+        userRelationState: UserRelationState
+    ): Flow<MessageData?> {
         return repository.getMessageListener(chatRoom, userRelationState)
     }
 }

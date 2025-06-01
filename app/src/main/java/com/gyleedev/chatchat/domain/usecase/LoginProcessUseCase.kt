@@ -1,8 +1,8 @@
 package com.gyleedev.chatchat.domain.usecase
 
-import com.gyleedev.chatchat.domain.LogInResult
-import com.gyleedev.chatchat.domain.LogInState
-import com.gyleedev.chatchat.domain.SearchUserResult
+import com.gyleedev.chatchat.domain.model.LogInResult
+import com.gyleedev.chatchat.domain.model.LogInState
+import com.gyleedev.chatchat.domain.model.SearchUserResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext

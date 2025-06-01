@@ -1,6 +1,6 @@
 package com.gyleedev.chatchat.domain.usecase
 
-import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.domain.model.UserData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
