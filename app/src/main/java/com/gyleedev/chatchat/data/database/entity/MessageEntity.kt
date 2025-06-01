@@ -3,9 +3,9 @@ package com.gyleedev.chatchat.data.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.gyleedev.chatchat.domain.MessageData
-import com.gyleedev.chatchat.domain.MessageSendState
-import com.gyleedev.chatchat.domain.MessageType
+import com.gyleedev.chatchat.domain.model.MessageData
+import com.gyleedev.chatchat.domain.model.MessageSendState
+import com.gyleedev.chatchat.domain.model.MessageType
 
 @Entity(
     tableName = "message"

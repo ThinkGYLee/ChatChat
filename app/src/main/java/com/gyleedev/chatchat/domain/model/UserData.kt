@@ -1,7 +1,6 @@
-package com.gyleedev.chatchat.domain
+package com.gyleedev.chatchat.domain.model
 
 import com.google.gson.annotations.SerializedName
-import com.gyleedev.chatchat.data.model.BlockedUser
 
 // User정보
 // 기본값 설정 안해주면 crash남

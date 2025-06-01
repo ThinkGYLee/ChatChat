@@ -3,7 +3,7 @@ package com.gyleedev.chatchat.ui.hidemanage
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.gyleedev.chatchat.domain.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
 import com.gyleedev.chatchat.domain.usecase.GetHideFriendsUseCase
 import com.gyleedev.chatchat.domain.usecase.GetHideFriendsWithNameUseCase
 import com.gyleedev.chatchat.domain.usecase.UserToFriendUseCase

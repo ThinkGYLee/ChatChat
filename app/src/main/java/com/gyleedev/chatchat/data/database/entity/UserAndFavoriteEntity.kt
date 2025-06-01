@@ -2,7 +2,7 @@ package com.gyleedev.chatchat.data.database.entity
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.gyleedev.chatchat.domain.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
 
 // 코스 정보
 data class UserAndFavoriteEntity(

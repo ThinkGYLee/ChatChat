@@ -1,15 +1,15 @@
 package com.gyleedev.chatchat.domain.usecase
 
-import com.gyleedev.chatchat.data.repository.ChatRoomRepository
-import com.gyleedev.chatchat.domain.ChatRoomData
-import com.gyleedev.chatchat.domain.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.model.ChatRoomData
+import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.repository.ChatRoomRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class RetrieveAndInsertChatRoomDataFromRemote @Inject constructor(
+class RetrieveAndInsertChatRoomDataFromRemoteUseCase @Inject constructor(
     private val repository: ChatRoomRepository
 ) {
     suspend operator fun invoke(relatedUserLocalData: RelatedUserLocalData): ChatRoomData? {

@@ -1,5 +1,8 @@
 package com.gyleedev.chatchat.data.repository
 
+import com.gyleedev.chatchat.domain.repository.ChatRoomRepository
+import com.gyleedev.chatchat.domain.repository.MessageRepository
+import com.gyleedev.chatchat.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.domain
+package com.gyleedev.chatchat.domain.model
 
 data class ChatRoomLocalData(
     val id: Long = 0,

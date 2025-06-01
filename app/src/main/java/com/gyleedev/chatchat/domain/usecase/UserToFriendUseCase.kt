@@ -1,7 +1,7 @@
 package com.gyleedev.chatchat.domain.usecase
 
-import com.gyleedev.chatchat.data.repository.UserRepository
-import com.gyleedev.chatchat.domain.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.repository.UserRepository
 import javax.inject.Inject
 
 class UserToFriendUseCase @Inject constructor(

@@ -1,8 +1,8 @@
 package com.gyleedev.chatchat.domain.usecase
 
 import com.gyleedev.chatchat.data.database.entity.toModel
-import com.gyleedev.chatchat.data.repository.MessageRepository
-import com.gyleedev.chatchat.domain.ChatRoomLocalData
+import com.gyleedev.chatchat.domain.model.ChatRoomLocalData
+import com.gyleedev.chatchat.domain.repository.MessageRepository
 import javax.inject.Inject
 
 class GetLastMessageUseCase @Inject constructor(

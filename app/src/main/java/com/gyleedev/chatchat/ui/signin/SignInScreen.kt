@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.chatchat.R
-import com.gyleedev.chatchat.domain.SignInResult
+import com.gyleedev.chatchat.domain.model.SignInResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

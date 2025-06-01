@@ -19,13 +19,14 @@ import com.gyleedev.chatchat.data.database.entity.toEntity
 import com.gyleedev.chatchat.data.database.entity.toModel
 import com.gyleedev.chatchat.data.database.entity.toUpdateEntity
 import com.gyleedev.chatchat.data.preference.MyDataPreference
-import com.gyleedev.chatchat.domain.ChatRoomLocalData
-import com.gyleedev.chatchat.domain.MessageData
-import com.gyleedev.chatchat.domain.MessageSendState
-import com.gyleedev.chatchat.domain.MessageType
-import com.gyleedev.chatchat.domain.ProcessResult
-import com.gyleedev.chatchat.domain.UserRelationState
-import com.gyleedev.chatchat.domain.toRemoteModel
+import com.gyleedev.chatchat.domain.model.ChatRoomLocalData
+import com.gyleedev.chatchat.domain.model.MessageData
+import com.gyleedev.chatchat.domain.model.MessageSendState
+import com.gyleedev.chatchat.domain.model.MessageType
+import com.gyleedev.chatchat.domain.model.ProcessResult
+import com.gyleedev.chatchat.domain.model.UserRelationState
+import com.gyleedev.chatchat.domain.model.toRemoteModel
+import com.gyleedev.chatchat.domain.repository.MessageRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -39,32 +40,6 @@ import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
-
-interface MessageRepository {
-    suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long
-    fun insertMessageToRemote(message: MessageData): Flow<MessageSendState>
-    suspend fun updateMessageState(messageId: Long, roomId: Long, message: MessageData)
-
-    fun getMessageListener(
-        chatRoom: ChatRoomLocalData,
-        userRelationState: UserRelationState
-    ): Flow<MessageData?>
-
-    suspend fun getLastMessage(chatRoomId: String): MessageEntity?
-
-    fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
-
-    fun getMessage(message: MessageData): Flow<MessageEntity>
-
-    suspend fun deleteLocalMessage(messageId: Long)
-
-    suspend fun resetMessageData()
-
-    suspend fun deleteRemoteMessage(message: MessageData): Flow<ProcessResult>
-
-    suspend fun deleteMessageRequest(message: MessageData): Flow<ProcessResult>
-    suspend fun sendMessage(messageData: MessageData, rid: Long, networkState: Boolean)
-}
 
 class MessageRepositoryImpl @Inject constructor(
     private val database: FirebaseDatabase,

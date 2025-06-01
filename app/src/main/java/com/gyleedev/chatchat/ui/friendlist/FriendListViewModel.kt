@@ -2,9 +2,9 @@ package com.gyleedev.chatchat.ui.friendlist
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.gyleedev.chatchat.data.model.RelatedUserRemoteData
-import com.gyleedev.chatchat.domain.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.UserData
+import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.model.RelatedUserRemoteData
+import com.gyleedev.chatchat.domain.model.UserData
 import com.gyleedev.chatchat.domain.usecase.AddMyRelatedUsersUseCase
 import com.gyleedev.chatchat.domain.usecase.BlockRelatedUserUseCase
 import com.gyleedev.chatchat.domain.usecase.DeleteFriendUseCase

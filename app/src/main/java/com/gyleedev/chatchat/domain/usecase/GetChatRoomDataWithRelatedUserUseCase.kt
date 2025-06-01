@@ -5,9 +5,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.gyleedev.chatchat.data.database.entity.toModel
-import com.gyleedev.chatchat.data.repository.ChatRoomRepository
-import com.gyleedev.chatchat.data.repository.UserRepository
-import com.gyleedev.chatchat.domain.ChatRoomDataWithRelatedUsers
+import com.gyleedev.chatchat.domain.model.ChatRoomDataWithRelatedUsers
+import com.gyleedev.chatchat.domain.repository.ChatRoomRepository
+import com.gyleedev.chatchat.domain.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

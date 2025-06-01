@@ -2,8 +2,8 @@ package com.gyleedev.chatchat.domain.usecase
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.gyleedev.chatchat.domain.MessageData
-import com.gyleedev.chatchat.domain.MessageSendState
+import com.gyleedev.chatchat.domain.model.MessageData
+import com.gyleedev.chatchat.domain.model.MessageSendState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull

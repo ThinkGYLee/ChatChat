@@ -2,8 +2,8 @@ package com.gyleedev.chatchat.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.chatchat.data.repository.UserRepository
-import com.gyleedev.chatchat.domain.UserState
+import com.gyleedev.chatchat.domain.model.UserState
+import com.gyleedev.chatchat.domain.usecase.FetchUserExistsUseCase
 import com.gyleedev.chatchat.domain.usecase.UpdateRelatedUserListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val fetchUserExistsUseCase: FetchUserExistsUseCase,
     private val updateRelatedUserListUseCase: UpdateRelatedUserListUseCase
 ) : ViewModel() {
     private val _isUserExists = MutableStateFlow(UserState.Loading)
@@ -31,7 +31,7 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun fetchUserExists() {
-        if (userRepository.fetchUserExists()) {
+        if (fetchUserExistsUseCase()) {
             _startDestination.emit(FRIENDLIST)
             _isUserExists.emit(UserState.Exists)
         } else {

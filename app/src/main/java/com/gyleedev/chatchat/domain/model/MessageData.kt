@@ -1,8 +1,7 @@
-package com.gyleedev.chatchat.domain
+package com.gyleedev.chatchat.domain.model
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.gyleedev.chatchat.data.model.MessageRemoteData
 import kotlinx.parcelize.Parcelize
 
 // 기본값 설정 안해주면 crash남

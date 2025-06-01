@@ -1,6 +1,4 @@
-package com.gyleedev.chatchat.data.model
-
-import com.gyleedev.chatchat.domain.RelatedUserLocalData
+package com.gyleedev.chatchat.domain.model
 
 data class BlockedUser(
     val uid: String = "",

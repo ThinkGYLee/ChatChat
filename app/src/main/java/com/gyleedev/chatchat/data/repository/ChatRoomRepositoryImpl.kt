@@ -9,10 +9,11 @@ import com.google.firebase.database.ValueEventListener
 import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
 import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
 import com.gyleedev.chatchat.data.database.entity.toModel
-import com.gyleedev.chatchat.domain.ChatRoomData
-import com.gyleedev.chatchat.domain.ChatRoomLocalData
-import com.gyleedev.chatchat.domain.RelatedUserLocalData
-import com.gyleedev.chatchat.domain.UserChatRoomData
+import com.gyleedev.chatchat.domain.model.ChatRoomData
+import com.gyleedev.chatchat.domain.model.ChatRoomLocalData
+import com.gyleedev.chatchat.domain.model.RelatedUserLocalData
+import com.gyleedev.chatchat.domain.model.UserChatRoomData
+import com.gyleedev.chatchat.domain.repository.ChatRoomRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -20,33 +21,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import java.util.UUID
 import javax.inject.Inject
-
-interface ChatRoomRepository {
-    fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
-    suspend fun createChatRoomData(): Flow<ChatRoomData?>
-    suspend fun createMyUserChatRoom(
-        relatedUserLocalData: RelatedUserLocalData,
-        chatRoomData: ChatRoomData
-    )
-
-    suspend fun createFriendUserChatRoom(
-        relatedUserLocalData: RelatedUserLocalData,
-        chatRoomData: ChatRoomData
-    )
-
-    fun getChatRoomIdFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<String?>
-    fun getChatRoomFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<ChatRoomData?>
-    suspend fun insertChatRoomToLocal(
-        relatedUserLocalData: RelatedUserLocalData,
-        chatRoomData: ChatRoomData
-    ): Long
-
-    suspend fun makeNewChatRoom(rid: String, receiver: String): Long
-
-    suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData
-    suspend fun resetChatRoomData()
-    fun getChatRoomListWithPaging(): PagingSource<Int, ChatRoomEntity>
-}
 
 class ChatRoomRepositoryImpl @Inject constructor(
     private val chatRoomDao: ChatRoomDao,
