@@ -45,6 +45,7 @@ data class MessageEntity(
 
 fun MessageEntity.toModel(): MessageData {
     return MessageData(
+        messageId = id,
         chatRoomId = rid,
         writer = writer,
         comment = comment,
@@ -60,7 +61,7 @@ fun MessageEntity.toModel(): MessageData {
 
 fun MessageData.toEntity(roomId: Long): MessageEntity {
     return MessageEntity(
-        id = 0,
+        id = if (messageId != 0L) messageId else 0L,
         rid = chatRoomId,
         writer = writer,
         comment = comment,

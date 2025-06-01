@@ -8,6 +8,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class MessageData(
     @SerializedName("chatRoomId") val chatRoomId: String = "",
+    @SerializedName("messageId") val messageId: Long = 0L,
     @SerializedName("writer") val writer: String = "",
     @SerializedName("comment") val comment: String = "",
     @SerializedName("type") val type: MessageType = MessageType.Text,
