@@ -2,8 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("chat.android.kotlin")
-    id("chat.android.hilt")
-    id("chat.android.room")
     alias(libs.plugins.jetbrains.kotlin.parcelize)
 }
 
@@ -23,4 +21,5 @@ android {
 
 dependencies {
     implementation(libs.google.gson)
+    implementation(libs.room.paging)
 }
