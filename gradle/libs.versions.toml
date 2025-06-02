@@ -27,7 +27,8 @@ appcompat = "1.7.0"
 material = "1.12.0"
 jetbrainsKotlinJvm = "2.1.21"
 androidTools = "31.10.1"
-coroutine = "1.10.1"
+coroutine = "1.10.2"
+browser = "1.8.0"
 
 [libraries]
 
@@ -37,6 +38,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-browser = { group = "androidx.browser", name = "browser" }
 
 ##UI
 ##Compose
@@ -55,7 +57,7 @@ androidx-lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-r
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 
 ##Appcompat
-appcompat = {module = "androidx.appcompat:appcompat", version.ref = "appcompat"}
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 
 ##Material
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
