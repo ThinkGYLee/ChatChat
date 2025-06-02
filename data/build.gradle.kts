@@ -4,6 +4,7 @@ plugins {
     id("chat.android.kotlin")
     id("chat.android.hilt")
     id("chat.android.room")
+    id("chat.android.firebase.library")
 }
 
 android {
