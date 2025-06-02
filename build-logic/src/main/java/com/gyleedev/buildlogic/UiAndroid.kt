@@ -39,7 +39,6 @@ internal fun Project.configureUiAndroid() {
     }
 
     extensions.getByType<ComposeCompilerGradlePluginExtension>().apply {
-        enableStrongSkippingMode.set(true)
         includeSourceInformation.set(true)
     }
 }
