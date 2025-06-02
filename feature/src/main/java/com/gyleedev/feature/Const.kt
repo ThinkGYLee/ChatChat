@@ -1,0 +1,18 @@
+package com.gyleedev.feature
+
+const val LOGIN = "LOGIN"
+const val SIGNIN = "SIGNIN"
+const val FRIENDLIST = "FRIENDLIST"
+const val CHATLIST = "CHATLIST"
+const val SETTING = "SETTING"
+const val FINDUSER = "FINDUSER"
+const val CHATROOM = "CHATROOM"
+const val MYINFO = "MYINFO"
+const val FRIENDINFO = "FRIENDINFO"
+const val MYINFOEDIT = "MYINFOEDIT"
+const val FRIENDEDIT = "FRIENDEDIT"
+const val FRIENDMANAGE = "FRIENDMANAGE"
+const val HIDENUSERMANAGE = "MANAGEHIDE"
+const val BLOCKEDUSERMANAGE = "MANAGEBLOCKED"
+const val CHANGELANGUAGE = "CHANGELANGUAGE"
+const val CHANGETHEME = "CHANGETHEME"
