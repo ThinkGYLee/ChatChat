@@ -2,6 +2,7 @@ package com.gyleedev.data.repository
 
 import com.gyleedev.domain.repository.ChatRoomRepository
 import com.gyleedev.domain.repository.MessageRepository
+import com.gyleedev.domain.repository.SettingRepository
 import com.gyleedev.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -23,4 +24,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindsChatRoomRepository(impl: ChatRoomRepositoryImpl): ChatRoomRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindsSettingRepository(impl: SettingRepositoryImpl): SettingRepository
 }
