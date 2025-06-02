@@ -1,8 +1,9 @@
 package com.gyleedev.chatchat.ui.setting.changetheme
 
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.chatchat.data.preference.ThemePreference
 import com.gyleedev.core.BaseViewModel
+import com.gyleedev.domain.usecase.GetThemeUseCase
+import com.gyleedev.domain.usecase.SetThemeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,19 +12,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChangeThemeViewModel @Inject constructor(
-    private val themePreference: ThemePreference
+    private val getThemeUseCase: GetThemeUseCase,
+    private val setThemeUseCase: SetThemeUseCase
 ) : BaseViewModel() {
 
     private val _currentTheme = MutableStateFlow<Int>(getTheme())
     val currentTheme: StateFlow<Int> = _currentTheme
 
     private fun getTheme(): Int {
-        return themePreference.getTheme()
+        return getThemeUseCase()
     }
 
     fun setTheme(mode: Int) {
         viewModelScope.launch {
-            this@ChangeThemeViewModel.themePreference.setTheme(mode)
+            setThemeUseCase(mode)
             _currentTheme.emit(mode)
         }
     }

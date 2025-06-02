@@ -42,6 +42,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":util"))
     implementation(project(":domain"))
+    implementation(project(":data"))
     implementation(libs.google.gson)
     implementation(libs.jsoup)
 }
