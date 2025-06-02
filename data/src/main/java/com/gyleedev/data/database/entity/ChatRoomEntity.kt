@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.data.database.entity
+package com.gyleedev.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

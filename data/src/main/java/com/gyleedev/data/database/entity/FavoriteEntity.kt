@@ -1,11 +1,10 @@
-package com.gyleedev.chatchat.data.database.entity
+package com.gyleedev.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-// 코스 정보
 @Entity(
     tableName = "favorite",
     foreignKeys = [
@@ -16,8 +15,8 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ]
-
 )
+
 data class FavoriteEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")

@@ -1,11 +1,11 @@
-package com.gyleedev.chatchat.data.database.dao
+package com.gyleedev.data.database.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
+import com.gyleedev.data.database.entity.ChatRoomEntity
 
 @Dao
 interface ChatRoomDao {

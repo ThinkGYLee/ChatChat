@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.data.repository
+package com.gyleedev.data.repository
 
 import com.gyleedev.domain.repository.ChatRoomRepository
 import com.gyleedev.domain.repository.MessageRepository

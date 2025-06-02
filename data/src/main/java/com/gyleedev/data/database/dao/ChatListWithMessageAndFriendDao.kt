@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.data.database.dao
+package com.gyleedev.data.database.dao
 
 import androidx.room.Dao
 

@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.data.preference
+package com.gyleedev.data.preference
 
 import android.content.Context
 import android.content.SharedPreferences

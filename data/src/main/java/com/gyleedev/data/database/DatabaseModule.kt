@@ -1,13 +1,13 @@
-package com.gyleedev.chatchat.data.database
+package com.gyleedev.data.database
 
 import android.content.Context
 import androidx.room.Room
-import com.gyleedev.chatchat.data.database.dao.ChatListWithMessageAndFriendDao
-import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
-import com.gyleedev.chatchat.data.database.dao.FavoriteDao
-import com.gyleedev.chatchat.data.database.dao.MessageDao
-import com.gyleedev.chatchat.data.database.dao.UserAndFavoriteDao
-import com.gyleedev.chatchat.data.database.dao.UserDao
+import com.gyleedev.data.database.dao.ChatListWithMessageAndFriendDao
+import com.gyleedev.data.database.dao.ChatRoomDao
+import com.gyleedev.data.database.dao.FavoriteDao
+import com.gyleedev.data.database.dao.MessageDao
+import com.gyleedev.data.database.dao.UserAndFavoriteDao
+import com.gyleedev.data.database.dao.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

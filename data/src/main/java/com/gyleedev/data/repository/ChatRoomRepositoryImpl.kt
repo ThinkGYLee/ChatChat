@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.data.repository
+package com.gyleedev.data.repository
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -9,9 +9,9 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.gyleedev.chatchat.data.database.dao.ChatRoomDao
-import com.gyleedev.chatchat.data.database.entity.ChatRoomEntity
-import com.gyleedev.chatchat.data.database.entity.toModel
+import com.gyleedev.data.database.dao.ChatRoomDao
+import com.gyleedev.data.database.entity.ChatRoomEntity
+import com.gyleedev.data.database.entity.toModel
 import com.gyleedev.domain.model.ChatRoomData
 import com.gyleedev.domain.model.ChatRoomLocalData
 import com.gyleedev.domain.model.RelatedUserLocalData

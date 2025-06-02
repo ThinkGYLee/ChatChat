@@ -1,4 +1,4 @@
-package com.gyleedev.chatchat.data.repository
+package com.gyleedev.data.repository
 
 import android.net.Uri
 import android.os.Build
@@ -14,17 +14,17 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
-import com.gyleedev.chatchat.data.database.dao.FavoriteDao
-import com.gyleedev.chatchat.data.database.dao.UserAndFavoriteDao
-import com.gyleedev.chatchat.data.database.dao.UserDao
-import com.gyleedev.chatchat.data.database.entity.FavoriteEntity
-import com.gyleedev.chatchat.data.database.entity.UserEntity
-import com.gyleedev.chatchat.data.database.entity.toEntity
-import com.gyleedev.chatchat.data.database.entity.toEntityAsFriend
-import com.gyleedev.chatchat.data.database.entity.toLocalData
-import com.gyleedev.chatchat.data.database.entity.toModel
-import com.gyleedev.chatchat.data.database.entity.toRelationLocalData
-import com.gyleedev.chatchat.data.preference.MyDataPreference
+import com.gyleedev.data.database.dao.FavoriteDao
+import com.gyleedev.data.database.dao.UserAndFavoriteDao
+import com.gyleedev.data.database.dao.UserDao
+import com.gyleedev.data.database.entity.FavoriteEntity
+import com.gyleedev.data.database.entity.UserEntity
+import com.gyleedev.data.database.entity.toEntity
+import com.gyleedev.data.database.entity.toEntityAsFriend
+import com.gyleedev.data.database.entity.toLocalData
+import com.gyleedev.data.database.entity.toModel
+import com.gyleedev.data.database.entity.toRelationLocalData
+import com.gyleedev.data.preference.MyDataPreference
 import com.gyleedev.domain.model.BlockedUser
 import com.gyleedev.domain.model.ChangeRelationResult
 import com.gyleedev.domain.model.LogInResult
