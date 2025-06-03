@@ -22,9 +22,13 @@ class SignInViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _idQuery = MutableStateFlow("")
+    val idQuery: StateFlow<String> = _idQuery
     private val _nicknameQuery = MutableStateFlow("")
+    val nicknameQuery: StateFlow<String> = _nicknameQuery
     private val _passwordQuery = MutableStateFlow("")
+    val passwordQuery: StateFlow<String> = _passwordQuery
     private val _passwordCheckQuery = MutableStateFlow("")
+    val passwordCheckQuery: StateFlow<String> = _passwordCheckQuery
 
     private val _idIsAvailable = MutableStateFlow(false)
     val idIsAvailable: StateFlow<Boolean> = _idIsAvailable
