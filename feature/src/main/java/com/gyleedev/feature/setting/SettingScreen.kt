@@ -53,6 +53,9 @@ fun SettingScreen(
     onLogoutRequest: () -> Unit,
     onLanguageRequest: () -> Unit,
     onThemeRequest: () -> Unit,
+    onConversationRequest: () -> Unit,
+    onManageAccountRequest: () -> Unit,
+    onMyInformationRequest: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
@@ -79,10 +82,10 @@ fun SettingScreen(
                         onClick = {
                             when (it) {
                                 SettingEvent.LANGUAGE -> onLanguageRequest()
-                                SettingEvent.ACCOUNT -> {}
-                                SettingEvent.MYINFORMATION -> {}
+                                SettingEvent.ACCOUNT -> onManageAccountRequest()
+                                SettingEvent.MYINFORMATION -> onMyInformationRequest()
                                 SettingEvent.THEME -> onThemeRequest()
-                                SettingEvent.CHAT -> {}
+                                SettingEvent.CHAT -> onConversationRequest()
                             }
                         },
                         settingItems = it
