@@ -115,7 +115,8 @@ fun MyInfoScreen(
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .clickable { onChatRoomClick(requireNotNull(userData).uid) }) {
+                        .clickable { onChatRoomClick(requireNotNull(userData).uid) }
+                ) {
                     Column(
                         modifier = Modifier.padding(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -131,7 +132,8 @@ fun MyInfoScreen(
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .clickable { onProfileEditClick(requireNotNull(userData?.uid)) }) {
+                        .clickable { onProfileEditClick(requireNotNull(userData?.uid)) }
+                ) {
                     Column(
                         modifier = Modifier.padding(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally

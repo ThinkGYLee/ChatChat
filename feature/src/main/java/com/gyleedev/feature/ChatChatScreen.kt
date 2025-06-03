@@ -150,7 +150,7 @@ fun ChatChatScreen(
                     onMyInformationRequest = {
                         navController.navigate(BottomNavItem.MyInformationSetting.screenRoute)
                     },
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 
