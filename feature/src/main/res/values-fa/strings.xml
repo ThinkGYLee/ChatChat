@@ -46,7 +46,7 @@
     <string name="login_box_facebook_text">facebook</string>
     <string name="login_box_google_text">google</string>
     <string name="id_text_field_hint">شناسه</string>
-    <string name="nickname_text_field_hint">شناسه</string>
+    <string name="nickname_text_field_hint">نام مستعار</string>
     <string name="password_text_field_hint">رمز عبور</string>
     <string name="password_check_text_field_hint">دوباره وارد کنید</string>
     <string name="password_available_text">لطفاً حداقل ۸ کاراکتر وارد کنید</string>

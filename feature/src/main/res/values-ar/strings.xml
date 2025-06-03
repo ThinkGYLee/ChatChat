@@ -46,7 +46,7 @@
     <string name="login_box_facebook_text">facebook</string>
     <string name="login_box_google_text">google</string>
     <string name="id_text_field_hint">المعرف</string>
-    <string name="nickname_text_field_hint">المعرف</string>
+    <string name="nickname_text_field_hint">اسم مستعار</string>
     <string name="password_text_field_hint">كلمة المرور</string>
     <string name="password_check_text_field_hint">أدخل مرة أخرى</string>
     <string name="password_available_text">يرجى إدخال 8 أحرف على الأقل</string>
