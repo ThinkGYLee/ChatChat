@@ -20,6 +20,10 @@ dependencyResolutionManagement {
     }
 }
 
+plugins {
+    id("com.gradle.develocity") version("4.0.2")
+}
+
 rootProject.name = "ChatChat"
 include(":app")
 include(":core")

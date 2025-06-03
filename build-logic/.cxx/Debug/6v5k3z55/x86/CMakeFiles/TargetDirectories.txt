@@ -1,3 +1,0 @@
-/Users/geumyonglee/AndroidStudioProjects/ChatChat/build-logic/.cxx/Debug/6v5k3z55/x86/CMakeFiles/build_logic.dir
-/Users/geumyonglee/AndroidStudioProjects/ChatChat/build-logic/.cxx/Debug/6v5k3z55/x86/CMakeFiles/edit_cache.dir
-/Users/geumyonglee/AndroidStudioProjects/ChatChat/build-logic/.cxx/Debug/6v5k3z55/x86/CMakeFiles/rebuild_cache.dir
