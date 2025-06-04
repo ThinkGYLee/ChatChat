@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -152,16 +153,23 @@ fun FriendInfoScreen(
             Text(text = friendData?.status ?: stringResource(R.string.blank_text))
             Spacer(modifier = Modifier.height(60.dp))
             Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Column(
-                    modifier = Modifier.clickable { friendData?.let { onChatRoomClick(it.uid) } },
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { friendData?.let { onChatRoomClick(it.uid) } }
+
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Email,
-                        contentDescription = stringResource(R.string.message_button_description)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = stringResource(R.string.message_button_message))
+                    Column(
+                        modifier = Modifier.padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Email,
+                            contentDescription = stringResource(R.string.message_button_description)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = stringResource(R.string.message_button_message))
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(72.dp))

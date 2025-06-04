@@ -1,1 +1,0 @@
-/Users/geumyonglee/AndroidStudioProjects/ChatChat/build-logic/src/main/cpp/CMakeLists.txt

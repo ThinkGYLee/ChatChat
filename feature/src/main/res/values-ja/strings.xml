@@ -46,7 +46,7 @@
     <string name="login_box_facebook_text">facebook</string>
     <string name="login_box_google_text">google</string>
     <string name="id_text_field_hint">ID</string>
-    <string name="nickname_text_field_hint">ID</string>
+    <string name="nickname_text_field_hint">ニックネーム</string>
     <string name="password_text_field_hint">パスワード</string>
     <string name="password_check_text_field_hint">もう一度入力してください</string>
     <string name="password_available_text">8文字以上入力してください</string>

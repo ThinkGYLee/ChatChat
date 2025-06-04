@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/Users/geumyonglee/AndroidStudioProjects/ChatChat/build-logic/.cxx/Debug/6v5k3z55/x86",
-  "command": "/Users/geumyonglee/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=i686-none-linux-android24 --sysroot=/Users/geumyonglee/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dbuild_logic_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC -o CMakeFiles/build_logic.dir/build_logic.cpp.o -c /Users/geumyonglee/AndroidStudioProjects/ChatChat/build-logic/src/main/cpp/build_logic.cpp",
-  "file": "/Users/geumyonglee/AndroidStudioProjects/ChatChat/build-logic/src/main/cpp/build_logic.cpp"
-}
-]

@@ -45,7 +45,7 @@
     <string name="login_box_facebook_text">facebook</string>
     <string name="login_box_google_text">google</string>
     <string name="id_text_field_hint">아이디</string>
-    <string name="nickname_text_field_hint">아이디</string>
+    <string name="nickname_text_field_hint">닉네임</string>
     <string name="password_text_field_hint">비밀번호</string>
     <string name="password_check_text_field_hint">다시 한번 입력하세요</string>
     <string name="password_available_text">8자리 이상을 입력해 주세요</string>

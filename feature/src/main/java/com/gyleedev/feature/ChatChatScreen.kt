@@ -44,6 +44,9 @@ import com.gyleedev.feature.myinfoedit.MyInfoEditScreen
 import com.gyleedev.feature.setting.SettingScreen
 import com.gyleedev.feature.setting.changelanguage.ChangeLanguageScreen
 import com.gyleedev.feature.setting.changetheme.ChangeThemeScreen
+import com.gyleedev.feature.setting.conversation.ConversationScreen
+import com.gyleedev.feature.setting.manageaccount.ManageAccountScreen
+import com.gyleedev.feature.setting.myinformation.MyInformationScreen
 import com.gyleedev.feature.signin.SignInScreen
 
 @Composable
@@ -137,6 +140,15 @@ fun ChatChatScreen(
                     },
                     onThemeRequest = {
                         navController.navigate(BottomNavItem.ChangeTheme.screenRoute)
+                    },
+                    onConversationRequest = {
+                        navController.navigate(BottomNavItem.Conversation.screenRoute)
+                    },
+                    onManageAccountRequest = {
+                        navController.navigate(BottomNavItem.ManageAccount.screenRoute)
+                    },
+                    onMyInformationRequest = {
+                        navController.navigate(BottomNavItem.MyInformationSetting.screenRoute)
                     },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -262,6 +274,30 @@ fun ChatChatScreen(
             ) {
                 ChangeThemeScreen(
                     onBackClick = { navController.navigateUp() }
+                )
+            }
+
+            composable(
+                route = BottomNavItem.Conversation.screenRoute
+            ) {
+                ConversationScreen(
+                    onBackButtonClicked = { navController.navigateUp() }
+                )
+            }
+
+            composable(
+                route = BottomNavItem.ManageAccount.screenRoute
+            ) {
+                ManageAccountScreen(
+                    onBackButtonClicked = { navController.navigateUp() }
+                )
+            }
+
+            composable(
+                route = BottomNavItem.MyInformationSetting.screenRoute
+            ) {
+                MyInformationScreen(
+                    onBackButtonClicked = { navController.navigateUp() }
                 )
             }
         }
@@ -415,5 +451,20 @@ sealed class BottomNavItem(
     data object ChangeTheme : BottomNavItem(
         Icons.Outlined.ThumbUp,
         CHANGETHEME
+    )
+
+    data object Conversation : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        CONVERSATION
+    )
+
+    data object ManageAccount : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        MANAGEACCOUNT
+    )
+
+    data object MyInformationSetting : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        MYINFORMATIONSETTING
     )
 }

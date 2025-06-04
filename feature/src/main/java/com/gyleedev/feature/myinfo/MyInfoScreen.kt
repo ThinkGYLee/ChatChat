@@ -2,7 +2,9 @@ package com.gyleedev.feature.myinfo
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -110,31 +112,39 @@ fun MyInfoScreen(
             Text(text = userData?.status ?: stringResource(R.string.blank_text))
             Spacer(modifier = Modifier.height(60.dp))
             Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Absolute.SpaceEvenly) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { onChatRoomClick(requireNotNull(userData).uid) }
                 ) {
-                    IconButton(
-                        onClick = { onChatRoomClick(requireNotNull(userData).uid) }
+                    Column(
+                        modifier = Modifier.padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Email,
                             contentDescription = stringResource(R.string.message_button_description)
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = stringResource(R.string.message_button_message))
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = stringResource(R.string.message_button_message))
                 }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    IconButton(
-                        onClick = { onProfileEditClick(requireNotNull(userData?.uid)) }
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { onProfileEditClick(requireNotNull(userData?.uid)) }
+                ) {
+                    Column(
+                        modifier = Modifier.padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
                             contentDescription = stringResource(R.string.edit_button_description)
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = stringResource(R.string.edit_button_message))
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = stringResource(R.string.edit_button_message))
                 }
             }
             Spacer(modifier = Modifier.height(72.dp))
