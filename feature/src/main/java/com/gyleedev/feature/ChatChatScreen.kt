@@ -47,7 +47,7 @@ import com.gyleedev.feature.setting.changetheme.ChangeThemeScreen
 import com.gyleedev.feature.setting.conversation.ConversationScreen
 import com.gyleedev.feature.setting.manageaccount.ManageAccountScreen
 import com.gyleedev.feature.setting.myinformation.MyInformationScreen
-import com.gyleedev.feature.signin.SignInScreen
+import com.gyleedev.feature.signin.SigninScreen
 
 @Composable
 fun ChatChatScreen(
@@ -115,7 +115,7 @@ fun ChatChatScreen(
             }
 
             composable(route = BottomNavItem.Signin.screenRoute) {
-                SignInScreen(
+                SigninScreen(
                     modifier = Modifier.fillMaxSize(),
                     onSignInComplete = {
                         navController.navigate(BottomNavItem.ChatList.screenRoute) {
