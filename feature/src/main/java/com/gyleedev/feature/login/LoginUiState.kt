@@ -1,6 +1,6 @@
 package com.gyleedev.feature.login
 
-interface LoginUiState {
+sealed interface LoginUiState {
     data object Loading : LoginUiState
     data class Success(
         val idQuery: String,
