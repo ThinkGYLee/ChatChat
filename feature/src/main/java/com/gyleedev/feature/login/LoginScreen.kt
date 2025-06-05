@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,8 +30,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -42,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.domain.model.LogInState
 import com.gyleedev.feature.R
+import com.gyleedev.feature.component.TextField
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,6 +73,8 @@ fun LoginScreen(
         }
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
         viewModel.logInResult.collect {
@@ -99,11 +106,14 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
+                        .imePadding()
                 ) {
-                    // TODO 키보드 내리기 로그인 할 떄
                     Button(
                         enabled = state.loginIsAvailable,
-                        onClick = viewModel::logInButtonClick,
+                        onClick = {
+                            focusManager.clearFocus()
+                            viewModel.logInButtonClick()
+                        },
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors().copy(
                             disabledContainerColor = ButtonDefaults.buttonColors().containerColor.copy(
@@ -156,7 +166,7 @@ fun LoginScreen(
                     .padding(horizontal = 24.dp)
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
-                com.gyleedev.feature.component.TextField(
+                TextField(
                     value = state.idQuery,
                     onValueChange = {
                         viewModel.editId(it)
@@ -173,7 +183,7 @@ fun LoginScreen(
                     color = Color.Red
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                com.gyleedev.feature.component.TextField(
+                TextField(
                     value = state.passwordQuery,
                     onValueChange = {
                         viewModel.editPassword(it)
@@ -183,7 +193,8 @@ fun LoginScreen(
                         imeAction = ImeAction.Done,
                         keyboardType = KeyboardType.Password
                     ),
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.focusRequester(focusRequester)
                 )
                 Text(
                     text = passwordComment,
