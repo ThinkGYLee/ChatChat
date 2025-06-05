@@ -52,13 +52,6 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    /**
-     * - ui State 구조로 받아오기 sealed interface, Loading, Success
-     * - toast -> snackbar로 변경
-     * - 버튼 -> bottomBar로 이동
-     * - 텍스트 필드 공통 컴포넌트 구조로 변경
-     *
-     */
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val idComment =
