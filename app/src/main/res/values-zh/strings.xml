@@ -46,7 +46,7 @@
     <string name="login_box_facebook_text">facebook</string>
     <string name="login_box_google_text">google</string>
     <string name="id_text_field_hint">ID</string>
-    <string name="nickname_text_field_hint">ID</string>
+    <string name="nickname_text_field_hint">昵称</string>
     <string name="password_text_field_hint">密码</string>
     <string name="password_check_text_field_hint">请再次输入</string>
     <string name="password_available_text">请输入至少8个字符</string>

@@ -46,7 +46,7 @@
     <string name="login_box_facebook_text">facebook</string>
     <string name="login_box_google_text">google</string>
     <string name="id_text_field_hint">ID</string>
-    <string name="nickname_text_field_hint">ID</string>
+    <string name="nickname_text_field_hint">apelido</string>
     <string name="password_text_field_hint">Senha</string>
     <string name="password_check_text_field_hint">Digite novamente</string>
     <string name="password_available_text">Por favor, digite pelo menos 8 caracteres</string>
