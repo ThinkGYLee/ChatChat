@@ -1,6 +1,5 @@
 package com.gyleedev.feature.signin
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -10,15 +9,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -37,11 +44,14 @@ import com.gyleedev.feature.component.TextField
 @Composable
 fun SigninScreen(
     onSignInComplete: () -> Unit,
+    onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SigninViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val idComment =
         if (uiState is SigninUiState.Loading || (uiState as SigninUiState.Success).idIsAvailable || (uiState as SigninUiState.Success).idQuery.isEmpty()) {
@@ -73,18 +83,16 @@ fun SigninScreen(
     LaunchedEffect(Unit) {
         viewModel.signInProgress.collect {
             if (it == SignInResult.Success) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.sign_in_success_message),
-                    Toast.LENGTH_SHORT
-                ).show()
+                snackbarHostState.showSnackbar(
+                    message = context.getString(R.string.sign_in_success_message),
+                    duration = SnackbarDuration.Short
+                )
                 onSignInComplete()
             } else {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.sign_in_failure_message),
-                    Toast.LENGTH_SHORT
-                ).show()
+                snackbarHostState.showSnackbar(
+                    message = context.getString(R.string.sign_in_failure_message),
+                    duration = SnackbarDuration.Short
+                )
             }
         }
     }
@@ -92,10 +100,19 @@ fun SigninScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(R.string.signin_screen_title)) }
+                title = { Text(text = stringResource(R.string.signin_screen_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBackPressed) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                        )
+                    }
+                }
             )
         },
         modifier = modifier,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             if (uiState is SigninUiState.Success) {
                 Column(
@@ -144,7 +161,7 @@ fun SigninScreen(
                     color = Color.Red
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                Text(text = "Nickname")
+                Text(text = stringResource(R.string.nickname_text_field_hint))
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
                     value = (uiState as SigninUiState.Success).nicknameQuery,
@@ -179,7 +196,7 @@ fun SigninScreen(
                     color = Color.Red
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Confirm Password")
+                Text(text = stringResource(R.string.password_check_text_field_hint))
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
                     value = (uiState as SigninUiState.Success).passwordCheckQuery,
