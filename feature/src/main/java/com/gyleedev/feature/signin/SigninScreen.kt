@@ -178,7 +178,8 @@ fun SigninScreen(
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Email
-                    )
+                    ),
+                    modifier = Modifier.focusRequester(focusRequester)
                 )
                 Text(
                     text = idComment,
@@ -194,7 +195,8 @@ fun SigninScreen(
                     hint = stringResource(R.string.nickname_text_field_hint),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next
-                    )
+                    ),
+                    modifier = Modifier.focusRequester(focusRequester)
                 )
                 Text(
                     text = nickNameComment,
@@ -212,7 +214,8 @@ fun SigninScreen(
                         imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Password
                     ),
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.focusRequester(focusRequester)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
