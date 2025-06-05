@@ -57,7 +57,6 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val idComment =
         if (uiState is LoginUiState.Loading || (uiState as LoginUiState.Success).idIsAvailable || (uiState as LoginUiState.Success).idQuery.isEmpty()) {

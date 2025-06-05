@@ -68,7 +68,7 @@ fun SigninScreen(
     val columnScrollState = rememberScrollState()
 
     LaunchedEffect(isLastTextFieldFocused) {
-        if(isLastTextFieldFocused) {
+        if (isLastTextFieldFocused) {
             columnScrollState.animateScrollBy(100f)
         }
     }
