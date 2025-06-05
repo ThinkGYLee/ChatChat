@@ -123,7 +123,8 @@ fun ChatChatScreen(
                                 inclusive = true
                             }
                         }
-                    }
+                    },
+                    onBackPressed = { navController.navigateUp() }
                 )
             }
             composable(route = BottomNavItem.Setting.screenRoute) {

@@ -46,7 +46,7 @@
     <string name="login_box_facebook_text">facebook</string>
     <string name="login_box_google_text">google</string>
     <string name="id_text_field_hint">ID</string>
-    <string name="nickname_text_field_hint">ID</string>
+    <string name="nickname_text_field_hint">nama panggilan</string>
     <string name="password_text_field_hint">Kata sandi</string>
     <string name="password_check_text_field_hint">Masukkan lagi</string>
     <string name="password_available_text">Silakan masukkan minimal 8 karakter</string>
