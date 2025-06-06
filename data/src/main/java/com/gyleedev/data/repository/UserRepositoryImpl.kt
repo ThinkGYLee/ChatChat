@@ -8,6 +8,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -25,6 +26,7 @@ import com.gyleedev.data.database.entity.toLocalData
 import com.gyleedev.data.database.entity.toModel
 import com.gyleedev.data.database.entity.toRelationLocalData
 import com.gyleedev.data.preference.MyDataPreference
+import com.gyleedev.data.preference.PasswordPreference
 import com.gyleedev.domain.model.BlockedUser
 import com.gyleedev.domain.model.ChangeRelationResult
 import com.gyleedev.domain.model.LogInResult
@@ -59,7 +61,8 @@ class UserRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val favoriteDao: FavoriteDao,
     private val userAndFavoriteDao: UserAndFavoriteDao,
-    private val myDataPreference: MyDataPreference
+    private val myDataPreference: MyDataPreference,
+    private val passwordPreference: PasswordPreference
 ) : UserRepository {
 
     private val imageStorageReference = storage.getReference("image")
@@ -83,6 +86,7 @@ class UserRepositoryImpl @Inject constructor(
                 verified = false
             )
             setMyUserInformation(myData)
+            passwordPreference.setPassword(password)
             trySend(myData)
         }.addOnFailureListener {
             trySend(null)
@@ -166,6 +170,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun fetchUserState(): UserState {
         val authState = auth.currentUser != null
+        println(authState)
         return if (authState) {
             val verified = getMyUserDataFromPreference().verified
             if (verified) {
@@ -869,4 +874,33 @@ class UserRepositoryImpl @Inject constructor(
                 })
             awaitClose()
         }
+
+    override suspend fun cancelSigninRequest(): Boolean {
+        val cancelResult = cancelSignin().first()
+        if (cancelResult) {
+            resetMyUserData()
+            passwordPreference.setPassword("default_password")
+        }
+        return cancelResult
+    }
+
+    private fun reauthenticate() {
+        val user = auth.currentUser!!
+        val credential = EmailAuthProvider
+            .getCredential(myDataPreference.getMyData().email, passwordPreference.getPassword())
+        user.reauthenticate(credential)
+    }
+
+    private fun cancelSignin(): Flow<Boolean> = callbackFlow {
+        reauthenticate()
+        auth.currentUser!!.delete().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                auth.signOut()
+                trySend(true)
+            } else {
+                trySend(false)
+            }
+        }
+        awaitClose()
+    }
 }
