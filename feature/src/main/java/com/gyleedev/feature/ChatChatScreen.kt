@@ -48,6 +48,7 @@ import com.gyleedev.feature.setting.conversation.ConversationScreen
 import com.gyleedev.feature.setting.manageaccount.ManageAccountScreen
 import com.gyleedev.feature.setting.myinformation.MyInformationScreen
 import com.gyleedev.feature.signin.SigninScreen
+import com.gyleedev.feature.verifyemail.VerifyEmailScreen
 
 @Composable
 fun ChatChatScreen(
@@ -118,7 +119,7 @@ fun ChatChatScreen(
                 SigninScreen(
                     modifier = Modifier.fillMaxSize(),
                     onSignInComplete = {
-                        navController.navigate(BottomNavItem.ChatList.screenRoute) {
+                        navController.navigate(BottomNavItem.VerifyEmail.screenRoute) {
                             popUpTo(BottomNavItem.Login.screenRoute) {
                                 inclusive = true
                             }
@@ -301,6 +302,20 @@ fun ChatChatScreen(
                     onBackButtonClicked = { navController.navigateUp() }
                 )
             }
+
+            composable(
+                route = BottomNavItem.VerifyEmail.screenRoute
+            ) {
+                VerifyEmailScreen(
+                    onSigninCancel = {
+                        navController.navigate(BottomNavItem.Login.screenRoute) {
+                            popUpTo(BottomNavItem.Login.screenRoute) {
+                                inclusive  = true
+                            }
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -467,5 +482,10 @@ sealed class BottomNavItem(
     data object MyInformationSetting : BottomNavItem(
         Icons.Outlined.ThumbUp,
         MYINFORMATIONSETTING
+    )
+
+    data object VerifyEmail: BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        VERIFYEMAIL
     )
 }
