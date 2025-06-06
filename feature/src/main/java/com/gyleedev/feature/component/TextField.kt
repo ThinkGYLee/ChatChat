@@ -15,12 +15,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TextField(
-    hint: String,
     value: String,
     onValueChange: (String) -> Unit,
-    keyboardOptions: KeyboardOptions,
     modifier: Modifier = Modifier,
-    visualTransformation: VisualTransformation = VisualTransformation.None
+    enabled: Boolean = true,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(),
+    hint: String = "",
 ) {
     TextField(
         value = value,
@@ -39,6 +40,7 @@ fun TextField(
             unfocusedIndicatorColor = Color.Transparent
         ),
         keyboardOptions = keyboardOptions,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        enabled = enabled
     )
 }
