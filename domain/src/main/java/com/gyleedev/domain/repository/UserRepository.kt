@@ -68,4 +68,5 @@ interface UserRepository {
     fun addUserToRemoteBlockedEntity(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult>
     suspend fun searchUserRequest(email: String): Flow<SearchUserResult>
     suspend fun searchUser(email: String): Flow<UserData?>
+    suspend fun cancelSigninRequest(): Boolean
 }
