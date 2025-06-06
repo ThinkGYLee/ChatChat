@@ -35,6 +35,7 @@ import com.gyleedev.domain.model.SearchUserResult
 import com.gyleedev.domain.model.SignInResult
 import com.gyleedev.domain.model.UserData
 import com.gyleedev.domain.model.UserRelationState
+import com.gyleedev.domain.model.UserState
 import com.gyleedev.domain.model.toBlockedUser
 import com.gyleedev.domain.model.toRelatedUserLocalData
 import com.gyleedev.domain.model.toRemoteData
@@ -163,8 +164,19 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override fun fetchUserExists(): Boolean {
-        return auth.currentUser != null
+    override fun fetchUserState(): UserState {
+        val authState = auth.currentUser != null
+        return if (authState) {
+            val verified = getMyUserDataFromPreference().verified
+            if (verified) {
+                UserState.Verified
+            } else {
+                UserState.UnVerified
+            }
+        } else {
+            UserState.NoUser
+        }
+
     }
 
     override suspend fun getMyDataFromRemote(): Flow<UserData?> = callbackFlow {

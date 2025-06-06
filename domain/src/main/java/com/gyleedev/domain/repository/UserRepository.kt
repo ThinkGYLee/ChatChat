@@ -10,6 +10,7 @@ import com.gyleedev.domain.model.SearchUserResult
 import com.gyleedev.domain.model.SignInResult
 import com.gyleedev.domain.model.UserData
 import com.gyleedev.domain.model.UserRelationState
+import com.gyleedev.domain.model.UserState
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
@@ -19,7 +20,7 @@ interface UserRepository {
     suspend fun loginRequest(id: String, password: String): Flow<LogInResult>
     suspend fun logoutRequest()
 
-    fun fetchUserExists(): Boolean
+    fun fetchUserState(): UserState
     suspend fun writeUserToRemote(user: UserData): Flow<SignInResult>
     suspend fun getMyDataFromRemote(): Flow<UserData?>
     suspend fun addRelatedUserToRemote(
