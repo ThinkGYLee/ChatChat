@@ -22,7 +22,8 @@ class MyDataPreferenceImpl(@ApplicationContext context: Context) : MyDataPrefere
             uid = myDataPreference.getString("Uid", "default uid") as String,
             name = myDataPreference.getString("Name", "default name") as String,
             picture = myDataPreference.getString("Picture", "default picture") as String,
-            status = myDataPreference.getString("Status", "default status") as String
+            status = myDataPreference.getString("Status", "default status") as String,
+            verified = myDataPreference.getBoolean("Verified", false)
         )
     }
 
@@ -32,5 +33,6 @@ class MyDataPreferenceImpl(@ApplicationContext context: Context) : MyDataPrefere
         myDataPreference.edit { putString("Uid", user.uid) }
         myDataPreference.edit { putString("Picture", user.picture) }
         myDataPreference.edit { putString("Status", user.status) }
+        myDataPreference.edit { putBoolean("Verified", user.verified) }
     }
 }

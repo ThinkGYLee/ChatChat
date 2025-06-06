@@ -78,7 +78,8 @@ class UserRepositoryImpl @Inject constructor(
                 name = nickname,
                 uid = task.user!!.uid,
                 picture = " ",
-                status = " "
+                status = " ",
+                verified = false
             )
             setMyUserInformation(myData)
             trySend(myData)
@@ -210,7 +211,8 @@ class UserRepositoryImpl @Inject constructor(
             picture = user.picture,
             status = user.status,
             userRelation = userRelation,
-            favoriteState = false
+            favoriteState = false,
+            verified = user.verified
         )
         auth.currentUser?.let {
             database.reference.child("relations").child(it.uid).child(user.uid).setValue(relation)
@@ -389,7 +391,8 @@ class UserRepositoryImpl @Inject constructor(
             name = user.name,
             status = user.status,
             uid = user.uid,
-            picture = imagePath
+            picture = imagePath,
+            verified = user.verified
         )
         database.reference.child("users").child(user.uid).setValue(userData)
             .addOnSuccessListener {
@@ -597,7 +600,8 @@ class UserRepositoryImpl @Inject constructor(
                 status = userData.status,
                 favoriteState = false,
                 picture = userData.picture,
-                userRelation = UserRelationState.BLOCKED
+                userRelation = UserRelationState.BLOCKED,
+                verified = userData.verified
             )
             val remoteAddRequest = addRelatedUserToRemote(
                 user = userData,

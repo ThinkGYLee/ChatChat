@@ -27,7 +27,9 @@ data class UserEntity(
     @ColumnInfo(name = "relation")
     val relation: UserRelationState,
     @ColumnInfo(name = "favoriteState")
-    val favoriteState: Boolean
+    val favoriteState: Boolean,
+    @ColumnInfo(name = "verified")
+    val verified: Boolean
 )
 
 fun RelatedUserLocalData.toEntity(): UserEntity {
@@ -39,7 +41,8 @@ fun RelatedUserLocalData.toEntity(): UserEntity {
         picture = picture,
         status = status,
         relation = userRelation,
-        favoriteState = favoriteState
+        favoriteState = favoriteState,
+        verified = verified
     )
 }
 
@@ -52,7 +55,8 @@ fun UserEntity.toRelationLocalData(): RelatedUserLocalData {
         picture = picture,
         status = status,
         userRelation = relation,
-        favoriteState = favoriteState
+        favoriteState = favoriteState,
+        verified = verified
     )
 }
 
@@ -62,7 +66,8 @@ fun UserEntity.toModel(): UserData {
         email = email,
         uid = uid,
         picture = picture,
-        status = status
+        status = status,
+        verified = verified
     )
 }
 
@@ -75,6 +80,7 @@ fun UserData.toEntityAsFriend(): UserEntity {
         picture = picture,
         status = status,
         relation = UserRelationState.FRIEND,
-        favoriteState = false
+        favoriteState = false,
+        verified = verified
     )
 }
