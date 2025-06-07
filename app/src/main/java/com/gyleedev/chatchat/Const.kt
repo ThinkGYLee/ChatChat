@@ -1,4 +1,4 @@
-package com.gyleedev.feature
+package com.gyleedev.chatchat
 
 const val LOGIN = "LOGIN"
 const val SIGNIN = "SIGNIN"

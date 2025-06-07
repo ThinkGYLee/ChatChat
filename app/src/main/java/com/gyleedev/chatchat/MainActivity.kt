@@ -1,4 +1,4 @@
-package com.gyleedev.feature
+package com.gyleedev.chatchat
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
