@@ -1,4 +1,4 @@
-package com.gyleedev.feature
+package com.gyleedev.chatchat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

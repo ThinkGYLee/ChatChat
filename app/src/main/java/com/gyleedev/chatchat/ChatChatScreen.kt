@@ -1,4 +1,4 @@
-package com.gyleedev.feature
+package com.gyleedev.chatchat
 
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.gyleedev.feature.R
 import com.gyleedev.feature.blockmanage.BlockManageScreen
 import com.gyleedev.feature.chatlist.ChatListScreen
 import com.gyleedev.feature.chatroom.ChatRoomScreen
