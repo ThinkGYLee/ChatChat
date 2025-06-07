@@ -26,7 +26,7 @@ object PreferenceModule {
 
     @Singleton
     @Provides
-    fun providesPasswordPreference(@ApplicationContext context: Context): PasswordPreference {
-        return PasswordPreferenceImpl(context)
+    fun providesPasswordPreference(@ApplicationContext context: Context): AuthenticationPreference {
+        return AuthenticationPreferenceImpl(context)
     }
 }
