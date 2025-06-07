@@ -310,7 +310,14 @@ fun ChatChatScreen(
                     onSigninCancel = {
                         navController.navigate(BottomNavItem.Login.screenRoute) {
                             popUpTo(BottomNavItem.Login.screenRoute) {
-                                inclusive  = true
+                                inclusive = true
+                            }
+                        }
+                    },
+                    onSigninComplete = {
+                        navController.navigate(BottomNavItem.FriendList.screenRoute) {
+                            popUpTo(BottomNavItem.FriendList.screenRoute) {
+                                inclusive = true
                             }
                         }
                     }
@@ -484,7 +491,7 @@ sealed class BottomNavItem(
         MYINFORMATIONSETTING
     )
 
-    data object VerifyEmail: BottomNavItem(
+    data object VerifyEmail : BottomNavItem(
         Icons.Outlined.ThumbUp,
         VERIFYEMAIL
     )
