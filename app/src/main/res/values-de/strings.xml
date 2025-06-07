@@ -152,4 +152,12 @@
     <string name="theme_light">Heller Modus</string>
     <string name="theme_dark">Dunkler Modus</string>
     <string name="theme_system">Systemstandard</string>
+    <string name="verify_email_cancel_message">Registrierung wurde storniert.</string>
+    <string name="verify_email_success_message">E-Mail-Verifizierung erfolgreich.</string>
+    <string name="verify_email_failure_message">E-Mail-Verifizierung konnte nicht bestätigt werden.</string>
+    <string name="verify_email_screen_title">E-Mail verifizieren</string>
+    <string name="verify_email_label">E-Mail</string>
+    <string name="verify_email_button">Verifizieren</string>
+    <string name="verify_email_check_button">Verifizierung prüfen</string>
+    <string name="verify_email_cancel_button">Registrierung abbrechen</string>
 </resources> 

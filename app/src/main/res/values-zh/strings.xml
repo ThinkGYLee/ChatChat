@@ -152,4 +152,12 @@
     <string name="theme_light">浅色模式</string>
     <string name="theme_dark">深色模式</string>
     <string name="theme_system">系统默认</string>
+    <string name="verify_email_cancel_message">注册已取消。</string>
+    <string name="verify_email_success_message">电子邮件验证成功。</string>
+    <string name="verify_email_failure_message">无法确认电子邮件验证。</string>
+    <string name="verify_email_screen_title">验证电子邮件</string>
+    <string name="verify_email_label">电子邮件</string>
+    <string name="verify_email_button">验证</string>
+    <string name="verify_email_check_button">检查验证</string>
+    <string name="verify_email_cancel_button">取消注册</string>
 </resources> 

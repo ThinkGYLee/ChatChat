@@ -3,8 +3,9 @@ package com.gyleedev.domain.usecase
 import com.gyleedev.domain.repository.UserRepository
 import javax.inject.Inject
 
-class FetchUserExistsUseCase @Inject constructor(
+class GetVerifiedStateUseCase @Inject constructor(
     private val repository: UserRepository
 ) {
-    operator fun invoke() = repository.fetchUserExists()
+    suspend operator fun invoke() =
+        repository.getVerifiedState()
 }

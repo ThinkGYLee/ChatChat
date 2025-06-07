@@ -152,4 +152,12 @@
     <string name="theme_light">Mode Terang</string>
     <string name="theme_dark">Mode Gelap</string>
     <string name="theme_system">Default Sistem</string>
+    <string name="verify_email_cancel_message">Pendaftaran dibatalkan.</string>
+    <string name="verify_email_success_message">Verifikasi email berhasil.</string>
+    <string name="verify_email_failure_message">Tidak dapat mengonfirmasi verifikasi email.</string>
+    <string name="verify_email_screen_title">Verifikasi Email</string>
+    <string name="verify_email_label">Email</string>
+    <string name="verify_email_button">Verifikasi</string>
+    <string name="verify_email_check_button">Periksa Verifikasi</string>
+    <string name="verify_email_cancel_button">Batalkan Pendaftaran</string>
 </resources> 

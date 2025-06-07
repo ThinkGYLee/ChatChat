@@ -8,6 +8,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -24,6 +25,7 @@ import com.gyleedev.data.database.entity.toEntityAsFriend
 import com.gyleedev.data.database.entity.toLocalData
 import com.gyleedev.data.database.entity.toModel
 import com.gyleedev.data.database.entity.toRelationLocalData
+import com.gyleedev.data.preference.AuthenticationPreference
 import com.gyleedev.data.preference.MyDataPreference
 import com.gyleedev.domain.model.BlockedUser
 import com.gyleedev.domain.model.ChangeRelationResult
@@ -35,6 +37,8 @@ import com.gyleedev.domain.model.SearchUserResult
 import com.gyleedev.domain.model.SignInResult
 import com.gyleedev.domain.model.UserData
 import com.gyleedev.domain.model.UserRelationState
+import com.gyleedev.domain.model.UserState
+import com.gyleedev.domain.model.VerifiedState
 import com.gyleedev.domain.model.toBlockedUser
 import com.gyleedev.domain.model.toRelatedUserLocalData
 import com.gyleedev.domain.model.toRemoteData
@@ -58,7 +62,8 @@ class UserRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val favoriteDao: FavoriteDao,
     private val userAndFavoriteDao: UserAndFavoriteDao,
-    private val myDataPreference: MyDataPreference
+    private val myDataPreference: MyDataPreference,
+    private val authenticationPreference: AuthenticationPreference
 ) : UserRepository {
 
     private val imageStorageReference = storage.getReference("image")
@@ -78,9 +83,12 @@ class UserRepositoryImpl @Inject constructor(
                 name = nickname,
                 uid = task.user!!.uid,
                 picture = " ",
-                status = " "
+                status = " ",
+                verified = false
             )
             setMyUserInformation(myData)
+            authenticationPreference.setPassword(password)
+            authenticationPreference.setState(VerifiedState.NOTINPROGRESS)
             trySend(myData)
         }.addOnFailureListener {
             trySend(null)
@@ -162,8 +170,18 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override fun fetchUserExists(): Boolean {
-        return auth.currentUser != null
+    override fun fetchUserState(): UserState {
+        val authState = auth.currentUser != null
+        return if (authState) {
+            val verified = getMyUserDataFromPreference().verified
+            if (verified) {
+                UserState.Verified
+            } else {
+                UserState.UnVerified
+            }
+        } else {
+            UserState.NoUser
+        }
     }
 
     override suspend fun getMyDataFromRemote(): Flow<UserData?> = callbackFlow {
@@ -210,7 +228,8 @@ class UserRepositoryImpl @Inject constructor(
             picture = user.picture,
             status = user.status,
             userRelation = userRelation,
-            favoriteState = false
+            favoriteState = false,
+            verified = user.verified
         )
         auth.currentUser?.let {
             database.reference.child("relations").child(it.uid).child(user.uid).setValue(relation)
@@ -389,7 +408,8 @@ class UserRepositoryImpl @Inject constructor(
             name = user.name,
             status = user.status,
             uid = user.uid,
-            picture = imagePath
+            picture = imagePath,
+            verified = user.verified
         )
         database.reference.child("users").child(user.uid).setValue(userData)
             .addOnSuccessListener {
@@ -597,7 +617,8 @@ class UserRepositoryImpl @Inject constructor(
                 status = userData.status,
                 favoriteState = false,
                 picture = userData.picture,
-                userRelation = UserRelationState.BLOCKED
+                userRelation = UserRelationState.BLOCKED,
+                verified = userData.verified
             )
             val remoteAddRequest = addRelatedUserToRemote(
                 user = userData,
@@ -853,4 +874,65 @@ class UserRepositoryImpl @Inject constructor(
                 })
             awaitClose()
         }
+
+    override suspend fun cancelSigninRequest(): Boolean {
+        val cancelResult = cancelSignin().first()
+        if (cancelResult) {
+            resetMyUserData()
+            authenticationPreference.setPassword("default_password")
+            authenticationPreference.setState(VerifiedState.NOTINPROGRESS)
+        }
+        return cancelResult
+    }
+
+    private fun reauthenticate() {
+        val user = auth.currentUser!!
+        val credential = EmailAuthProvider
+            .getCredential(myDataPreference.getMyData().email, authenticationPreference.getPassword())
+        user.reauthenticate(credential)
+    }
+
+    private fun cancelSignin(): Flow<Boolean> = callbackFlow {
+        reauthenticate()
+        auth.currentUser!!.delete().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                auth.signOut()
+                trySend(true)
+            } else {
+                trySend(false)
+            }
+        }
+        awaitClose()
+    }
+
+    override fun checkUserVerified(): Flow<Boolean> = callbackFlow {
+        requireNotNull(auth.currentUser).reload().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val check = requireNotNull(auth.currentUser).isEmailVerified
+                trySend(check)
+            } else {
+                trySend(false)
+            }
+        }
+        awaitClose()
+    }
+
+    override suspend fun getVerifiedState(): VerifiedState {
+        return authenticationPreference.getState()
+    }
+
+    override suspend fun setVerifiedState(verifiedState: VerifiedState) {
+        authenticationPreference.setState(verifiedState)
+    }
+    override suspend fun verifyEmailRequest(): Flow<Boolean> = callbackFlow {
+        requireNotNull(auth.currentUser).sendEmailVerification()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    trySend(true)
+                } else {
+                    trySend(false)
+                }
+            }
+        awaitClose()
+    }
 }

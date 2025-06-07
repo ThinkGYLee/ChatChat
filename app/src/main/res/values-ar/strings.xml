@@ -152,4 +152,12 @@
     <string name="theme_light">الوضع الفاتح</string>
     <string name="theme_dark">الوضع الداكن</string>
     <string name="theme_system">النظام الافتراضي</string>
+    <string name="verify_email_cancel_message">تم إلغاء التسجيل.</string>
+    <string name="verify_email_success_message">تم التحقق من البريد الإلكتروني بنجاح.</string>
+    <string name="verify_email_failure_message">تعذر تأكيد التحقق من البريد الإلكتروني.</string>
+    <string name="verify_email_screen_title">التحقق من البريد الإلكتروني</string>
+    <string name="verify_email_label">البريد الإلكتروني</string>
+    <string name="verify_email_button">تحقق</string>
+    <string name="verify_email_check_button">التحقق من التأكيد</string>
+    <string name="verify_email_cancel_button">إلغاء التسجيل</string>
 </resources> 

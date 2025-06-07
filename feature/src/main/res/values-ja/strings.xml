@@ -152,4 +152,12 @@
     <string name="theme_light">ライトモード</string>
     <string name="theme_dark">ダークモード</string>
     <string name="theme_system">システムのデフォルト</string>
+    <string name="verify_email_cancel_message">登録がキャンセルされました。</string>
+    <string name="verify_email_success_message">メール認証が成功しました。</string>
+    <string name="verify_email_failure_message">メール認証を確認できませんでした。</string>
+    <string name="verify_email_screen_title">メール認証</string>
+    <string name="verify_email_label">メール</string>
+    <string name="verify_email_button">認証</string>
+    <string name="verify_email_check_button">認証確認</string>
+    <string name="verify_email_cancel_button">登録キャンセル</string>
 </resources> 

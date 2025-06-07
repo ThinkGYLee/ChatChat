@@ -151,4 +151,12 @@
     <string name="theme_light">라이트 모드</string>
     <string name="theme_dark">다크 모드</string>
     <string name="theme_system">시스템 기본값</string>
+    <string name="verify_email_cancel_message">회원가입을 취소했습니다.</string>
+    <string name="verify_email_success_message">이메일 인증에 성공했습니다.</string>
+    <string name="verify_email_failure_message">이메일 인증을 확인할 수 없습니다.</string>
+    <string name="verify_email_screen_title">이메일 인증하기</string>
+    <string name="verify_email_label">Email</string>
+    <string name="verify_email_button">인증</string>
+    <string name="verify_email_check_button">인증 확인</string>
+    <string name="verify_email_cancel_button">회원가입 취소</string>
 </resources>

@@ -9,7 +9,8 @@ data class UserData(
     @SerializedName("name") val name: String = "",
     @SerializedName("uid") val uid: String = "",
     @SerializedName("picture") val picture: String = "",
-    @SerializedName("status") val status: String = ""
+    @SerializedName("status") val status: String = "",
+    @SerializedName("verified") val verified: Boolean = false
 )
 
 fun UserData.toBlockedUser(): BlockedUser {

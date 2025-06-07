@@ -10,6 +10,8 @@ import com.gyleedev.domain.model.SearchUserResult
 import com.gyleedev.domain.model.SignInResult
 import com.gyleedev.domain.model.UserData
 import com.gyleedev.domain.model.UserRelationState
+import com.gyleedev.domain.model.UserState
+import com.gyleedev.domain.model.VerifiedState
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
@@ -19,7 +21,7 @@ interface UserRepository {
     suspend fun loginRequest(id: String, password: String): Flow<LogInResult>
     suspend fun logoutRequest()
 
-    fun fetchUserExists(): Boolean
+    fun fetchUserState(): UserState
     suspend fun writeUserToRemote(user: UserData): Flow<SignInResult>
     suspend fun getMyDataFromRemote(): Flow<UserData?>
     suspend fun addRelatedUserToRemote(
@@ -67,4 +69,9 @@ interface UserRepository {
     fun addUserToRemoteBlockedEntity(relatedUserLocalData: RelatedUserLocalData): Flow<ProcessResult>
     suspend fun searchUserRequest(email: String): Flow<SearchUserResult>
     suspend fun searchUser(email: String): Flow<UserData?>
+    suspend fun cancelSigninRequest(): Boolean
+    suspend fun setVerifiedState(verifiedState: VerifiedState)
+    suspend fun getVerifiedState(): VerifiedState
+    suspend fun verifyEmailRequest(): Flow<Boolean>
+    fun checkUserVerified(): Flow<Boolean>
 }

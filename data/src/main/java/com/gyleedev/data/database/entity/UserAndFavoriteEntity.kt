@@ -24,6 +24,7 @@ fun UserAndFavoriteEntity.toLocalData(): RelatedUserLocalData {
         favoriteState = favorite.favoriteState,
         favoriteNumber = favorite.favoriteNumber,
         userRelation = user.relation,
-        name = user.name
+        name = user.name,
+        verified = user.verified
     )
 }

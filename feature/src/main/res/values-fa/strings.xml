@@ -152,4 +152,12 @@
     <string name="theme_light">حالت روشن</string>
     <string name="theme_dark">حالت تاریک</string>
     <string name="theme_system">پیش‌فرض سیستم</string>
+    <string name="verify_email_cancel_message">ثبت نام لغو شد.</string>
+    <string name="verify_email_success_message">تایید ایمیل موفقیت آمیز بود.</string>
+    <string name="verify_email_failure_message">تایید ایمیل امکان پذیر نبود.</string>
+    <string name="verify_email_screen_title">تایید ایمیل</string>
+    <string name="verify_email_label">ایمیل</string>
+    <string name="verify_email_button">تایید</string>
+    <string name="verify_email_check_button">بررسی تایید</string>
+    <string name="verify_email_cancel_button">لغو ثبت نام</string>
 </resources> 

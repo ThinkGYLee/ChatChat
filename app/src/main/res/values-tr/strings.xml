@@ -152,4 +152,12 @@
     <string name="theme_light">Açık Mod</string>
     <string name="theme_dark">Koyu Mod</string>
     <string name="theme_system">Sistem Varsayılanı</string>
+    <string name="verify_email_cancel_message">Kayıt iptal edildi.</string>
+    <string name="verify_email_success_message">E-posta doğrulaması başarılı.</string>
+    <string name="verify_email_failure_message">E-posta doğrulaması onaylanamadı.</string>
+    <string name="verify_email_screen_title">E-postayı Doğrula</string>
+    <string name="verify_email_label">E-posta</string>
+    <string name="verify_email_button">Doğrula</string>
+    <string name="verify_email_check_button">Doğrulamayı Kontrol Et</string>
+    <string name="verify_email_cancel_button">Kaydı İptal Et</string>
 </resources> 

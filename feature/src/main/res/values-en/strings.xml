@@ -46,7 +46,7 @@
     <string name="login_box_facebook_text">facebook</string>
     <string name="login_box_google_text">google</string>
     <string name="id_text_field_hint">ID</string>
-    <string name="nickname_text_field_hint">nickname</string>
+    <string name="nickname_text_field_hint">Nickname</string>
     <string name="password_text_field_hint">Password</string>
     <string name="password_check_text_field_hint">Enter again</string>
     <string name="password_available_text">Please enter at least 8 characters</string>
@@ -152,4 +152,12 @@
     <string name="theme_light">Light Mode</string>
     <string name="theme_dark">Dark Mode</string>
     <string name="theme_system">System Default</string>
+    <string name="verify_email_cancel_message">Sign up has been cancelled.</string>
+    <string name="verify_email_success_message">Email verification successful.</string>
+    <string name="verify_email_failure_message">Email verification could not be confirmed.</string>
+    <string name="verify_email_screen_title">Verify Email</string>
+    <string name="verify_email_label">Email</string>
+    <string name="verify_email_button">Verify</string>
+    <string name="verify_email_check_button">Check Verification</string>
+    <string name="verify_email_cancel_button">Cancel Sign Up</string>
 </resources> 

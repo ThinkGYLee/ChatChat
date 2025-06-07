@@ -23,4 +23,10 @@ object PreferenceModule {
     fun providesThemePreference(@ApplicationContext context: Context): ThemePreference {
         return ThemePreferenceImpl(context)
     }
+
+    @Singleton
+    @Provides
+    fun providesPasswordPreference(@ApplicationContext context: Context): AuthenticationPreference {
+        return AuthenticationPreferenceImpl(context)
+    }
 }
