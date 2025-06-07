@@ -152,4 +152,12 @@
     <string name="theme_light">Modo claro</string>
     <string name="theme_dark">Modo escuro</string>
     <string name="theme_system">Padrão do sistema</string>
+    <string name="verify_email_cancel_message">Cadastro cancelado.</string>
+    <string name="verify_email_success_message">Verificação de e-mail bem-sucedida.</string>
+    <string name="verify_email_failure_message">Não foi possível confirmar a verificação do e-mail.</string>
+    <string name="verify_email_screen_title">Verificar E-mail</string>
+    <string name="verify_email_label">E-mail</string>
+    <string name="verify_email_button">Verificar</string>
+    <string name="verify_email_check_button">Verificar Confirmação</string>
+    <string name="verify_email_cancel_button">Cancelar Cadastro</string>
 </resources> 

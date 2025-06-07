@@ -152,4 +152,12 @@
     <string name="theme_light">Mode clair</string>
     <string name="theme_dark">Mode sombre</string>
     <string name="theme_system">Par défaut du système</string>
+    <string name="verify_email_cancel_message">L\'inscription a été annulée.</string>
+    <string name="verify_email_success_message">Vérification de l\'e-mail réussie.</string>
+    <string name="verify_email_failure_message">La vérification de l\'e-mail n\'a pas pu être confirmée.</string>
+    <string name="verify_email_screen_title">Vérifier l\'E-mail</string>
+    <string name="verify_email_label">E-mail</string>
+    <string name="verify_email_button">Vérifier</string>
+    <string name="verify_email_check_button">Vérifier la Confirmation</string>
+    <string name="verify_email_cancel_button">Annuler l\'Inscription</string>
 </resources> 

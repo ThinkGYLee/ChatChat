@@ -152,4 +152,12 @@
     <string name="theme_light">Light Mode</string>
     <string name="theme_dark">Dark Mode</string>
     <string name="theme_system">System Default</string>
+    <string name="verify_email_cancel_message">Sign up has been cancelled.</string>
+    <string name="verify_email_success_message">Email verification successful.</string>
+    <string name="verify_email_failure_message">Email verification could not be confirmed.</string>
+    <string name="verify_email_screen_title">Verify Email</string>
+    <string name="verify_email_label">Email</string>
+    <string name="verify_email_button">Verify</string>
+    <string name="verify_email_check_button">Check Verification</string>
+    <string name="verify_email_cancel_button">Cancel Sign Up</string>
 </resources> 

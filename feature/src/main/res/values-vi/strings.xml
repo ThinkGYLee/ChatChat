@@ -152,4 +152,12 @@
     <string name="theme_light">Chế độ sáng</string>
     <string name="theme_dark">Chế độ tối</string>
     <string name="theme_system">Mặc định hệ thống</string>
+    <string name="verify_email_cancel_message">Đã hủy đăng ký.</string>
+    <string name="verify_email_success_message">Xác minh email thành công.</string>
+    <string name="verify_email_failure_message">Không thể xác nhận xác minh email.</string>
+    <string name="verify_email_screen_title">Xác minh Email</string>
+    <string name="verify_email_label">Email</string>
+    <string name="verify_email_button">Xác minh</string>
+    <string name="verify_email_check_button">Kiểm tra Xác minh</string>
+    <string name="verify_email_cancel_button">Hủy Đăng ký</string>
 </resources> 
