@@ -11,6 +11,7 @@ import com.gyleedev.domain.model.SignInResult
 import com.gyleedev.domain.model.UserData
 import com.gyleedev.domain.model.UserRelationState
 import com.gyleedev.domain.model.UserState
+import com.gyleedev.domain.model.VerifiedState
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
@@ -69,4 +70,8 @@ interface UserRepository {
     suspend fun searchUserRequest(email: String): Flow<SearchUserResult>
     suspend fun searchUser(email: String): Flow<UserData?>
     suspend fun cancelSigninRequest(): Boolean
+    suspend fun setVerifiedState(verifiedState: VerifiedState)
+    suspend fun getVerifiedState(): VerifiedState
+    suspend fun verifyEmailRequest(): Flow<Boolean>
+    fun checkUserVerified(): Flow<Boolean>
 }
