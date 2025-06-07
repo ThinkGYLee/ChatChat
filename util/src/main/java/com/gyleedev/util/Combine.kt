@@ -3,6 +3,7 @@ package com.gyleedev.util
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
+@Suppress("UNCHECKED_CAST")
 fun <T1, T2, T3, T4, T5, T6, R> combine(
     flow: Flow<T1>,
     flow2: Flow<T2>,
@@ -22,6 +23,7 @@ fun <T1, T2, T3, T4, T5, T6, R> combine(
     )
 }
 
+@Suppress("UNCHECKED_CAST")
 fun <T1, T2, T3, T4, T5, T6, T7, R> combine(
     flow: Flow<T1>,
     flow2: Flow<T2>,
@@ -43,6 +45,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, R> combine(
     )
 }
 
+@Suppress("UNCHECKED_CAST")
 fun <T1, T2, T3, T4, T5, T6, T7, T8, R> combine(
     flow: Flow<T1>,
     flow2: Flow<T2>,
@@ -66,6 +69,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, R> combine(
     )
 }
 
+@Suppress("UNCHECKED_CAST")
 fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, R> combine(
     flow: Flow<T1>,
     flow2: Flow<T2>,
@@ -92,6 +96,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, R> combine(
         )
     }
 
+@Suppress("UNCHECKED_CAST")
 fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> combine(
     flow: Flow<T1>,
     flow2: Flow<T2>,
