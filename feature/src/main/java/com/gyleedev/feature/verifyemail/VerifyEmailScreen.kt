@@ -27,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
+import com.gyleedev.domain.model.VerifiedState
 import com.gyleedev.feature.component.TextField
 import kotlinx.coroutines.flow.collectLatest
 
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun VerifyEmailScreen(
     onSigninCancel: () -> Unit,
+    onSigninComplete: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: VerifyEmailViewModel = hiltViewModel()
 ) {
@@ -51,6 +53,25 @@ fun VerifyEmailScreen(
                         duration = SnackbarDuration.Short
                     )
                     onSigninCancel()
+                }
+            }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.verifyCheckResult
+            .flowWithLifecycle(lifecycle.lifecycle)
+            .collectLatest {
+                if (it) {
+                    snackbarHostState.showSnackbar(
+                        message = "이메일 인증에 성공했습니다.",
+                        duration = SnackbarDuration.Short
+                    )
+                    onSigninComplete()
+                } else {
+                    snackbarHostState.showSnackbar(
+                        message = "이메일 인증을 확인할 수 없습니다.",
+                        duration = SnackbarDuration.Short
+                    )
                 }
             }
     }
@@ -81,12 +102,21 @@ fun VerifyEmailScreen(
                     enabled = false
                 )
                 Spacer(modifier = Modifier.height(40.dp))
-
-                Button(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("인증")
+                if (successState.verifiedState == VerifiedState.NOTINPROGRESS) {
+                    Button(
+                        onClick = viewModel::verifyRequest,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("인증")
+                    }
+                }
+                if (successState.verifiedState == VerifiedState.INPROGRESS) {
+                    Button(
+                        onClick = viewModel::checkVerified,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("인증 확인")
+                    }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
