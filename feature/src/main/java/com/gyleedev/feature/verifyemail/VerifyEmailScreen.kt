@@ -22,12 +22,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.gyleedev.domain.model.VerifiedState
+import com.gyleedev.feature.R
 import com.gyleedev.feature.component.TextField
 import kotlinx.coroutines.flow.collectLatest
 
@@ -42,6 +45,7 @@ fun VerifyEmailScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycle = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.cancelSigninResult
@@ -49,7 +53,7 @@ fun VerifyEmailScreen(
             .collectLatest {
                 if (it) {
                     snackbarHostState.showSnackbar(
-                        message = "회원가입을 취소했습니다.",
+                        message = context.getString(R.string.verify_email_cancel_message),
                         duration = SnackbarDuration.Short
                     )
                     onSigninCancel()
@@ -63,13 +67,13 @@ fun VerifyEmailScreen(
             .collectLatest {
                 if (it) {
                     snackbarHostState.showSnackbar(
-                        message = "이메일 인증에 성공했습니다.",
+                        message = context.getString(R.string.verify_email_success_message),
                         duration = SnackbarDuration.Short
                     )
                     onSigninComplete()
                 } else {
                     snackbarHostState.showSnackbar(
-                        message = "이메일 인증을 확인할 수 없습니다.",
+                        message = context.getString(R.string.verify_email_failure_message),
                         duration = SnackbarDuration.Short
                     )
                 }
@@ -78,7 +82,7 @@ fun VerifyEmailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("이메일 인증하기") })
+            TopAppBar(title = { Text(stringResource(R.string.verify_email_screen_title)) })
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         modifier = modifier.fillMaxSize()
@@ -94,7 +98,7 @@ fun VerifyEmailScreen(
                 horizontalAlignment = Alignment.Start
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
-                Text("Email")
+                Text(stringResource(R.string.verify_email_label))
                 Spacer(modifier = Modifier.height(12.dp))
                 TextField(
                     value = successState.userData.email,
@@ -107,7 +111,7 @@ fun VerifyEmailScreen(
                         onClick = viewModel::verifyRequest,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("인증")
+                        Text(stringResource(R.string.verify_email_button))
                     }
                 }
                 if (successState.verifiedState == VerifiedState.INPROGRESS) {
@@ -115,7 +119,7 @@ fun VerifyEmailScreen(
                         onClick = viewModel::checkVerified,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("인증 확인")
+                        Text(stringResource(R.string.verify_email_check_button))
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -128,7 +132,7 @@ fun VerifyEmailScreen(
                         contentColor = MaterialTheme.colorScheme.onSurface
                     )
                 ) {
-                    Text("회원가입 취소")
+                    Text(stringResource(R.string.verify_email_cancel_button))
                 }
             }
         }
