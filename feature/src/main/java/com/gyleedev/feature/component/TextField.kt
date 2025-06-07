@@ -21,7 +21,7 @@ fun TextField(
     enabled: Boolean = true,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions(),
-    hint: String = "",
+    hint: String = ""
 ) {
     TextField(
         value = value,
