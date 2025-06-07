@@ -302,7 +302,7 @@ fun FindUserCard(
                 horizontalArrangement = Arrangement.Center
             ) {
                 OutlinedButton(onClick = onBlockUser) {
-                    stringResource(R.string.block_friend_action)
+                    Text(text = stringResource(R.string.block_friend_action))
                 }
                 Spacer(modifier = Modifier.width(20.dp))
                 Button(onClick = onAddAsFriend) {
