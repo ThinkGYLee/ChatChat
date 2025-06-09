@@ -1,7 +1,7 @@
 package com.gyleedev.feature.verifyemail
 
-sealed interface VerifyEmailEvent {
-    data object Success: VerifyEmailEvent
-    data object Fail: VerifyEmailEvent
-    data object Cancel: VerifyEmailEvent
+sealed interface VerifyEmailUiEvent {
+    data object Success : VerifyEmailUiEvent
+    data object Fail : VerifyEmailUiEvent
+    data object Cancel : VerifyEmailUiEvent
 }

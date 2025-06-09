@@ -1,6 +1,5 @@
 package com.gyleedev.feature.verifyemail
 
-
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewModelScope
@@ -37,8 +36,8 @@ class VerifyEmailViewModel @Inject constructor(
     private val updateMyUserInformationUseCase: UpdateMyInfoUseCase
 ) : BaseViewModel() {
 
-    private val _uiEvent = MutableSharedFlow<VerifyEmailEvent>()
-    val uiEvent: SharedFlow<VerifyEmailEvent> = _uiEvent
+    private val _uiEvent = MutableSharedFlow<VerifyEmailUiEvent>()
+    val uiEvent: SharedFlow<VerifyEmailUiEvent> = _uiEvent
 
     @RequiresApi(Build.VERSION_CODES.P)
     private val userData = MutableStateFlow<UserData>(UserData())
@@ -72,7 +71,7 @@ class VerifyEmailViewModel @Inject constructor(
         viewModelScope.launch {
             val result = cancelSigninUseCase()
             if (result) {
-                _uiEvent.emit(VerifyEmailEvent.Cancel)
+                _uiEvent.emit(VerifyEmailUiEvent.Cancel)
             }
         }
     }
@@ -85,7 +84,7 @@ class VerifyEmailViewModel @Inject constructor(
                 userData.emit((uiState.value as VerifyEmailUiState.Success).userData)
                 verifiedState.emit(VerifiedState.INPROGRESS)
             } else {
-                _uiEvent.emit(VerifyEmailEvent.Fail)
+                _uiEvent.emit(VerifyEmailUiEvent.Fail)
             }
         }
     }
@@ -99,12 +98,12 @@ class VerifyEmailViewModel @Inject constructor(
                 ).first()
                 if (updateResult) {
                     setVerifiedStateUseCase(VerifiedState.VERIFIED)
-                    _uiEvent.emit(VerifyEmailEvent.Success)
+                    _uiEvent.emit(VerifyEmailUiEvent.Success)
                 } else {
-                    _uiEvent.emit(VerifyEmailEvent.Fail)
+                    _uiEvent.emit(VerifyEmailUiEvent.Fail)
                 }
             } else {
-                _uiEvent.emit(VerifyEmailEvent.Fail)
+                _uiEvent.emit(VerifyEmailUiEvent.Fail)
             }
         }
     }

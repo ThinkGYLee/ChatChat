@@ -54,21 +54,21 @@ fun VerifyEmailScreen(
         viewModel.uiEvent
             .flowWithLifecycle(lifecycle.lifecycle)
             .collectLatest {
-                when(it) {
-                    VerifyEmailEvent.Success -> {
+                when (it) {
+                    VerifyEmailUiEvent.Success -> {
                         snackbarHostState.showSnackbar(
                             message = context.getString(R.string.verify_email_success_message),
                             duration = SnackbarDuration.Short
                         )
                         onSigninComplete()
                     }
-                    VerifyEmailEvent.Fail -> {
+                    VerifyEmailUiEvent.Fail -> {
                         snackbarHostState.showSnackbar(
                             message = context.getString(R.string.verify_email_failure_message),
                             duration = SnackbarDuration.Short
                         )
                     }
-                    VerifyEmailEvent.Cancel -> {
+                    VerifyEmailUiEvent.Cancel -> {
                         snackbarHostState.showSnackbar(
                             message = context.getString(R.string.verify_email_cancel_message),
                             duration = SnackbarDuration.Short
