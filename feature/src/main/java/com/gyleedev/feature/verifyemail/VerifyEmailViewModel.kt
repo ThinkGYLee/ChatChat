@@ -37,11 +37,8 @@ class VerifyEmailViewModel @Inject constructor(
     private val updateMyUserInformationUseCase: UpdateMyInfoUseCase
 ) : BaseViewModel() {
 
-    private val _cancelSigninResult = MutableSharedFlow<Boolean>()
-    val cancelSigninResult: SharedFlow<Boolean> = _cancelSigninResult
-
-    private val _verifyCheckResult = MutableSharedFlow<Boolean>()
-    val verifyCheckResult: SharedFlow<Boolean> = _verifyCheckResult
+    private val _uiEvent = MutableSharedFlow<VerifyEmailEvent>()
+    val uiEvent: SharedFlow<VerifyEmailEvent> = _uiEvent
 
     @RequiresApi(Build.VERSION_CODES.P)
     private val userData = MutableStateFlow<UserData>(UserData())
@@ -74,7 +71,9 @@ class VerifyEmailViewModel @Inject constructor(
     fun cancelSignin() {
         viewModelScope.launch {
             val result = cancelSigninUseCase()
-            _cancelSigninResult.emit(result)
+            if (result) {
+                _uiEvent.emit(VerifyEmailEvent.Cancel)
+            }
         }
     }
 
@@ -86,7 +85,7 @@ class VerifyEmailViewModel @Inject constructor(
                 userData.emit((uiState.value as VerifyEmailUiState.Success).userData)
                 verifiedState.emit(VerifiedState.INPROGRESS)
             } else {
-                _verifyCheckResult.emit(false)
+                _uiEvent.emit(VerifyEmailEvent.Fail)
             }
         }
     }
@@ -100,12 +99,12 @@ class VerifyEmailViewModel @Inject constructor(
                 ).first()
                 if (updateResult) {
                     setVerifiedStateUseCase(VerifiedState.VERIFIED)
-                    _verifyCheckResult.emit(true)
+                    _uiEvent.emit(VerifyEmailEvent.Success)
                 } else {
-                    _verifyCheckResult.emit(false)
+                    _uiEvent.emit(VerifyEmailEvent.Fail)
                 }
             } else {
-                _verifyCheckResult.emit(false)
+                _uiEvent.emit(VerifyEmailEvent.Fail)
             }
         }
     }
