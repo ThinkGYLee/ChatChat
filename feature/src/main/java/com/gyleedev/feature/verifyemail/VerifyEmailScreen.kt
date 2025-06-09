@@ -1,5 +1,7 @@
 package com.gyleedev.feature.verifyemail
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -34,6 +36,7 @@ import com.gyleedev.feature.R
 import com.gyleedev.feature.component.TextField
 import kotlinx.coroutines.flow.collectLatest
 
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VerifyEmailScreen(
@@ -48,34 +51,30 @@ fun VerifyEmailScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.cancelSigninResult
+        viewModel.uiEvent
             .flowWithLifecycle(lifecycle.lifecycle)
             .collectLatest {
-                if (it) {
-                    snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.verify_email_cancel_message),
-                        duration = SnackbarDuration.Short
-                    )
-                    onSigninCancel()
-                }
-            }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.verifyCheckResult
-            .flowWithLifecycle(lifecycle.lifecycle)
-            .collectLatest {
-                if (it) {
-                    snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.verify_email_success_message),
-                        duration = SnackbarDuration.Short
-                    )
-                    onSigninComplete()
-                } else {
-                    snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.verify_email_failure_message),
-                        duration = SnackbarDuration.Short
-                    )
+                when(it) {
+                    VerifyEmailEvent.Success -> {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.verify_email_success_message),
+                            duration = SnackbarDuration.Short
+                        )
+                        onSigninComplete()
+                    }
+                    VerifyEmailEvent.Fail -> {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.verify_email_failure_message),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                    VerifyEmailEvent.Cancel -> {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.verify_email_cancel_message),
+                            duration = SnackbarDuration.Short
+                        )
+                        onSigninCancel()
+                    }
                 }
             }
     }
