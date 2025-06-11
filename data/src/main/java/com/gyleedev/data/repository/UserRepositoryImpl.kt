@@ -885,15 +885,26 @@ class UserRepositoryImpl @Inject constructor(
         return cancelResult
     }
 
-    private fun reauthenticate() {
+    private fun reauthenticate(): Flow<Boolean> = callbackFlow {
         val user = auth.currentUser!!
         val credential = EmailAuthProvider
-            .getCredential(myDataPreference.getMyData().email, authenticationPreference.getPassword())
-        user.reauthenticate(credential)
+            .getCredential(
+                myDataPreference.getMyData().email,
+                authenticationPreference.getPassword()
+            )
+        user.reauthenticate(credential).addOnCompleteListener { task ->
+            trySend(task.isSuccessful)
+        }
+        awaitClose()
     }
 
     private fun cancelSignin(): Flow<Boolean> = callbackFlow {
-        reauthenticate()
+        val reauthenticateSuccess = reauthenticate().first()
+        if (!reauthenticateSuccess) {
+            trySend(false)
+            awaitClose()
+            return@callbackFlow
+        }
         auth.currentUser!!.delete().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 auth.signOut()
@@ -924,6 +935,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun setVerifiedState(verifiedState: VerifiedState) {
         authenticationPreference.setState(verifiedState)
     }
+
     override suspend fun verifyEmailRequest(): Flow<Boolean> = callbackFlow {
         requireNotNull(auth.currentUser).sendEmailVerification()
             .addOnCompleteListener { task ->
