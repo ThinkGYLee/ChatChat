@@ -14,6 +14,7 @@ import com.gyleedev.data.database.entity.ChatRoomEntity
 import com.gyleedev.data.database.entity.toModel
 import com.gyleedev.domain.model.ChatRoomData
 import com.gyleedev.domain.model.ChatRoomLocalData
+import com.gyleedev.domain.model.ProcessResult
 import com.gyleedev.domain.model.RelatedUserLocalData
 import com.gyleedev.domain.model.UserChatRoomData
 import com.gyleedev.domain.repository.ChatRoomRepository
@@ -69,10 +70,10 @@ class ChatRoomRepositoryImpl @Inject constructor(
             awaitClose()
         }
 
-    override suspend fun createMyUserChatRoom(
+    override fun createMyUserChatRoom(
         relatedUserLocalData: RelatedUserLocalData,
         chatRoomData: ChatRoomData
-    ) {
+    ): Flow<ProcessResult> = callbackFlow {
         UserChatRoomData(rid = chatRoomData.rid, receiver = relatedUserLocalData.uid)
         auth.currentUser?.uid?.let {
             database.reference.child("userChatRooms").child(it).child(chatRoomData.rid)
@@ -81,20 +82,33 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         rid = chatRoomData.rid,
                         receiver = relatedUserLocalData.uid
                     )
-                )
+                ).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(ProcessResult.Success)
+                    } else {
+                        trySend(ProcessResult.Failure)
+                    }
+                }
         }
     }
 
-    override suspend fun createFriendUserChatRoom(
+    override fun createFriendUserChatRoom(
         relatedUserLocalData: RelatedUserLocalData,
         chatRoomData: ChatRoomData
-    ) {
+    ): Flow<ProcessResult> = callbackFlow {
         auth.currentUser?.uid?.let {
             val userChatRoomData = UserChatRoomData(rid = chatRoomData.rid, receiver = it)
             database.reference.child("userChatRooms").child(relatedUserLocalData.uid)
                 .child(chatRoomData.rid)
-                .setValue(userChatRoomData)
+                .setValue(userChatRoomData).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(ProcessResult.Success)
+                    } else {
+                        trySend(ProcessResult.Failure)
+                    }
+                }
         }
+        awaitClose()
     }
 
     override suspend fun makeNewChatRoom(rid: String, receiver: String): Long {
