@@ -12,6 +12,7 @@ import com.google.firebase.database.ValueEventListener
 import com.gyleedev.data.database.dao.ChatRoomDao
 import com.gyleedev.data.database.entity.ChatRoomEntity
 import com.gyleedev.data.database.entity.toModel
+import com.gyleedev.domain.model.ChatCreationState
 import com.gyleedev.domain.model.ChatRoomData
 import com.gyleedev.domain.model.ChatRoomLocalData
 import com.gyleedev.domain.model.ProcessResult
@@ -22,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.util.UUID
@@ -32,6 +34,54 @@ class ChatRoomRepositoryImpl @Inject constructor(
     private val database: FirebaseDatabase,
     private val auth: FirebaseAuth
 ) : ChatRoomRepository {
+
+    private fun getChatRoom(user: RelatedUserLocalData): Flow<ChatCreationState> = callbackFlow {
+        send(ChatCreationState.CheckingLocal)
+        try {
+            val checkLocal = getChatRoomByUid(user.uid)
+            if (checkLocal != null) {
+                send(ChatCreationState.Success(checkLocal))
+                close()
+                return@callbackFlow
+            }
+            send(ChatCreationState.CheckingRemote)
+            val checkRemote = checkChatRoomExistsInRemote(user).first()
+            if (checkRemote) {
+                send(ChatCreationState.SavingToLocal)
+                val chatRoomData = getChatRoomFromRemote(user).first()
+                insertChatRoomToLocal(user, requireNotNull(chatRoomData))
+                val localData = getChatRoomByUid(user.uid)
+                send(ChatCreationState.Success(localData))
+                close()
+                return@callbackFlow
+            }
+            send(ChatCreationState.CreatingRemoteChatRoom)
+            val createdChatRoomData = createChatRoomData().first()
+            if (createdChatRoomData != null) {
+                send(ChatCreationState.UpdatingChatRoomToUserData)
+                val myChatRoomInfo =
+                    createMyUserChatRoom(user, requireNotNull(createdChatRoomData)).first()
+                val friendChatRoomInfo =
+                    createFriendUserChatRoom(user, requireNotNull(createdChatRoomData)).first()
+                if (myChatRoomInfo == ProcessResult.Success && friendChatRoomInfo == ProcessResult.Success) {
+                    send(ChatCreationState.SavingToLocal)
+                    insertChatRoomToLocal(user, createdChatRoomData)
+                    val localData = getChatRoomByUid(user.uid)
+                    send(ChatCreationState.Success(localData))
+                    close()
+                    return@callbackFlow
+                }
+            }
+        } catch (e: Exception) {
+            send(
+                ChatCreationState.Failure(
+                    failurePoint = ChatCreationState.SavingToLocal
+                )
+            )
+        }
+
+    }
+
     override fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean> =
         callbackFlow {
             auth.currentUser?.uid?.let {
