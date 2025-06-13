@@ -4,8 +4,7 @@ sealed interface ChatCreationState {
     data object CheckingLocal : ChatCreationState
     data object CheckingRemote : ChatCreationState
     data object CreatingRemoteChatRoom : ChatCreationState
-    data object UpdatingChatRoomToMyRemote : ChatCreationState
-    data object UpdatingChatRoomToFriendRemote : ChatCreationState
+    data object UpdatingChatRoomToUserData : ChatCreationState
     data object SavingToLocal : ChatCreationState
     data class Success(
         val data: ChatRoomLocalData
