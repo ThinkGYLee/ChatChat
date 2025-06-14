@@ -78,6 +78,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     failurePoint = ChatCreationState.SavingToLocal
                 )
             )
+            close()
         }
 
     }
