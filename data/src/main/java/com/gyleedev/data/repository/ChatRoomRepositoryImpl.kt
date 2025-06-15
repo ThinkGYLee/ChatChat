@@ -12,6 +12,7 @@ import com.google.firebase.database.ValueEventListener
 import com.gyleedev.data.database.dao.ChatRoomDao
 import com.gyleedev.data.database.entity.ChatRoomEntity
 import com.gyleedev.data.database.entity.toModel
+import com.gyleedev.domain.model.ChatCreationException
 import com.gyleedev.domain.model.ChatCreationState
 import com.gyleedev.domain.model.ChatRoomData
 import com.gyleedev.domain.model.ChatRoomLocalData
@@ -72,102 +73,138 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     return@callbackFlow
                 }
             }
-        } catch (e: Exception) {
-            send(
-                ChatCreationState.Failure(
-                    failurePoint = ChatCreationState.SavingToLocal
-                )
-            )
+        } catch (e: ChatCreationException) {
+            throw e
             close()
         }
-
     }
 
     override fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean> =
         callbackFlow {
-            auth.currentUser?.uid?.let {
-                database.reference.child("userChatRooms").child(it).orderByChild("receiver")
-                    .equalTo(relatedUserLocalData.uid)
-            }?.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.value != null) {
-                        trySend(true)
-                    } else {
+            try {
+                auth.currentUser?.uid?.let {
+                    database.reference.child("userChatRooms").child(it).orderByChild("receiver")
+                        .equalTo(relatedUserLocalData.uid)
+                }?.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.value != null) {
+                            trySend(true)
+                        } else {
+                            trySend(false)
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
                         trySend(false)
                     }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    trySend(false)
-                }
-            })
+                })
+            } catch (e: Exception) {
+                ChatCreationException(
+                    state = ChatCreationState.CheckingRemote,
+                    message = requireNotNull(e.message),
+                    cause = e.cause
+                )
+            }
             awaitClose()
         }.flowOn(Dispatchers.IO)
 
     override suspend fun createChatRoomData(): Flow<ChatRoomData?> =
         callbackFlow {
-            val rid = UUID.randomUUID().toString()
-            val chatRoomData = ChatRoomData(rid = rid, lastMessage = "")
-            auth.currentUser?.uid?.let {
-                database.reference.child("chatRooms").child(rid)
-                    .setValue(ChatRoomData(rid = rid)).addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            trySend(chatRoomData)
-                        } else {
-                            trySend(null)
+            try {
+                val rid = UUID.randomUUID().toString()
+                val chatRoomData = ChatRoomData(rid = rid, lastMessage = "")
+                auth.currentUser?.uid?.let {
+                    database.reference.child("chatRooms").child(rid)
+                        .setValue(ChatRoomData(rid = rid)).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                trySend(chatRoomData)
+                            } else {
+                                trySend(null)
+                            }
                         }
-                    }
+                }
+            } catch (e: Exception) {
+                ChatCreationException(
+                    state = ChatCreationState.CreatingRemoteChatRoom,
+                    message = requireNotNull(e.message),
+                    cause = e.cause
+                )
             }
             awaitClose()
-        }
+        }.flowOn(Dispatchers.IO)
 
     override fun createMyUserChatRoom(
         relatedUserLocalData: RelatedUserLocalData,
         chatRoomData: ChatRoomData
     ): Flow<ProcessResult> = callbackFlow {
-        UserChatRoomData(rid = chatRoomData.rid, receiver = relatedUserLocalData.uid)
-        auth.currentUser?.uid?.let {
-            database.reference.child("userChatRooms").child(it).child(chatRoomData.rid)
-                .setValue(
-                    UserChatRoomData(
-                        rid = chatRoomData.rid,
-                        receiver = relatedUserLocalData.uid
-                    )
-                ).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        trySend(ProcessResult.Success)
-                    } else {
-                        trySend(ProcessResult.Failure)
+        try {
+            UserChatRoomData(rid = chatRoomData.rid, receiver = relatedUserLocalData.uid)
+            auth.currentUser?.uid?.let {
+                database.reference.child("userChatRooms").child(it).child(chatRoomData.rid)
+                    .setValue(
+                        UserChatRoomData(
+                            rid = chatRoomData.rid,
+                            receiver = relatedUserLocalData.uid
+                        )
+                    ).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            trySend(ProcessResult.Success)
+                        } else {
+                            trySend(ProcessResult.Failure)
+                        }
                     }
-                }
+            }
+        } catch (e: Exception) {
+            ChatCreationException(
+                state = ChatCreationState.UpdatingChatRoomToUserData,
+                message = requireNotNull(e.message),
+                cause = e.cause
+            )
         }
-    }
+        awaitClose()
+    }.flowOn(Dispatchers.IO)
 
     override fun createFriendUserChatRoom(
         relatedUserLocalData: RelatedUserLocalData,
         chatRoomData: ChatRoomData
     ): Flow<ProcessResult> = callbackFlow {
-        auth.currentUser?.uid?.let {
-            val userChatRoomData = UserChatRoomData(rid = chatRoomData.rid, receiver = it)
-            database.reference.child("userChatRooms").child(relatedUserLocalData.uid)
-                .child(chatRoomData.rid)
-                .setValue(userChatRoomData).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        trySend(ProcessResult.Success)
-                    } else {
-                        trySend(ProcessResult.Failure)
+        try {
+            auth.currentUser?.uid?.let {
+                val userChatRoomData = UserChatRoomData(rid = chatRoomData.rid, receiver = it)
+                database.reference.child("userChatRooms").child(relatedUserLocalData.uid)
+                    .child(chatRoomData.rid)
+                    .setValue(userChatRoomData).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            trySend(ProcessResult.Success)
+                        } else {
+                            trySend(ProcessResult.Failure)
+                        }
                     }
-                }
+            }
+        } catch (e: Exception) {
+            ChatCreationException(
+                state = ChatCreationState.UpdatingChatRoomToUserData,
+                message = requireNotNull(e.message),
+                cause = e.cause
+            )
         }
         awaitClose()
-    }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun makeNewChatRoom(rid: String, receiver: String): Long {
         return chatRoomDao.insertChatRoom(ChatRoomEntity(0, rid, receiver, ""))
     }
 
     override suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData {
-        return chatRoomDao.getChatRoomByUid(uid).toModel()
+        return try {
+            chatRoomDao.getChatRoomByUid(uid).toModel()
+        } catch (e: Exception) {
+            throw ChatCreationException(
+                state = ChatCreationState.CheckingLocal,
+                message = requireNotNull(e.message),
+                cause = e.cause
+            )
+        }
     }
 
     override fun getChatRoomIdFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<String?> =
@@ -192,31 +229,39 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 }
             })
             awaitClose()
-        }
+        }.flowOn(Dispatchers.IO)
 
     override fun getChatRoomFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<ChatRoomData?> =
         callbackFlow {
-            auth.currentUser?.uid?.let {
-                database.reference.child("userChatRooms").child(it).orderByChild("receiver")
-                    .equalTo(relatedUserLocalData.uid)
-            }?.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (ds in snapshot.children) {
-                        val snap = ds.getValue(ChatRoomData::class.java)
-                        if (snap != null) {
-                            trySend(snap)
-                        } else {
-                            trySend(null)
+            try {
+                auth.currentUser?.uid?.let {
+                    database.reference.child("userChatRooms").child(it).orderByChild("receiver")
+                        .equalTo(relatedUserLocalData.uid)
+                }?.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (ds in snapshot.children) {
+                            val snap = ds.getValue(ChatRoomData::class.java)
+                            if (snap != null) {
+                                trySend(snap)
+                            } else {
+                                trySend(null)
+                            }
                         }
                     }
-                }
 
-                override fun onCancelled(error: DatabaseError) {
-                    trySend(null)
-                }
-            })
+                    override fun onCancelled(error: DatabaseError) {
+                        trySend(null)
+                    }
+                })
+            } catch (e: Exception) {
+                ChatCreationException(
+                    state = ChatCreationState.CheckingRemote,
+                    message = requireNotNull(e.message),
+                    cause = e.cause
+                )
+            }
             awaitClose()
-        }
+        }.flowOn(Dispatchers.IO)
 
     override suspend fun insertChatRoomToLocal(
         relatedUserLocalData: RelatedUserLocalData,
@@ -246,6 +291,6 @@ class ChatRoomRepositoryImpl @Inject constructor(
             it.map {
                 it.toModel()
             }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 }
