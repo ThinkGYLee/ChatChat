@@ -36,7 +36,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : ChatRoomRepository {
 
-    private fun getChatRoom(user: RelatedUserLocalData): Flow<ChatCreationState> = callbackFlow {
+    override fun getChatRoom(user: RelatedUserLocalData): Flow<ChatCreationState> = callbackFlow {
         send(ChatCreationState.CheckingLocal)
         try {
             val checkLocal = getChatRoomByUid(user.uid)
