@@ -9,7 +9,11 @@ import com.gyleedev.domain.model.RelatedUserLocalData
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRoomRepository {
-    fun getChatRoom(user: RelatedUserLocalData): Flow<ChatCreationState>
+    fun getChatRoom(
+        user: RelatedUserLocalData,
+        chatCreationState: ChatCreationState
+    ): Flow<ChatCreationState>
+
     fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
     suspend fun createChatRoomData(): Flow<ChatRoomData?>
     fun createMyUserChatRoom(
