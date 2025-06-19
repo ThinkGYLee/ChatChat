@@ -9,6 +9,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.gyleedev.core.BaseViewModel
+import com.gyleedev.domain.model.ChatCreationException
+import com.gyleedev.domain.model.ChatCreationState
 import com.gyleedev.domain.model.ChatRoomLocalData
 import com.gyleedev.domain.model.MessageData
 import com.gyleedev.domain.model.MessageSendState
@@ -20,6 +22,7 @@ import com.gyleedev.domain.usecase.CancelMessageUseCase
 import com.gyleedev.domain.usecase.DeleteMessageUseCase
 import com.gyleedev.domain.usecase.GetChatRoomDataUseCase
 import com.gyleedev.domain.usecase.GetChatRoomLocalDataByUidUseCase
+import com.gyleedev.domain.usecase.GetChatRoomUseCase
 import com.gyleedev.domain.usecase.GetFriendDataUseCase
 import com.gyleedev.domain.usecase.GetMessagesFromLocalUseCase
 import com.gyleedev.domain.usecase.GetMessagesFromRemoteUseCase
@@ -62,6 +65,7 @@ class ChatRoomViewModel @Inject constructor(
     private val userToFriendUseCase: UserToFriendUseCase,
     private val blockRelatedUserUseCase: BlockRelatedUserUseCase,
     private val deleteMessageUseCase: DeleteMessageUseCase,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val firebaseServerTimeHelper: FirebaseServerTimeHelper,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
@@ -118,6 +122,11 @@ class ChatRoomViewModel @Inject constructor(
             relatedUserLocalData.emit(friend)
             getChatRoomDataUseCase(friend)
             getChatRoomFromLocal(friend)
+            try {
+                getChatRoomUseCase(friend, ChatCreationState.CheckingLocal)
+            } catch (e: ChatCreationException) {
+
+            }
             messagesCallback.collectLatest { }
         }
     }
