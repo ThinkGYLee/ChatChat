@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
 import java.util.UUID
 import javax.inject.Inject
 
@@ -40,25 +41,50 @@ class ChatRoomRepositoryImpl @Inject constructor(
         user: RelatedUserLocalData,
         chatCreationState: ChatCreationState
     ): Flow<ChatCreationState> = callbackFlow {
-        send(ChatCreationState.CheckingLocal)
+        var currentState = chatCreationState
         try {
-            val checkLocal = getChatRoomByUid(user.uid)
-            if (checkLocal != null) {
-                send(ChatCreationState.Success(checkLocal))
-                close()
-                return@callbackFlow
+            while (isActive) {
+                when(currentState) {
+                    ChatCreationState.CheckingLocal -> {
+                        send(ChatCreationState.CheckingLocal)
+                        val checkLocal = getChatRoomByUid(user.uid)
+                        if (checkLocal != null) {
+                            send(ChatCreationState.Success(checkLocal))
+                            close()
+                            break
+                        }
+                        currentState = ChatCreationState.CheckingRemote
+                    }
+                    ChatCreationState.CheckingRemote -> {
+                        send(ChatCreationState.CheckingRemote)
+                        val checkRemote = checkChatRoomExistsInRemote(user).first()
+                        if (checkRemote) {
+                            send(ChatCreationState.SavingToLocal)
+                            val chatRoomData = getChatRoomFromRemote(user).first()
+                            insertChatRoomToLocal(user, requireNotNull(chatRoomData))
+                            val localData = getChatRoomByUid(user.uid)
+                            send(ChatCreationState.Success(localData))
+                            close()
+                            break
+                        }
+                        currentState = ChatCreationState.CreatingRemoteChatRoom
+                    }
+                    ChatCreationState.CreatingRemoteChatRoom -> {
+
+                    }
+                    ChatCreationState.UpdatingChatRoomToUserData -> {
+
+                    }
+                    ChatCreationState.SavingToLocal -> {
+
+                    }
+                    else -> {
+
+                    }
+                }
             }
-            send(ChatCreationState.CheckingRemote)
-            val checkRemote = checkChatRoomExistsInRemote(user).first()
-            if (checkRemote) {
-                send(ChatCreationState.SavingToLocal)
-                val chatRoomData = getChatRoomFromRemote(user).first()
-                insertChatRoomToLocal(user, requireNotNull(chatRoomData))
-                val localData = getChatRoomByUid(user.uid)
-                send(ChatCreationState.Success(localData))
-                close()
-                return@callbackFlow
-            }
+
+
             send(ChatCreationState.CreatingRemoteChatRoom)
             val createdChatRoomData = createChatRoomData().first()
             if (createdChatRoomData != null) {
@@ -103,7 +129,8 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 })
             } catch (e: Exception) {
                 ChatCreationException(
-                    state = ChatCreationState.CheckingRemote,
+                    problemState = ChatCreationState.CheckingRemote,
+                    restartState = ChatCreationState.CheckingRemote,
                     message = requireNotNull(e.message),
                     cause = e.cause
                 )
@@ -128,7 +155,8 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 }
             } catch (e: Exception) {
                 ChatCreationException(
-                    state = ChatCreationState.CreatingRemoteChatRoom,
+                    problemState = ChatCreationState.CreatingRemoteChatRoom,
+                    restartState = ChatCreationState.CreatingRemoteChatRoom,
                     message = requireNotNull(e.message),
                     cause = e.cause
                 )
@@ -159,7 +187,8 @@ class ChatRoomRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             ChatCreationException(
-                state = ChatCreationState.UpdatingChatRoomToUserData,
+                problemState = ChatCreationState.UpdatingChatRoomToUserData,
+                restartState = ChatCreationState.CheckingRemote,
                 message = requireNotNull(e.message),
                 cause = e.cause
             )
@@ -186,8 +215,9 @@ class ChatRoomRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             ChatCreationException(
-                state = ChatCreationState.UpdatingChatRoomToUserData,
+                problemState = ChatCreationState.UpdatingChatRoomToUserData,
                 message = requireNotNull(e.message),
+                restartState = ChatCreationState.CheckingRemote,
                 cause = e.cause
             )
         }
@@ -203,7 +233,8 @@ class ChatRoomRepositoryImpl @Inject constructor(
             chatRoomDao.getChatRoomByUid(uid).toModel()
         } catch (e: Exception) {
             throw ChatCreationException(
-                state = ChatCreationState.CheckingLocal,
+                problemState = ChatCreationState.CheckingLocal,
+                restartState = ChatCreationState.CheckingLocal,
                 message = requireNotNull(e.message),
                 cause = e.cause
             )
@@ -258,7 +289,8 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 })
             } catch (e: Exception) {
                 ChatCreationException(
-                    state = ChatCreationState.CheckingRemote,
+                    problemState = ChatCreationState.CheckingRemote,
+                    restartState = ChatCreationState.CheckingRemote,
                     message = requireNotNull(e.message),
                     cause = e.cause
                 )
