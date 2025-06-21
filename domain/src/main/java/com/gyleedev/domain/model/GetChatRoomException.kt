@@ -1,8 +1,8 @@
 package com.gyleedev.domain.model
 
-class ChatCreationException(
-    val problemState: ChatCreationState,
-    val restartState: ChatCreationState,
+class GetChatRoomException(
+    val problemState: GetChatRoomState,
+    val restartState: GetChatRoomState,
     message: String,
     cause: Throwable? = null
 ) : Exception(message, cause)
