@@ -10,6 +10,6 @@ class GetChatRoomUseCase @Inject constructor(
 ) {
     operator fun invoke(
         user: RelatedUserLocalData,
-        chatCreationState: ChatCreationState = ChatCreationState.CheckingLocal
+        chatCreationState: ChatCreationState = ChatCreationState.CheckAndGetDataFromLocal
     ) = repository.getChatRoom(user, chatCreationState)
 }
