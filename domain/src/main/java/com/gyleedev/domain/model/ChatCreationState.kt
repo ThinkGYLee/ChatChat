@@ -1,7 +1,7 @@
 package com.gyleedev.domain.model
 
 sealed interface ChatCreationState {
-    data object CheckingLocal : ChatCreationState
+    data object CheckAndGetDataFromLocal : ChatCreationState
     data object CheckingRemoteChatRoomExists : ChatCreationState
     data object CheckingMyDataExists : ChatCreationState
     data object CheckingFriendDataExists : ChatCreationState
@@ -9,7 +9,6 @@ sealed interface ChatCreationState {
     data object UpdateMyData : ChatCreationState
     data object UpdateFriendData : ChatCreationState
     data object SavingChatRoomToLocal : ChatCreationState
-    data object GetDataFromLocal : ChatCreationState
     data class Success(
         val data: ChatRoomLocalData
     ) : ChatCreationState
