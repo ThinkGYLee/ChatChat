@@ -12,6 +12,8 @@ import com.google.firebase.database.ValueEventListener
 import com.gyleedev.data.database.dao.ChatRoomDao
 import com.gyleedev.data.database.entity.ChatRoomEntity
 import com.gyleedev.data.database.entity.toModel
+import com.gyleedev.domain.model.ChatRoomData
+import com.gyleedev.domain.model.ChatRoomLocalData
 import com.gyleedev.domain.model.GetChatRoomException
 import com.gyleedev.domain.model.GetChatRoomState
 import com.gyleedev.domain.model.GetChatRoomState.CheckAndGetDataFromLocal
@@ -24,8 +26,6 @@ import com.gyleedev.domain.model.GetChatRoomState.SavingGetChatRoomToLocal
 import com.gyleedev.domain.model.GetChatRoomState.Success
 import com.gyleedev.domain.model.GetChatRoomState.UpdateFriendData
 import com.gyleedev.domain.model.GetChatRoomState.UpdateMyData
-import com.gyleedev.domain.model.ChatRoomData
-import com.gyleedev.domain.model.ChatRoomLocalData
 import com.gyleedev.domain.model.ProcessResult
 import com.gyleedev.domain.model.RelatedUserLocalData
 import com.gyleedev.domain.model.UserChatRoomData
@@ -37,7 +37,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.isActive
 import java.util.UUID
 import javax.inject.Inject
 
@@ -103,29 +102,26 @@ class ChatRoomRepositoryImpl @Inject constructor(
     f/e -> problemState: returnData, restartState: GetData
 
      */
-    override fun getChatRoom(
+    override suspend fun getChatRoom(
         user: RelatedUserLocalData,
         getChatRoomState: GetChatRoomState
-    ): Flow<GetChatRoomState> = callbackFlow {
+    ): GetChatRoomState {
         var currentState = getChatRoomState
         var chatRoomData: ChatRoomData? = null
-
         try {
-            while (isActive) {
+            while (true) {
                 when (currentState) {
                     CheckAndGetDataFromLocal -> {
-                        send(CheckAndGetDataFromLocal)
                         val checkLocal = getChatRoomByUid(user.uid)
                         if (checkLocal != null) {
-                            send(Success(checkLocal))
-                            close()
+                            return Success(checkLocal)
                             break
+                        } else {
+                            currentState = CheckingRemoteGetChatRoomExists
                         }
-                        currentState = CheckingRemoteGetChatRoomExists
                     }
 
                     CheckingRemoteGetChatRoomExists -> {
-                        send(CheckingRemoteGetChatRoomExists)
                         val checkRemote = checkChatRoomExistsInRemote(user).first()
                         currentState = if (checkRemote) {
                             GetRemoteData
@@ -135,7 +131,6 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
 
                     GetRemoteData -> {
-                        send(GetRemoteData)
                         chatRoomData = getChatRoomFromRemote(user).first()
                         requireChatRoomData(
                             data = chatRoomData,
@@ -146,7 +141,6 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
 
                     CheckingMyDataExists -> {
-                        send(CheckingMyDataExists)
                         val isExists = checkMyRoomDataRemote(user).first()
                         currentState = if (isExists) {
                             CheckingFriendDataExists
@@ -156,7 +150,6 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
 
                     CheckingFriendDataExists -> {
-                        send(CheckingFriendDataExists)
                         val isExists = checkFriendRoomDataRemote(user).first()
                         currentState = if (isExists) {
                             SavingGetChatRoomToLocal
@@ -166,9 +159,9 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
 
                     CreatingRemoteGetChatRoom -> {
-                        send(CreatingRemoteGetChatRoom)
                         val createdRoomData = createChatRoomData().first()
                         if (createdRoomData != null) {
+                            chatRoomData = createdRoomData
                             currentState = UpdateMyData
                         } else {
                             throw GetChatRoomException(
@@ -182,7 +175,6 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
 
                     UpdateMyData -> {
-                        send(UpdateMyData)
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = UpdateMyData,
@@ -203,7 +195,6 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
 
                     UpdateFriendData -> {
-                        send(UpdateFriendData)
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = UpdateFriendData,
@@ -224,7 +215,6 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
 
                     SavingGetChatRoomToLocal -> {
-                        send(SavingGetChatRoomToLocal)
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = SavingGetChatRoomToLocal,
@@ -240,8 +230,6 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 }
             }
         } catch (e: GetChatRoomException) {
-            println(e)
-            close(e)
             throw e
         }
     }
@@ -267,11 +255,8 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         .equalTo(relatedUserLocalData.uid)
                 }?.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.value != null) {
-                            trySend(true)
-                        } else {
-                            trySend(false)
-                        }
+                        val result = snapshot.value != null
+                        trySend(result)
                     }
 
                     override fun onCancelled(error: DatabaseError) {
@@ -356,11 +341,8 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     .equalTo(relatedUserLocalData.uid).addListenerForSingleValueEvent(
                         object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
-                                if (snapshot.value != null) {
-                                    trySend(true)
-                                } else {
-                                    trySend(false)
-                                }
+                                val result = snapshot.value != null
+                                trySend(result)
                             }
 
                             override fun onCancelled(error: DatabaseError) {
@@ -379,7 +361,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
         }
 
         awaitClose()
-    }
+    }.flowOn(Dispatchers.IO)
 
     private fun checkFriendRoomDataRemote(
         relatedUserLocalData: RelatedUserLocalData
@@ -391,11 +373,8 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     .equalTo(it).addListenerForSingleValueEvent(
                         object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
-                                if (snapshot.value != null) {
-                                    trySend(true)
-                                } else {
-                                    trySend(false)
-                                }
+                                val result = snapshot.value != null
+                                trySend(result)
                             }
 
                             override fun onCancelled(error: DatabaseError) {
@@ -413,7 +392,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
             )
         }
         awaitClose()
-    }
+    }.flowOn(Dispatchers.IO)
 
     override fun createFriendUserChatRoom(
         relatedUserLocalData: RelatedUserLocalData,
@@ -447,9 +426,9 @@ class ChatRoomRepositoryImpl @Inject constructor(
         return chatRoomDao.insertChatRoom(ChatRoomEntity(0, rid, receiver, ""))
     }
 
-    override suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData {
+    override suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData? {
         return try {
-            chatRoomDao.getChatRoomByUid(uid).toModel()
+            chatRoomDao.getChatRoomByUid(uid)?.toModel()
         } catch (e: Exception) {
             throw GetChatRoomException(
                 problemState = CheckAndGetDataFromLocal,
