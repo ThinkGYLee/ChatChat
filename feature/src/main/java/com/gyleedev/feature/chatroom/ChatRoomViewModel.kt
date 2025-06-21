@@ -9,9 +9,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.gyleedev.core.BaseViewModel
-import com.gyleedev.domain.model.ChatCreationException
-import com.gyleedev.domain.model.ChatCreationState
 import com.gyleedev.domain.model.ChatRoomLocalData
+import com.gyleedev.domain.model.GetChatRoomException
+import com.gyleedev.domain.model.GetChatRoomState
 import com.gyleedev.domain.model.MessageData
 import com.gyleedev.domain.model.MessageSendState
 import com.gyleedev.domain.model.MessageType
@@ -86,6 +86,9 @@ class ChatRoomViewModel @Inject constructor(
         MutableStateFlow<SelectedMessageState>(SelectedMessageState.NotSelected)
     val replyTarget: StateFlow<SelectedMessageState> = _replyTarget
 
+    private val _getChatRoomEvent = MutableSharedFlow<GetChatRoomException>()
+    val getChatRoomEvent: SharedFlow<GetChatRoomException> = _getChatRoomEvent
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val messages = _chatRoomLocalData.flatMapLatest {
         getMessagesFromLocalUseCase(it.rid).cachedIn(viewModelScope)
@@ -118,22 +121,34 @@ class ChatRoomViewModel @Inject constructor(
             throw Exception("예외 처리 에러 말고 단거로")
         }
         viewModelScope.launch {
-            val friend = getFriendDataUseCase(passedFriendUid).first()
-            relatedUserLocalData.emit(friend)
-            getChatRoomDataUseCase(friend)
-            getChatRoomFromLocal(friend)
+            /*val friend = getFriendDataUseCase(passedFriendUid).first()
+            relatedUserLocalData.emit(friend)*/
+            /*getChatRoomDataUseCase(friend)
+            getChatRoomFromLocal(friend)*/
             try {
-                getChatRoomUseCase(friend, ChatCreationState.CheckingLocal)
-            } catch (e: ChatCreationException) {
-
+                val friend = getFriendDataUseCase(passedFriendUid).first()
+                relatedUserLocalData.emit(friend)
+                val getChatRoomData = getChatRoomUseCase(
+                    relatedUserLocalData.value,
+                    GetChatRoomState.CheckAndGetDataFromLocal
+                )
+                if (getChatRoomData is GetChatRoomState.Success) {
+                    _chatRoomLocalData.emit(getChatRoomData.data)
+                    messagesCallback.collectLatest { }
+                }
+            } catch (e: GetChatRoomException) {
+                println(e)
+                _getChatRoomEvent.emit(e)
             }
-            messagesCallback.collectLatest { }
+            // messagesCallback.collectLatest { }
         }
     }
 
     private suspend fun getChatRoomFromLocal(relatedUserLocalData: RelatedUserLocalData) {
         val data = getChatRoomLocalDataByUidUseCase(relatedUserLocalData.uid)
-        _chatRoomLocalData.emit(data)
+        if (data != null) {
+            _chatRoomLocalData.emit(data)
+        }
     }
 
     fun editMessageQuery(query: String) {
