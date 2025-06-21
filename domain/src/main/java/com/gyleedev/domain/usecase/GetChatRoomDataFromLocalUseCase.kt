@@ -13,7 +13,8 @@ class GetChatRoomDataFromLocalUseCase @Inject constructor(
     suspend operator fun invoke(relatedUserLocalData: RelatedUserLocalData): ChatRoomLocalDataWrapper {
         return withContext(Dispatchers.IO) {
             try {
-                ChatRoomLocalDataWrapper.Success(getChatRoomLocalDataByUidUseCase(relatedUserLocalData.uid))
+                val data = getChatRoomLocalDataByUidUseCase(relatedUserLocalData.uid)
+                ChatRoomLocalDataWrapper.Success(requireNotNull(data))
             } catch (e: Exception) {
                 ChatRoomLocalDataWrapper.Failure
             }

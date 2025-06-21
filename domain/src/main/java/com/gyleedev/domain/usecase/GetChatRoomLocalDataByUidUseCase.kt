@@ -9,7 +9,7 @@ import javax.inject.Inject
 class GetChatRoomLocalDataByUidUseCase @Inject constructor(
     private val repository: ChatRoomRepository
 ) {
-    suspend operator fun invoke(uid: String): ChatRoomLocalData {
+    suspend operator fun invoke(uid: String): ChatRoomLocalData? {
         return withContext(Dispatchers.IO) {
             repository.getChatRoomByUid(uid)
         }
