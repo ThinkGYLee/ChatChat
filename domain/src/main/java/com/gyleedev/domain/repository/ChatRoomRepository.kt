@@ -1,7 +1,7 @@
 package com.gyleedev.domain.repository
 
 import androidx.paging.PagingData
-import com.gyleedev.domain.model.ChatCreationState
+import com.gyleedev.domain.model.GetChatRoomState
 import com.gyleedev.domain.model.ChatRoomData
 import com.gyleedev.domain.model.ChatRoomLocalData
 import com.gyleedev.domain.model.ProcessResult
@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.Flow
 interface ChatRoomRepository {
     fun getChatRoom(
         user: RelatedUserLocalData,
-        chatCreationState: ChatCreationState
-    ): Flow<ChatCreationState>
+        getChatRoomState: GetChatRoomState
+    ): Flow<GetChatRoomState>
 
     fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean>
     suspend fun createChatRoomData(): Flow<ChatRoomData?>

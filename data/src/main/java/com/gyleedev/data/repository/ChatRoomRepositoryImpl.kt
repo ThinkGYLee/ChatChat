@@ -12,18 +12,18 @@ import com.google.firebase.database.ValueEventListener
 import com.gyleedev.data.database.dao.ChatRoomDao
 import com.gyleedev.data.database.entity.ChatRoomEntity
 import com.gyleedev.data.database.entity.toModel
-import com.gyleedev.domain.model.ChatCreationException
-import com.gyleedev.domain.model.ChatCreationState
-import com.gyleedev.domain.model.ChatCreationState.CheckAndGetDataFromLocal
-import com.gyleedev.domain.model.ChatCreationState.CheckingFriendDataExists
-import com.gyleedev.domain.model.ChatCreationState.CheckingMyDataExists
-import com.gyleedev.domain.model.ChatCreationState.CheckingRemoteChatRoomExists
-import com.gyleedev.domain.model.ChatCreationState.CreatingRemoteChatRoom
-import com.gyleedev.domain.model.ChatCreationState.GetRemoteData
-import com.gyleedev.domain.model.ChatCreationState.SavingChatRoomToLocal
-import com.gyleedev.domain.model.ChatCreationState.Success
-import com.gyleedev.domain.model.ChatCreationState.UpdateFriendData
-import com.gyleedev.domain.model.ChatCreationState.UpdateMyData
+import com.gyleedev.domain.model.GetChatRoomException
+import com.gyleedev.domain.model.GetChatRoomState
+import com.gyleedev.domain.model.GetChatRoomState.CheckAndGetDataFromLocal
+import com.gyleedev.domain.model.GetChatRoomState.CheckingFriendDataExists
+import com.gyleedev.domain.model.GetChatRoomState.CheckingMyDataExists
+import com.gyleedev.domain.model.GetChatRoomState.CheckingRemoteGetChatRoomExists
+import com.gyleedev.domain.model.GetChatRoomState.CreatingRemoteGetChatRoom
+import com.gyleedev.domain.model.GetChatRoomState.GetRemoteData
+import com.gyleedev.domain.model.GetChatRoomState.SavingGetChatRoomToLocal
+import com.gyleedev.domain.model.GetChatRoomState.Success
+import com.gyleedev.domain.model.GetChatRoomState.UpdateFriendData
+import com.gyleedev.domain.model.GetChatRoomState.UpdateMyData
 import com.gyleedev.domain.model.ChatRoomData
 import com.gyleedev.domain.model.ChatRoomLocalData
 import com.gyleedev.domain.model.ProcessResult
@@ -105,9 +105,9 @@ class ChatRoomRepositoryImpl @Inject constructor(
      */
     override fun getChatRoom(
         user: RelatedUserLocalData,
-        chatCreationState: ChatCreationState
-    ): Flow<ChatCreationState> = callbackFlow {
-        var currentState = chatCreationState
+        getChatRoomState: GetChatRoomState
+    ): Flow<GetChatRoomState> = callbackFlow {
+        var currentState = getChatRoomState
         var chatRoomData: ChatRoomData? = null
 
         try {
@@ -121,16 +121,16 @@ class ChatRoomRepositoryImpl @Inject constructor(
                             close()
                             break
                         }
-                        currentState = CheckingRemoteChatRoomExists
+                        currentState = CheckingRemoteGetChatRoomExists
                     }
 
-                    CheckingRemoteChatRoomExists -> {
-                        send(CheckingRemoteChatRoomExists)
+                    CheckingRemoteGetChatRoomExists -> {
+                        send(CheckingRemoteGetChatRoomExists)
                         val checkRemote = checkChatRoomExistsInRemote(user).first()
                         currentState = if (checkRemote) {
                             GetRemoteData
                         } else {
-                            CreatingRemoteChatRoom
+                            CreatingRemoteGetChatRoom
                         }
                     }
 
@@ -159,23 +159,23 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         send(CheckingFriendDataExists)
                         val isExists = checkFriendRoomDataRemote(user).first()
                         currentState = if (isExists) {
-                            SavingChatRoomToLocal
+                            SavingGetChatRoomToLocal
                         } else {
                             UpdateFriendData
                         }
                     }
 
-                    CreatingRemoteChatRoom -> {
-                        send(CreatingRemoteChatRoom)
+                    CreatingRemoteGetChatRoom -> {
+                        send(CreatingRemoteGetChatRoom)
                         val createdRoomData = createChatRoomData().first()
                         if (createdRoomData != null) {
                             currentState = UpdateMyData
                         } else {
-                            throw ChatCreationException(
+                            throw GetChatRoomException(
                                 message = "Can't create ChatRoom",
                                 cause = null,
-                                problemState = CreatingRemoteChatRoom,
-                                restartState = CreatingRemoteChatRoom
+                                problemState = CreatingRemoteGetChatRoom,
+                                restartState = CreatingRemoteGetChatRoom
                             )
                             break
                         }
@@ -186,13 +186,13 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = UpdateMyData,
-                            restartState = CheckingRemoteChatRoomExists
+                            restartState = CheckingRemoteGetChatRoomExists
                         )
                         val result = createMyUserChatRoom(user, data).first()
                         if (result == ProcessResult.Success) {
                             currentState = CheckingFriendDataExists
                         } else {
-                            throw ChatCreationException(
+                            throw GetChatRoomException(
                                 message = "Can't update MyData",
                                 cause = null,
                                 problemState = UpdateMyData,
@@ -207,13 +207,13 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = UpdateFriendData,
-                            restartState = CheckingRemoteChatRoomExists
+                            restartState = CheckingRemoteGetChatRoomExists
                         )
                         val result = createFriendUserChatRoom(user, data).first()
                         if (result == ProcessResult.Success) {
-                            currentState = SavingChatRoomToLocal
+                            currentState = SavingGetChatRoomToLocal
                         } else {
-                            throw ChatCreationException(
+                            throw GetChatRoomException(
                                 message = "Can't update FriendData",
                                 cause = null,
                                 problemState = UpdateFriendData,
@@ -223,12 +223,12 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         }
                     }
 
-                    SavingChatRoomToLocal -> {
-                        send(SavingChatRoomToLocal)
+                    SavingGetChatRoomToLocal -> {
+                        send(SavingGetChatRoomToLocal)
                         val data = requireChatRoomData(
                             data = chatRoomData,
-                            problemState = SavingChatRoomToLocal,
-                            restartState = CheckingRemoteChatRoomExists
+                            problemState = SavingGetChatRoomToLocal,
+                            restartState = CheckingRemoteGetChatRoomExists
                         )
                         insertChatRoomToLocal(user, data)
                         currentState = CheckAndGetDataFromLocal
@@ -239,7 +239,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
                 }
             }
-        } catch (e: ChatCreationException) {
+        } catch (e: GetChatRoomException) {
             println(e)
             close(e)
             throw e
@@ -248,10 +248,10 @@ class ChatRoomRepositoryImpl @Inject constructor(
 
     private fun requireChatRoomData(
         data: ChatRoomData?,
-        problemState: ChatCreationState,
-        restartState: ChatCreationState
+        problemState: GetChatRoomState,
+        restartState: GetChatRoomState
     ): ChatRoomData {
-        return data ?: throw ChatCreationException(
+        return data ?: throw GetChatRoomException(
             message = "No ChatRoomData",
             cause = null,
             problemState = problemState,
@@ -279,9 +279,9 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
                 })
             } catch (e: Exception) {
-                ChatCreationException(
-                    problemState = CheckingRemoteChatRoomExists,
-                    restartState = CheckingRemoteChatRoomExists,
+                GetChatRoomException(
+                    problemState = CheckingRemoteGetChatRoomExists,
+                    restartState = CheckingRemoteGetChatRoomExists,
                     message = requireNotNull(e.message),
                     cause = e.cause
                 )
@@ -305,9 +305,9 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         }
                 }
             } catch (e: Exception) {
-                ChatCreationException(
-                    problemState = CreatingRemoteChatRoom,
-                    restartState = CreatingRemoteChatRoom,
+                GetChatRoomException(
+                    problemState = CreatingRemoteGetChatRoom,
+                    restartState = CreatingRemoteGetChatRoom,
                     message = requireNotNull(e.message),
                     cause = e.cause
                 )
@@ -337,9 +337,9 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
             }
         } catch (e: Exception) {
-            ChatCreationException(
+            GetChatRoomException(
                 problemState = UpdateMyData,
-                restartState = CheckingRemoteChatRoomExists,
+                restartState = CheckingRemoteGetChatRoomExists,
                 message = requireNotNull(e.message),
                 cause = e.cause
             )
@@ -370,7 +370,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     )
             }
         } catch (e: Exception) {
-            throw ChatCreationException(
+            throw GetChatRoomException(
                 cause = e.cause,
                 message = e.message.toString(),
                 problemState = CheckingMyDataExists,
@@ -405,7 +405,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     )
             }
         } catch (e: Exception) {
-            throw ChatCreationException(
+            throw GetChatRoomException(
                 cause = e.cause,
                 message = e.message.toString(),
                 problemState = CheckingFriendDataExists,
@@ -433,10 +433,10 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
             }
         } catch (e: Exception) {
-            ChatCreationException(
+            GetChatRoomException(
                 problemState = UpdateFriendData,
                 message = requireNotNull(e.message),
-                restartState = CheckingRemoteChatRoomExists,
+                restartState = CheckingRemoteGetChatRoomExists,
                 cause = e.cause
             )
         }
@@ -451,7 +451,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
         return try {
             chatRoomDao.getChatRoomByUid(uid).toModel()
         } catch (e: Exception) {
-            throw ChatCreationException(
+            throw GetChatRoomException(
                 problemState = CheckAndGetDataFromLocal,
                 restartState = CheckAndGetDataFromLocal,
                 message = requireNotNull(e.message),
@@ -507,9 +507,9 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     }
                 })
             } catch (e: Exception) {
-                ChatCreationException(
-                    problemState = CheckingRemoteChatRoomExists,
-                    restartState = CheckingRemoteChatRoomExists,
+                GetChatRoomException(
+                    problemState = CheckingRemoteGetChatRoomExists,
+                    restartState = CheckingRemoteGetChatRoomExists,
                     message = requireNotNull(e.message),
                     cause = e.cause
                 )
