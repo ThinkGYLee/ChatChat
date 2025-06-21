@@ -18,16 +18,3 @@ sealed interface ChatCreationState {
         val failurePoint: ChatCreationState
     ) : ChatCreationState
 }
-
-/*
-    check local
-    check remote roomdata exists
-    check remote mydata
-    check remote frienddata
-    create room
-    update myData
-    update friendData
-    insert data to local
-    get data from local
-
- */
