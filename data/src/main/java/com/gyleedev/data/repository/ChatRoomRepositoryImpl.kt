@@ -112,7 +112,6 @@ class ChatRoomRepositoryImpl @Inject constructor(
         user: RelatedUserLocalData,
         getChatRoomState: GetChatRoomState
     ): GetChatRoomState {
-
         var chatRoomData: ChatRoomData? = null
         var localCurrentState = getChatRoomState
         _currentState.emit(getChatRoomState)

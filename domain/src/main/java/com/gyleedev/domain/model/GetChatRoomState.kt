@@ -1,7 +1,7 @@
 package com.gyleedev.domain.model
 
 sealed interface GetChatRoomState {
-    data object None: GetChatRoomState
+    data object None : GetChatRoomState
     data object CheckAndGetDataFromLocal : GetChatRoomState
     data object CheckingRemoteGetChatRoomExists : GetChatRoomState
     data object GetRemoteData : GetChatRoomState
