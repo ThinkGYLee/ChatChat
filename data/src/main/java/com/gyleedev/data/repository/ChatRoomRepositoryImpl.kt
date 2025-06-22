@@ -105,7 +105,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
 
      */
     private val _currentState: MutableStateFlow<GetChatRoomState> = MutableStateFlow(None)
-    val currentState: Flow<GetChatRoomState>
+    override val currentState: Flow<GetChatRoomState>
         get() = _currentState
 
     override suspend fun getChatRoom(

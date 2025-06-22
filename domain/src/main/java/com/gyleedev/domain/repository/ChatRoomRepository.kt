@@ -9,6 +9,8 @@ import com.gyleedev.domain.model.RelatedUserLocalData
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRoomRepository {
+    val currentState: Flow<GetChatRoomState>
+
     suspend fun getChatRoom(
         user: RelatedUserLocalData,
         getChatRoomState: GetChatRoomState
