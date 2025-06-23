@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatRoomRepository {
     val currentState: Flow<GetChatRoomState>
+    suspend fun resetCurrentState()
 
     suspend fun getChatRoom(
         user: RelatedUserLocalData,

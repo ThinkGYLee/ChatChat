@@ -108,6 +108,10 @@ class ChatRoomRepositoryImpl @Inject constructor(
     override val currentState: Flow<GetChatRoomState>
         get() = _currentState
 
+    override suspend fun resetCurrentState() {
+        _currentState.emit(None)
+    }
+
     override suspend fun getChatRoom(
         user: RelatedUserLocalData,
         getChatRoomState: GetChatRoomState
@@ -123,7 +127,6 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         if (checkLocal != null) {
                             _currentState.emit(Success(checkLocal))
                             return Success(checkLocal)
-                            _currentState.emit(None)
                             break
                         } else {
                             _currentState.emit(CheckingRemoteGetChatRoomExists)
