@@ -179,6 +179,11 @@ fun ChatRoomScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        chatRoomViewModel.getChatRoomEvent.flowWithLifecycle(lifecycle.lifecycle).collectLatest {
+        }
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -293,6 +298,10 @@ fun ChatRoomScreen(
                         }
                     }
                 }
+            }
+        } else {
+            Box(modifier = modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
 
