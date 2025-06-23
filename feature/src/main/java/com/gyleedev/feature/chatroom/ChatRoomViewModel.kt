@@ -20,20 +20,21 @@ import com.gyleedev.domain.model.UserRelationState
 import com.gyleedev.domain.usecase.BlockRelatedUserUseCase
 import com.gyleedev.domain.usecase.CancelMessageUseCase
 import com.gyleedev.domain.usecase.DeleteMessageUseCase
-import com.gyleedev.domain.usecase.GetChatRoomDataUseCase
-import com.gyleedev.domain.usecase.GetChatRoomLocalDataByUidUseCase
+import com.gyleedev.domain.usecase.GetChatRoomDataStateObserveUseCase
 import com.gyleedev.domain.usecase.GetChatRoomUseCase
 import com.gyleedev.domain.usecase.GetFriendDataUseCase
 import com.gyleedev.domain.usecase.GetMessagesFromLocalUseCase
 import com.gyleedev.domain.usecase.GetMessagesFromRemoteUseCase
 import com.gyleedev.domain.usecase.GetMyUidFromLogInDataUseCase
 import com.gyleedev.domain.usecase.ResendMessageUseCase
+import com.gyleedev.domain.usecase.ResetGetChatDataStateUseCase
 import com.gyleedev.domain.usecase.SendMessageUseCase
 import com.gyleedev.domain.usecase.UserToFriendUseCase
 import com.gyleedev.util.FirebaseServerTimeHelper
 import com.gyleedev.util.NetworkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -54,10 +55,10 @@ import javax.inject.Inject
 class ChatRoomViewModel @Inject constructor(
     getMyUidFromLogInDataUseCase: GetMyUidFromLogInDataUseCase,
     private val getFriendDataUseCase: GetFriendDataUseCase,
-    private val getChatRoomLocalDataByUidUseCase: GetChatRoomLocalDataByUidUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val getMessagesFromLocalUseCase: GetMessagesFromLocalUseCase,
-    private val getChatRoomDataUseCase: GetChatRoomDataUseCase,
+    private val getChatRoomDataStateObserveUseCase: GetChatRoomDataStateObserveUseCase,
+    private val resetGetChatDataStateUseCase: ResetGetChatDataStateUseCase,
     private val getMessagesFromRemoteUseCase: GetMessagesFromRemoteUseCase,
     private val getNetworkState: NetworkManager,
     private val resendMessageUseCase: ResendMessageUseCase,
@@ -89,13 +90,19 @@ class ChatRoomViewModel @Inject constructor(
     private val _getChatRoomEvent = MutableSharedFlow<GetChatRoomException>()
     val getChatRoomEvent: SharedFlow<GetChatRoomException> = _getChatRoomEvent
 
+    private val getChatRoomState = MutableStateFlow<GetChatRoomState>(GetChatRoomState.None)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val messages = _chatRoomLocalData.flatMapLatest {
         getMessagesFromLocalUseCase(it.rid).cachedIn(viewModelScope)
     }
 
-    val uiState = combine(relatedUserLocalData, myUid) { friendData, uid ->
-        if (uid != null) {
+    val uiState = combine(
+        relatedUserLocalData,
+        myUid,
+        getChatRoomState
+    ) { friendData, uid, getChatRoomState ->
+        if (uid != null && getChatRoomState is GetChatRoomState.Success) {
             ChatRoomUiState.Success(
                 userName = friendData.name,
                 uid = uid,
@@ -121,33 +128,38 @@ class ChatRoomViewModel @Inject constructor(
             throw Exception("예외 처리 에러 말고 단거로")
         }
         viewModelScope.launch {
-            /*val friend = getFriendDataUseCase(passedFriendUid).first()
-            relatedUserLocalData.emit(friend)*/
-            /*getChatRoomDataUseCase(friend)
-            getChatRoomFromLocal(friend)*/
             try {
                 val friend = getFriendDataUseCase(passedFriendUid).first()
                 relatedUserLocalData.emit(friend)
+                observeCurrentState()
                 val getChatRoomData = getChatRoomUseCase(
                     relatedUserLocalData.value,
                     GetChatRoomState.CheckAndGetDataFromLocal
                 )
                 if (getChatRoomData is GetChatRoomState.Success) {
                     _chatRoomLocalData.emit(getChatRoomData.data)
+                    resetGetChatDataStateUseCase()
                     messagesCallback.collectLatest { }
                 }
             } catch (e: GetChatRoomException) {
                 println(e)
                 _getChatRoomEvent.emit(e)
             }
-            // messagesCallback.collectLatest { }
         }
     }
 
-    private suspend fun getChatRoomFromLocal(relatedUserLocalData: RelatedUserLocalData) {
-        val data = getChatRoomLocalDataByUidUseCase(relatedUserLocalData.uid)
-        if (data != null) {
-            _chatRoomLocalData.emit(data)
+    private fun observeCurrentState() {
+        viewModelScope.launch scope@{
+            val state = getChatRoomDataStateObserveUseCase()
+            state.collect { currentState ->
+                if (currentState !is GetChatRoomState.None) {
+                    getChatRoomState.emit(currentState)
+                }
+                if (currentState is GetChatRoomState.Success) {
+                    this.cancel()
+                    return@collect
+                }
+            }
         }
     }
 
