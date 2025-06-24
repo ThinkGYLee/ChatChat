@@ -258,6 +258,10 @@ class ChatRoomRepositoryImpl @Inject constructor(
         }
     }
 
+    private fun createGroupChat() {
+
+    }
+
     private fun requireChatRoomData(
         data: ChatRoomData?,
         problemState: GetChatRoomState,
