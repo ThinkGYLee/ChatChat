@@ -3,7 +3,6 @@ package com.gyleedev.domain.model
 data class ChatRoomLocalData(
     val id: Long = 0,
     val rid: String = "",
-    val receiver: String = "",
     val lastMessage: String = ""
 )
 // 챗룸정보 테이블 -> 챗룸id를 키값으로

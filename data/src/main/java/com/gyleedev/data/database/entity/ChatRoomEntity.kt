@@ -14,8 +14,6 @@ data class ChatRoomEntity(
     val id: Long,
     @ColumnInfo(name = "rid")
     val rid: String,
-    @ColumnInfo(name = "receiver")
-    val receiver: String,
     @ColumnInfo(name = "lastMessage")
     val lastMessage: String
 )
@@ -24,7 +22,6 @@ fun ChatRoomEntity.toModel(): ChatRoomLocalData {
     return ChatRoomLocalData(
         id = id,
         rid = rid,
-        receiver = receiver,
         lastMessage = lastMessage
     )
 }
