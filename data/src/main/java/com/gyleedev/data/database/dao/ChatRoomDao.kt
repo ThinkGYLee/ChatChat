@@ -16,6 +16,9 @@ interface ChatRoomDao {
     @Query("SELECT * FROM chatroom WHERE receiver = :receiver")
     fun getChatRoomByUid(receiver: String): ChatRoomEntity?
 
+    @Query("SELECT * FROM chatroom WHERE rid = :rid")
+    fun getChatRoomByRid(rid: String): ChatRoomEntity?
+
     @Update
     fun updateChatRoom(chatRoom: ChatRoomEntity)
 
