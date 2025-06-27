@@ -9,7 +9,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.gyleedev.core.BaseViewModel
-import com.gyleedev.domain.model.ChatRoomLocalData
+import com.gyleedev.domain.model.ChatRoomAndReceiverLocalData
 import com.gyleedev.domain.model.GetChatRoomException
 import com.gyleedev.domain.model.GetChatRoomState
 import com.gyleedev.domain.model.MessageData
@@ -20,12 +20,14 @@ import com.gyleedev.domain.model.UserRelationState
 import com.gyleedev.domain.usecase.BlockRelatedUserUseCase
 import com.gyleedev.domain.usecase.CancelMessageUseCase
 import com.gyleedev.domain.usecase.DeleteMessageUseCase
+import com.gyleedev.domain.usecase.GetChatRoomByRidUseCase
+import com.gyleedev.domain.usecase.GetChatRoomByUidUseCase
 import com.gyleedev.domain.usecase.GetChatRoomDataStateObserveUseCase
-import com.gyleedev.domain.usecase.GetChatRoomUseCase
 import com.gyleedev.domain.usecase.GetFriendDataUseCase
 import com.gyleedev.domain.usecase.GetMessagesFromLocalUseCase
 import com.gyleedev.domain.usecase.GetMessagesFromRemoteUseCase
 import com.gyleedev.domain.usecase.GetMyUidFromLogInDataUseCase
+import com.gyleedev.domain.usecase.GetRelatedUserDataOfParticipantsByUidUseCase
 import com.gyleedev.domain.usecase.ResendMessageUseCase
 import com.gyleedev.domain.usecase.ResetGetChatDataStateUseCase
 import com.gyleedev.domain.usecase.SendMessageUseCase
@@ -66,16 +68,19 @@ class ChatRoomViewModel @Inject constructor(
     private val userToFriendUseCase: UserToFriendUseCase,
     private val blockRelatedUserUseCase: BlockRelatedUserUseCase,
     private val deleteMessageUseCase: DeleteMessageUseCase,
-    private val getChatRoomUseCase: GetChatRoomUseCase,
+    private val getChatRoomByUidUseCase: GetChatRoomByUidUseCase,
+    private val getChatRoomByRidUseCase: GetChatRoomByRidUseCase,
+    private val getRelatedUserDataOfParticipantsByUidUseCase: GetRelatedUserDataOfParticipantsByUidUseCase,
     private val firebaseServerTimeHelper: FirebaseServerTimeHelper,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
-    private val relatedUserLocalData = MutableStateFlow(RelatedUserLocalData())
+    private val chatRoomParticipants = MutableStateFlow<List<RelatedUserLocalData>>(emptyList())
     private var uid: String? = null
     private val myUid = getMyUidFromLogInDataUseCase().onEach { uid = it }
+    private val rid = MutableStateFlow<String?>(null)
 
     private val _messageQuery = MutableStateFlow("")
-    private val _chatRoomLocalData = MutableStateFlow(ChatRoomLocalData())
+    private val _chatRoomLocalData = MutableStateFlow(ChatRoomAndReceiverLocalData())
 
     private val _photoUri = MutableStateFlow("")
     val photoUri: StateFlow<String> = _photoUri
@@ -98,15 +103,22 @@ class ChatRoomViewModel @Inject constructor(
     }
 
     val uiState = combine(
-        relatedUserLocalData,
+        chatRoomParticipants,
         myUid,
+        rid,
         getChatRoomState
-    ) { friendData, uid, getChatRoomState ->
-        if (uid != null && getChatRoomState is GetChatRoomState.Success) {
+    ) { participants, uid, rid, getChatRoomState ->
+        if (rid != null && uid != null && participants.isNotEmpty() && getChatRoomState is GetChatRoomState.Success) {
             ChatRoomUiState.Success(
-                userName = friendData.name,
+                userName = if (participants.size == 1) participants[0].name else "${participants[0].name} 외 ${participants.size} 명",
+                uid = requireNotNull(uid),
+                relationState = if (participants.size == 1) participants[0].userRelation else UserRelationState.GROUP
+            )
+        } else if (rid == null && uid != null && getChatRoomState is GetChatRoomState.Success) {
+            ChatRoomUiState.Success(
+                userName = if (participants.size == 1) participants[0].name else "${participants[0].name} 외 ${participants.size} 명",
                 uid = uid,
-                relationState = friendData.userRelation
+                relationState = if (participants.size == 1) participants[0].userRelation else UserRelationState.GROUP
             )
         } else {
             ChatRoomUiState.Loading
@@ -117,23 +129,40 @@ class ChatRoomViewModel @Inject constructor(
         ChatRoomUiState.Loading
     )
 
-    private val messagesCallback = relatedUserLocalData.flatMapLatest {
-        getMessagesFromRemoteUseCase(_chatRoomLocalData.value, it.userRelation)
+    private val messagesCallback = chatRoomParticipants.flatMapLatest {
+        val relation = if (it.size == 1) it[0].userRelation else UserRelationState.GROUP
+        getMessagesFromRemoteUseCase(_chatRoomLocalData.value, relation)
     }
 
     init {
-        val passedFriendUid = savedStateHandle.get<String>("friend")
-        if (passedFriendUid == null) {
+        val passedRid = savedStateHandle.get<String>("rid")
+        val passedFriendUid = savedStateHandle.get<String>("uid")
+
+        if (passedFriendUid == null && passedRid == null) {
             // TODO 화면 종료 처리
             throw Exception("예외 처리 에러 말고 단거로")
         }
+
+        if (passedFriendUid != null) {
+            startChatRoomWithUid(passedFriendUid)
+        }
+
+        if (passedRid != null) {
+            viewModelScope.launch {
+                rid.emit(passedRid)
+                startChatRoomWithRid(passedRid)
+            }
+        }
+    }
+
+    fun startChatRoomWithUid(uid: String) {
         viewModelScope.launch {
             try {
-                val friend = getFriendDataUseCase(passedFriendUid).first()
-                relatedUserLocalData.emit(friend)
+                val friend = getFriendDataUseCase(requireNotNull(uid)).first()
+                chatRoomParticipants.emit(listOf(friend))
                 observeCurrentState()
-                val getChatRoomData = getChatRoomUseCase(
-                    relatedUserLocalData.value,
+                val getChatRoomData = getChatRoomByUidUseCase(
+                    chatRoomParticipants.value[0],
                     GetChatRoomState.CheckAndGetDataFromLocal
                 )
                 if (getChatRoomData is GetChatRoomState.Success) {
@@ -148,8 +177,30 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
+    fun startChatRoomWithRid(rid: String) {
+        viewModelScope.launch {
+            try {
+                observeCurrentState()
+                val getChatRoomData = getChatRoomByRidUseCase(rid)
+                if (getChatRoomData is GetChatRoomState.Success) {
+                    chatRoomParticipants.emit(
+                        getRelatedUserDataOfParticipantsByUidUseCase(
+                            getChatRoomData.data.receivers
+                        )
+                    )
+                    _chatRoomLocalData.emit(getChatRoomData.data)
+                    resetGetChatDataStateUseCase()
+                    messagesCallback.collectLatest { }
+                }
+            } catch (e: GetChatRoomException) {
+                println(e)
+                _getChatRoomEvent.emit(e)
+            }
+        }
+    }
+
     private fun observeCurrentState() {
-        viewModelScope.launch scope@{
+        viewModelScope.launch {
             val state = getChatRoomDataStateObserveUseCase()
             state.collect { currentState ->
                 if (currentState !is GetChatRoomState.None) {
@@ -289,22 +340,22 @@ class ChatRoomViewModel @Inject constructor(
 
     fun blockUser() {
         viewModelScope.launch {
-            blockRelatedUserUseCase(relatedUserLocalData.value)
-            val changedData = relatedUserLocalData.value.copy(
+            blockRelatedUserUseCase(chatRoomParticipants.value[0])
+            val changedData = chatRoomParticipants.value[0].copy(
                 userRelation = UserRelationState.BLOCKED,
                 favoriteState = false
             )
-            relatedUserLocalData.emit(changedData)
+            chatRoomParticipants.emit(listOf(changedData))
         }
     }
 
     fun userToFriend() {
         viewModelScope.launch {
-            userToFriendUseCase(relatedUserLocalData.value)
-            val changedData = relatedUserLocalData.value.copy(
+            userToFriendUseCase(chatRoomParticipants.value[0])
+            val changedData = chatRoomParticipants.value[0].copy(
                 userRelation = UserRelationState.FRIEND
             )
-            relatedUserLocalData.emit(changedData)
+            chatRoomParticipants.emit(listOf(changedData))
         }
     }
 

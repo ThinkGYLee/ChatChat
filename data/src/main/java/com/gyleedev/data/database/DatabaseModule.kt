@@ -3,9 +3,11 @@ package com.gyleedev.data.database
 import android.content.Context
 import androidx.room.Room
 import com.gyleedev.data.database.dao.ChatListWithMessageAndFriendDao
+import com.gyleedev.data.database.dao.ChatRoomAndReceiverDao
 import com.gyleedev.data.database.dao.ChatRoomDao
 import com.gyleedev.data.database.dao.FavoriteDao
 import com.gyleedev.data.database.dao.MessageDao
+import com.gyleedev.data.database.dao.ReceiverDao
 import com.gyleedev.data.database.dao.UserAndFavoriteDao
 import com.gyleedev.data.database.dao.UserDao
 import dagger.Module
@@ -58,4 +60,14 @@ object DatabaseModule {
     @Provides
     fun providesUserAndFavoriteDao(chatDataDatabase: ChatDataDatabase): UserAndFavoriteDao =
         chatDataDatabase.userAndFavoriteDao()
+
+    @Singleton
+    @Provides
+    fun providesReceiverDao(chatDataDatabase: ChatDataDatabase): ReceiverDao =
+        chatDataDatabase.receiverDao()
+
+    @Singleton
+    @Provides
+    fun providesChatRoomAndReceiverDao(chatDataDatabase: ChatDataDatabase): ChatRoomAndReceiverDao =
+        chatDataDatabase.chatRoomAndReceiverDao()
 }

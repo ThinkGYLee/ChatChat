@@ -5,5 +5,6 @@ enum class UserRelationState {
     UNKNOWN,
     FRIEND,
     HIDE,
-    BLOCKED
+    BLOCKED,
+    GROUP
 }

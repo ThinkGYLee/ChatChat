@@ -99,8 +99,10 @@ fun ChatChatScreen(
 
             composable(route = BottomNavItem.ChatList.screenRoute) {
                 ChatListScreen(
-                    onClick = { navController.navigate("${BottomNavItem.ChatRoom.screenRoute}/$it") },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    onClick = {
+                        navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?rid=$it")
+                    }
                 )
             }
 
@@ -186,6 +188,22 @@ fun ChatChatScreen(
             }
 
             composable(
+                route = "${BottomNavItem.ChatRoom.screenRoute}?uid={uid}&rid={rid}",
+                arguments = listOf(
+                    navArgument("uid") {
+                        type = NavType.StringType
+                        nullable = true
+                    },
+                    navArgument("rid") {
+                        type = NavType.StringType
+                        nullable = true
+                    }
+                )
+            ) {
+                ChatRoomScreen(onBackPressKeyClick = { navController.navigateUp() })
+            }
+
+            composable(
                 route = "${BottomNavItem.FriendInfo.screenRoute}/{friend}",
                 arguments = listOf(
                     navArgument("friend") {
@@ -196,7 +214,7 @@ fun ChatChatScreen(
             ) {
                 FriendInfoScreen(
                     onCloseKeyPressed = { navController.navigateUp() },
-                    onChatRoomClick = { navController.navigate("${BottomNavItem.ChatRoom.screenRoute}/$it") }
+                    onChatRoomClick = { navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?uid=$it") }
                 )
             }
 

@@ -3,14 +3,17 @@ package com.gyleedev.data.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.gyleedev.data.database.dao.ChatListWithMessageAndFriendDao
+import com.gyleedev.data.database.dao.ChatRoomAndReceiverDao
 import com.gyleedev.data.database.dao.ChatRoomDao
 import com.gyleedev.data.database.dao.FavoriteDao
 import com.gyleedev.data.database.dao.MessageDao
+import com.gyleedev.data.database.dao.ReceiverDao
 import com.gyleedev.data.database.dao.UserAndFavoriteDao
 import com.gyleedev.data.database.dao.UserDao
 import com.gyleedev.data.database.entity.ChatRoomEntity
 import com.gyleedev.data.database.entity.FavoriteEntity
 import com.gyleedev.data.database.entity.MessageEntity
+import com.gyleedev.data.database.entity.ReceiverEntity
 import com.gyleedev.data.database.entity.UserEntity
 import com.gyleedev.data.database.entity.UserFts
 
@@ -20,7 +23,8 @@ import com.gyleedev.data.database.entity.UserFts
         UserFts::class,
         FavoriteEntity::class,
         ChatRoomEntity::class,
-        MessageEntity::class
+        MessageEntity::class,
+        ReceiverEntity::class
     ],
     version = 1,
     exportSchema = true
@@ -33,4 +37,6 @@ abstract class ChatDataDatabase : RoomDatabase() {
     abstract fun chatListWithMessageAndFriendDao(): ChatListWithMessageAndFriendDao
     abstract fun favoriteDao(): FavoriteDao
     abstract fun userAndFavoriteDao(): UserAndFavoriteDao
+    abstract fun receiverDao(): ReceiverDao
+    abstract fun chatRoomAndReceiverDao(): ChatRoomAndReceiverDao
 }

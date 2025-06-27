@@ -1,8 +1,8 @@
 package com.gyleedev.domain.repository
 
 import androidx.paging.PagingData
+import com.gyleedev.domain.model.ChatRoomAndReceiverLocalData
 import com.gyleedev.domain.model.ChatRoomData
-import com.gyleedev.domain.model.ChatRoomLocalData
 import com.gyleedev.domain.model.GetChatRoomState
 import com.gyleedev.domain.model.ProcessResult
 import com.gyleedev.domain.model.RelatedUserLocalData
@@ -12,8 +12,18 @@ interface ChatRoomRepository {
     val currentState: Flow<GetChatRoomState>
     suspend fun resetCurrentState()
 
-    suspend fun getChatRoom(
+    suspend fun getChatRoomWithUserData(
         user: RelatedUserLocalData,
+        getChatRoomState: GetChatRoomState
+    ): GetChatRoomState
+
+    suspend fun getChatRoomWithRid(
+        rid: String,
+        getChatRoomState: GetChatRoomState
+    ): GetChatRoomState
+
+    suspend fun createGroupChat(
+        users: List<RelatedUserLocalData>,
         getChatRoomState: GetChatRoomState
     ): GetChatRoomState
 
@@ -33,12 +43,13 @@ interface ChatRoomRepository {
     fun getChatRoomFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<ChatRoomData?>
     suspend fun insertChatRoomToLocal(
         relatedUserLocalData: RelatedUserLocalData,
-        chatRoomData: ChatRoomData
+        chatRoomData: ChatRoomData,
+        isGroup: Boolean = false
     ): Long
 
-    suspend fun makeNewChatRoom(rid: String, receiver: String): Long
+    suspend fun makeNewChatRoom(rid: String, receiver: String, isGroup: Boolean = false): Long
 
-    suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData?
+    // suspend fun getChatRoomByUid(uid: String): ChatRoomLocalData?
     suspend fun resetChatRoomData()
-    fun getChatRoomListWithPaging(): Flow<PagingData<ChatRoomLocalData>>
+    fun getChatRoomListWithPaging(): Flow<PagingData<ChatRoomAndReceiverLocalData>>
 }
