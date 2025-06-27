@@ -20,13 +20,13 @@ import com.gyleedev.domain.model.ChatRoomAndReceiverLocalData
 import com.gyleedev.domain.model.ChatRoomData
 import com.gyleedev.domain.model.GetChatRoomException
 import com.gyleedev.domain.model.GetChatRoomState
-import com.gyleedev.domain.model.GetChatRoomState.CompareAndInsertReceiversToLocal
 import com.gyleedev.domain.model.GetChatRoomState.CheckAndGetDataFromLocal
 import com.gyleedev.domain.model.GetChatRoomState.CheckingFriendDataExists
 import com.gyleedev.domain.model.GetChatRoomState.CheckingFriendReceiverExists
 import com.gyleedev.domain.model.GetChatRoomState.CheckingMyDataExists
 import com.gyleedev.domain.model.GetChatRoomState.CheckingMyReceiverExists
 import com.gyleedev.domain.model.GetChatRoomState.CheckingRemoteGetChatRoomExists
+import com.gyleedev.domain.model.GetChatRoomState.CompareAndInsertReceiversToLocal
 import com.gyleedev.domain.model.GetChatRoomState.CreatingRemoteChatRoomData
 import com.gyleedev.domain.model.GetChatRoomState.GetRemoteData
 import com.gyleedev.domain.model.GetChatRoomState.GetRemoteReceivers
