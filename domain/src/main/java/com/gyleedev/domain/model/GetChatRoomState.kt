@@ -16,6 +16,6 @@ sealed interface GetChatRoomState {
     data object UpdateFriendData : GetChatRoomState
     data object SavingGetChatRoomToLocal : GetChatRoomState
     data class Success(
-        val data: ChatRoomLocalData
+        val data: ChatRoomAndReceiverLocalData
     ) : GetChatRoomState
 }
