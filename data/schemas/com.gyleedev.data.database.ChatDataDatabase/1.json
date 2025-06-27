@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6afa4b84fd14cd02d400bedcf7d7d763",
+    "identityHash": "b715b83452582b313d4a3a25bbfc4459",
     "entities": [
       {
         "tableName": "user",
@@ -170,7 +170,7 @@
       },
       {
         "tableName": "chatroom",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `rid` TEXT NOT NULL, `receiver` TEXT NOT NULL, `lastMessage` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `rid` TEXT NOT NULL, `lastMessage` TEXT NOT NULL, `isGroup` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -185,15 +185,15 @@
             "notNull": true
           },
           {
-            "fieldPath": "receiver",
-            "columnName": "receiver",
+            "fieldPath": "lastMessage",
+            "columnName": "lastMessage",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "lastMessage",
-            "columnName": "lastMessage",
-            "affinity": "TEXT",
+            "fieldPath": "isGroup",
+            "columnName": "isGroup",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -283,11 +283,65 @@
             "id"
           ]
         }
+      },
+      {
+        "tableName": "receiver",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `chatroom_entity_id` INTEGER NOT NULL, `receiver` TEXT NOT NULL, FOREIGN KEY(`chatroom_entity_id`) REFERENCES `chatroom`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userEntityId",
+            "columnName": "chatroom_entity_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receiver",
+            "columnName": "receiver",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_receiver_chatroom_entity_id",
+            "unique": false,
+            "columnNames": [
+              "chatroom_entity_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_receiver_chatroom_entity_id` ON `${TABLE_NAME}` (`chatroom_entity_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chatroom",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chatroom_entity_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6afa4b84fd14cd02d400bedcf7d7d763')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b715b83452582b313d4a3a25bbfc4459')"
     ]
   }
 }
