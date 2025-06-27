@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.gyleedev.domain.model.UserChatRoomReceiver
 
 @Entity(
     tableName = "receiver",
@@ -28,3 +29,11 @@ data class ReceiverEntity(
     @ColumnInfo(name = "receiver")
     val receiver: String
 )
+
+fun UserChatRoomReceiver.toEntity(userEntityId: Long): ReceiverEntity {
+    return ReceiverEntity(
+        id = 0L,
+        userEntityId = userEntityId,
+        receiver = receiver
+    )
+}
