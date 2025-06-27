@@ -947,4 +947,14 @@ class UserRepositoryImpl @Inject constructor(
             }
         awaitClose()
     }
+
+    override suspend fun getUsersByUid(list: List<String>): List<RelatedUserLocalData> {
+        return list.map {
+            requireNotNull(
+                userDao.getUserInfoByUid(it).map {
+                    it?.toRelationLocalData()
+                }.first()
+            )
+        }
+    }
 }

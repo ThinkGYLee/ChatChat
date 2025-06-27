@@ -29,6 +29,8 @@ interface UserRepository {
         userRelation: UserRelationState = UserRelationState.FRIEND
     ): Flow<Boolean>
 
+    suspend fun getUsersByUid(list: List<String>): List<RelatedUserLocalData>
+
     suspend fun getMyRelatedUserListFromRemote(): Flow<List<RelatedUserRemoteData>?>
     suspend fun insertMyRelationsToLocal(list: List<RelatedUserRemoteData>)
     suspend fun insertFriendToLocal(user: UserData): Flow<Boolean>
