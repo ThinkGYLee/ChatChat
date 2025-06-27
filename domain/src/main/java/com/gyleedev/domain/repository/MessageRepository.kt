@@ -1,7 +1,7 @@
 package com.gyleedev.domain.repository
 
 import androidx.paging.PagingData
-import com.gyleedev.domain.model.ChatRoomLocalData
+import com.gyleedev.domain.model.ChatRoomAndReceiverLocalData
 import com.gyleedev.domain.model.MessageData
 import com.gyleedev.domain.model.MessageSendState
 import com.gyleedev.domain.model.ProcessResult
@@ -14,7 +14,7 @@ interface MessageRepository {
     suspend fun updateMessageState(messageId: Long, roomId: Long, message: MessageData)
 
     fun getMessageListener(
-        chatRoom: ChatRoomLocalData,
+        chatRoom: ChatRoomAndReceiverLocalData,
         userRelationState: UserRelationState
     ): Flow<MessageData?>
 
