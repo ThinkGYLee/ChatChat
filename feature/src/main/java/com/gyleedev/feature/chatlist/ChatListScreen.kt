@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -59,7 +60,7 @@ fun ChatListScreen(
     modifier: Modifier = Modifier,
     viewModel: ChatListViewModel = hiltViewModel()
 ) {
-    val chatRoomList = viewModel.chatRoomList.collectAsLazyPagingItems()
+    val chatRoomList = viewModel.uiState.collectAsLazyPagingItems()
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect {
         }
@@ -88,7 +89,7 @@ fun ChatListScreen(
             ) {
                 items(
                     chatRoomList.itemCount,
-                    key = { requireNotNull(chatRoomList[it]).chatRoomLocalData.id },
+                    key = { requireNotNull(chatRoomList[it]).chatRoomAndReceiverLocalData.id },
                     contentType = { 0 }
                 ) { index ->
                     ChatRoomItem(
@@ -119,15 +120,15 @@ fun ChatRoomItem(
         modifier
             .fillMaxWidth()
             .clickable {
-                onClick(chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.uid)
+                onClick(chatRoomDataWithAllRelatedUsersAndMessage.chatRoomAndReceiverLocalData.rid)
             }
             .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
-        Row(Modifier) {
+        Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
             GlideImage(
                 imageModel = {
-                    chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.picture.ifBlank { R.drawable.baseline_person_24 }
+                    chatRoomDataWithAllRelatedUsersAndMessage.receiversInfo[0].picture.ifBlank { R.drawable.baseline_person_24 }
                 },
                 imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                 modifier = Modifier
@@ -150,14 +151,16 @@ fun ChatRoomItem(
                 previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
             )
             Spacer(modifier = Modifier.width(20.dp))
-            Column {
+            Column(verticalArrangement = Arrangement.Center) {
                 Text(
-                    text = chatRoomDataWithAllRelatedUsersAndMessage.relatedUserLocalData.name,
+                    text = chatRoomDataWithAllRelatedUsersAndMessage.receiversInfo[0].name,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(text = text, style = MaterialTheme.typography.labelMedium, maxLines = 2)
+                if (chatRoomDataWithAllRelatedUsersAndMessage.receiversInfo[0].status.isNotBlank()) {
+                    Text(text = text, style = MaterialTheme.typography.labelMedium, maxLines = 2)
+                }
             }
         }
 
