@@ -1,6 +1,6 @@
 package com.gyleedev.domain.usecase
 
-import com.gyleedev.domain.model.ChatRoomLocalData
+import com.gyleedev.domain.model.ChatRoomAndReceiverLocalData
 import com.gyleedev.domain.model.MessageData
 import com.gyleedev.domain.model.UserRelationState
 import com.gyleedev.domain.repository.MessageRepository
@@ -11,7 +11,7 @@ class GetMessagesFromRemoteUseCase @Inject constructor(
     private val repository: MessageRepository
 ) {
     operator fun invoke(
-        chatRoom: ChatRoomLocalData,
+        chatRoom: ChatRoomAndReceiverLocalData,
         userRelationState: UserRelationState
     ): Flow<MessageData?> {
         return repository.getMessageListener(chatRoom, userRelationState)
