@@ -18,7 +18,7 @@ import com.gyleedev.data.database.entity.toEntity
 import com.gyleedev.data.database.entity.toModel
 import com.gyleedev.data.database.entity.toUpdateEntity
 import com.gyleedev.data.preference.MyDataPreference
-import com.gyleedev.domain.model.ChatRoomLocalData
+import com.gyleedev.domain.model.ChatRoomAndReceiverLocalData
 import com.gyleedev.domain.model.MessageData
 import com.gyleedev.domain.model.MessageSendState
 import com.gyleedev.domain.model.MessageType
@@ -86,7 +86,7 @@ class MessageRepositoryImpl @Inject constructor(
     }
 
     override fun getMessageListener(
-        chatRoom: ChatRoomLocalData,
+        chatRoom: ChatRoomAndReceiverLocalData,
         userRelationState: UserRelationState
     ): Flow<MessageData?> {
         return messageListener(chatRoom)
@@ -97,7 +97,7 @@ class MessageRepositoryImpl @Inject constructor(
             }.flowOn(Dispatchers.IO)
     }
 
-    private fun messageListener(chatRoom: ChatRoomLocalData): Flow<MessageData?> =
+    private fun messageListener(chatRoom: ChatRoomAndReceiverLocalData): Flow<MessageData?> =
         callbackFlow {
             database.reference.child("messages").child(chatRoom.rid)
                 .addChildEventListener(
