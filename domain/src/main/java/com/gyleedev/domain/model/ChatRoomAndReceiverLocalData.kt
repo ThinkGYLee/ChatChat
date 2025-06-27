@@ -4,6 +4,7 @@ data class ChatRoomAndReceiverLocalData(
     val id: Long = 0,
     val rid: String = "",
     val lastMessage: String = "",
+    val isGroup: Boolean = false,
     val receivers: List<String> = listOf<String>()
 )
 // 챗룸정보 테이블 -> 챗룸id를 키값으로

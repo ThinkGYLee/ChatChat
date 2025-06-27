@@ -19,6 +19,7 @@ fun ChatRoomAndReceiverEntity.toLocalData(): ChatRoomAndReceiverLocalData {
         id = chatroom.id,
         rid = chatroom.rid,
         lastMessage = chatroom.lastMessage,
+        isGroup = chatroom.isGroup,
         receivers = receivers.map { it.receiver }
     )
 }
