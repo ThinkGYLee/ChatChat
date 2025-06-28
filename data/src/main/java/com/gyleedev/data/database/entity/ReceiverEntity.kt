@@ -25,15 +25,15 @@ data class ReceiverEntity(
     @ColumnInfo(name = "id")
     val id: Long = 0L,
     @ColumnInfo(name = "chatroom_entity_id")
-    val userEntityId: Long,
+    val chatRoomEntityId: Long,
     @ColumnInfo(name = "receiver")
     val receiver: String
 )
 
-fun UserChatRoomReceiver.toEntity(userEntityId: Long): ReceiverEntity {
+fun UserChatRoomReceiver.toEntity(chatRoomEntityId: Long): ReceiverEntity {
     return ReceiverEntity(
         id = 0L,
-        userEntityId = userEntityId,
+        chatRoomEntityId = chatRoomEntityId,
         receiver = receiver
     )
 }
