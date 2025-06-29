@@ -22,4 +22,7 @@ android {
 dependencies {
     implementation(libs.google.gson)
     implementation(libs.room.paging)
+    implementation(libs.coroutines.core)
+    testImplementation(libs.coroutines.test)
+    testImplementation ("io.mockk:mockk-android:1.14.4")
 }
