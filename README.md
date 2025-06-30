@@ -10,14 +10,15 @@
 - 프로필 수정
 
 ## 기술 스택
-| 구분 | 내용 |
-| --- | --- |
-| Jetpack | Navigation, Compose, Lifecycle, ViewModel, Paging3, Room |
-| Asynchronous Processing | Coroutine, Flow |
-| Dependency Injection | Hilt |
-| Third Party Library | Glide |
-| Architecture | MVVM |
-| Other | Firebase |
+| 구분                      | 내용                                                       |
+|-------------------------|----------------------------------------------------------|
+| Jetpack                 | Navigation, Compose, Lifecycle, ViewModel, Paging3, Room |
+| Asynchronous Processing | Coroutine, Flow                                          |
+| Dependency Injection    | Hilt                                                     |
+| Third Party Library     | Glide                                                    |
+| Architecture            | MVVM                                                     |
+| Other                   | Firebase                                                 |
+| Test                    | Junit                                                    |
 
 ## 스크린샷
 | 친구 목록 | 채팅 목록 | 내 프로필 |
