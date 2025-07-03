@@ -1,5 +1,7 @@
 package com.gyleedev.chatchat
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +35,7 @@ import com.gyleedev.feature.R
 import com.gyleedev.feature.blockmanage.BlockManageScreen
 import com.gyleedev.feature.chatlist.ChatListScreen
 import com.gyleedev.feature.chatroom.ChatRoomScreen
+import com.gyleedev.feature.createchat.CreateChatScreen
 import com.gyleedev.feature.finduser.FindUserScreen
 import com.gyleedev.feature.friendedit.FriendEditScreen
 import com.gyleedev.feature.friendinfo.FriendInfoScreen
@@ -51,6 +54,7 @@ import com.gyleedev.feature.setting.myinformation.MyInformationScreen
 import com.gyleedev.feature.signin.SigninScreen
 import com.gyleedev.feature.verifyemail.VerifyEmailScreen
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun ChatChatScreen(
     startDestination: String,
@@ -98,12 +102,14 @@ fun ChatChatScreen(
             }
 
             composable(route = BottomNavItem.ChatList.screenRoute) {
-                ChatListScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    onClick = {
-                        navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?rid=$it")
-                    }
-                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    ChatListScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        onClick = {
+                            navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?rid=$it")
+                        }
+                    )
+                }
             }
 
             composable(route = BottomNavItem.Login.screenRoute) {
@@ -342,6 +348,13 @@ fun ChatChatScreen(
                     }
                 )
             }
+            composable(
+                route = BottomNavItem.CreateChat.screenRoute
+            ){
+                CreateChatScreen(
+                    onBackPressKeyClick = {navController.navigateUp()},
+                )
+            }
         }
     }
 }
@@ -513,5 +526,10 @@ sealed class BottomNavItem(
     data object VerifyEmail : BottomNavItem(
         Icons.Outlined.ThumbUp,
         VERIFYEMAIL
+    )
+
+    data object CreateChat: BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        CREATECHAT
     )
 }
