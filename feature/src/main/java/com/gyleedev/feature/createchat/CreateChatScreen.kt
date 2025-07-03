@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -82,6 +83,7 @@ fun CreateChatScreen(
     val checkedUsers = viewModel.checkedUsers.collectAsStateWithLifecycle()
 
     val lifecycle = LocalLifecycleOwner.current
+
     LaunchedEffect(Unit) {
         viewModel.searchFailure
             .flowWithLifecycle(lifecycle.lifecycle)
@@ -96,52 +98,63 @@ fun CreateChatScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.friend_edit_title_text),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackPressKeyClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "채팅방 만들기",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
                         )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackPressKeyClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                            )
+                        }
+                    },
+                    actions = {
+                        AnimatedVisibility(checkedUsers.value.isNotEmpty()) {
+                            TextButton(onClick = {}) {
+                                Text("확인")
+                            }
+                        }
                     }
-                }
-            )
-        },
-        modifier = modifier
-    ) { innerPadding ->
-
-        if (items.itemCount > 0) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                item {
-                    AnimatedVisibility(checkedUsers.value.isEmpty()) {
-                        LazyRow {
-                            items(
-                                count = checkedUsers.value.size
+                )
+                AnimatedVisibility(checkedUsers.value.isNotEmpty()) {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 20.dp, horizontal = 12.dp)
+                    ) {
+                        items(
+                            count = checkedUsers.value.size
+                        ) { index ->
+                            Column(
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                checkedUsers.value.forEach { user ->
+                                Box(
+                                    modifier = Modifier.clickable {
+                                        viewModel.updateCheckedUsers(checkedUsers.value[index])
+                                    }
+                                ) {
                                     GlideImage(
-                                        imageModel = { user.picture.ifBlank { R.drawable.baseline_person_24 } },
+                                        imageModel = { checkedUsers.value[index].picture.ifBlank { R.drawable.baseline_person_24 } },
                                         imageOptions = ImageOptions(contentScale = ContentScale.Crop),
                                         modifier = Modifier
-                                            .size(60.dp)
+                                            .padding(4.dp)
+                                            .size(40.dp)
                                             .border(
                                                 width = 0.01.dp,
                                                 color = MaterialTheme.colorScheme.outlineVariant,
                                                 shape = CircleShape
                                             )
                                             .clip(CircleShape)
-                                            .background(color = colorResource(R.color.avatar_background)),
+                                            .background(color = colorResource(R.color.avatar_background))
+                                            .align(Alignment.Center),
                                         component = rememberImageComponent {
                                             +ShimmerPlugin(
                                                 Shimmer.Flash(
@@ -152,13 +165,37 @@ fun CreateChatScreen(
                                         },
                                         previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
                                     )
+                                    Icon(
+                                        imageVector = Icons.Filled.Close,
+                                        contentDescription = "",
+                                        tint = Color.White,
+                                        modifier = Modifier
+                                            .clip(CircleShape)
+                                            .background(Color.Gray.copy(alpha = 0.6f))
+                                            .size(16.dp)
+                                            .align(Alignment.TopEnd)
+                                    )
                                 }
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = checkedUsers.value[index].name,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
                             }
                         }
                     }
                 }
+            }
+        },
+        modifier = modifier
+    ) { innerPadding ->
 
-
+        if (items.itemCount > 0) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
                 item {
                     FriendFilterTextField(
                         searchQuery = searchQuery.value,
@@ -353,7 +390,7 @@ fun FriendDataPreview() {
                 userRelation = UserRelationState.FRIEND
             ),
             isChecked = false,
-            onRadioButtonClick = {},
+            onRadioButtonClick = {}
         )
     }
 }
