@@ -2,7 +2,6 @@ package com.gyleedev.feature.createchat
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -29,9 +29,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -79,6 +79,7 @@ fun CreateChatScreen(
     val context = LocalContext.current
     val items = viewModel.items.collectAsLazyPagingItems()
     val searchItems = viewModel.searchItems.collectAsLazyPagingItems()
+    val checkedUsers = viewModel.checkedUsers.collectAsStateWithLifecycle()
 
     val lifecycle = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
@@ -123,6 +124,42 @@ fun CreateChatScreen(
                     .padding(innerPadding)
             ) {
                 item {
+                    AnimatedVisibility(checkedUsers.value.isEmpty()) {
+                        LazyRow {
+                            items(
+                                count = checkedUsers.value.size
+                            ) {
+                                checkedUsers.value.forEach { user ->
+                                    GlideImage(
+                                        imageModel = { user.picture.ifBlank { R.drawable.baseline_person_24 } },
+                                        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+                                        modifier = Modifier
+                                            .size(60.dp)
+                                            .border(
+                                                width = 0.01.dp,
+                                                color = MaterialTheme.colorScheme.outlineVariant,
+                                                shape = CircleShape
+                                            )
+                                            .clip(CircleShape)
+                                            .background(color = colorResource(R.color.avatar_background)),
+                                        component = rememberImageComponent {
+                                            +ShimmerPlugin(
+                                                Shimmer.Flash(
+                                                    baseColor = Color.White,
+                                                    highlightColor = Color.LightGray
+                                                )
+                                            )
+                                        },
+                                        previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                item {
                     FriendFilterTextField(
                         searchQuery = searchQuery.value,
                         onReset = { viewModel.editSearchQuery("") },
@@ -149,8 +186,9 @@ fun CreateChatScreen(
                     AnimatedVisibility(searchQuery.value.isEmpty()) {
                         items[it]?.let { userData ->
                             FriendData(
-                                relatedUserLocalData = userData,
-                                onHideRequest = { viewModel.hideFriend(userData) }
+                                isChecked = checkedUsers.value.contains(userData),
+                                onRadioButtonClick = { viewModel.updateCheckedUsers(userData) },
+                                relatedUserLocalData = userData
                             )
                         }
                     }
@@ -174,8 +212,9 @@ fun CreateChatScreen(
                     AnimatedVisibility(searchQuery.value.isNotEmpty()) {
                         searchItems[it]?.let { userData ->
                             FriendData(
-                                relatedUserLocalData = userData,
-                                onHideRequest = { viewModel.hideFriend(userData) }
+                                isChecked = checkedUsers.value.contains(userData),
+                                onRadioButtonClick = { viewModel.updateCheckedUsers(userData) },
+                                relatedUserLocalData = userData
                             )
                         }
                     }
@@ -248,7 +287,8 @@ fun FriendFilterTextField(
 
 @Composable
 fun FriendData(
-    onHideRequest: () -> Unit,
+    isChecked: Boolean,
+    onRadioButtonClick: () -> Unit,
     relatedUserLocalData: RelatedUserLocalData,
     modifier: Modifier = Modifier
 ) {
@@ -291,12 +331,10 @@ fun FriendData(
             )
         }
 
-        TextButton(
-            border = BorderStroke(0.5.dp, color = MaterialTheme.colorScheme.onSurface),
-            onClick = onHideRequest
-        ) {
-            Text(text = stringResource(R.string.friend_edit_screen_hide_text))
-        }
+        RadioButton(
+            selected = isChecked,
+            onClick = onRadioButtonClick
+        )
     }
 }
 
@@ -314,7 +352,8 @@ fun FriendDataPreview() {
                 uid = "",
                 userRelation = UserRelationState.FRIEND
             ),
-            onHideRequest = {}
+            isChecked = false,
+            onRadioButtonClick = {},
         )
     }
 }
