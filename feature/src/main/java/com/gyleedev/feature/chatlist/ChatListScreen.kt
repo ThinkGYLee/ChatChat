@@ -18,7 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -57,6 +61,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ChatListScreen(
     onClick: (String) -> Unit,
+    onCreateChatClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChatListViewModel = hiltViewModel()
 ) {
@@ -75,6 +80,14 @@ fun ChatListScreen(
             TopAppBar(
                 title = {
                     Text(text = stringResource(R.string.chat_list_screen_title))
+                },
+                actions = {
+                    IconButton(onClick = onCreateChatClick) {
+                        Icon(
+                            imageVector = Icons.Default.Message,
+                            contentDescription = ""
+                        )
+                    }
                 }
             )
         },

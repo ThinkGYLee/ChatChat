@@ -107,6 +107,9 @@ fun ChatChatScreen(
                         modifier = Modifier.fillMaxSize(),
                         onClick = {
                             navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?rid=$it")
+                        },
+                        onCreateChatClick = {
+                            navController.navigate(BottomNavItem.CreateChat.screenRoute)
                         }
                     )
                 }
@@ -350,9 +353,9 @@ fun ChatChatScreen(
             }
             composable(
                 route = BottomNavItem.CreateChat.screenRoute
-            ){
+            ) {
                 CreateChatScreen(
-                    onBackPressKeyClick = {navController.navigateUp()},
+                    onBackPressKeyClick = { navController.navigateUp() },
                 )
             }
         }
@@ -528,7 +531,7 @@ sealed class BottomNavItem(
         VERIFYEMAIL
     )
 
-    data object CreateChat: BottomNavItem(
+    data object CreateChat : BottomNavItem(
         Icons.Outlined.ThumbUp,
         CREATECHAT
     )
