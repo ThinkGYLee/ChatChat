@@ -118,7 +118,12 @@ fun CreateChatScreen(
                     actions = {
                         AnimatedVisibility(checkedUsers.value.isNotEmpty()) {
                             TextButton(onClick = {}) {
-                                Text("확인")
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "${checkedUsers.value.size}  확인",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                }
                             }
                         }
                     }
