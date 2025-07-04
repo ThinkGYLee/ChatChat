@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.outlined.AddComment
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -84,7 +84,7 @@ fun ChatListScreen(
                 actions = {
                     IconButton(onClick = onCreateChatClick) {
                         Icon(
-                            imageVector = Icons.Default.Message,
+                            imageVector = Icons.Outlined.AddComment,
                             contentDescription = ""
                         )
                     }
