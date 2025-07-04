@@ -1,5 +1,6 @@
 package com.gyleedev.chatchat
 
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -197,13 +198,17 @@ fun ChatChatScreen(
             }
 
             composable(
-                route = "${BottomNavItem.ChatRoom.screenRoute}?uid={uid}&rid={rid}",
+                route = "${BottomNavItem.ChatRoom.screenRoute}?uid={uid}&rid={rid}&create={create}",
                 arguments = listOf(
                     navArgument("uid") {
                         type = NavType.StringType
                         nullable = true
                     },
                     navArgument("rid") {
+                        type = NavType.StringType
+                        nullable = true
+                    },
+                    navArgument("create") {
                         type = NavType.StringType
                         nullable = true
                     }
@@ -356,6 +361,14 @@ fun ChatChatScreen(
             ) {
                 CreateChatScreen(
                     onBackPressKeyClick = { navController.navigateUp() },
+                    onConfirm = { list ->
+                        val encoded = list.joinToString(",") { Uri.encode(it) }
+                        navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?create=$encoded") {
+                            popUpTo(BottomNavItem.CreateChat.screenRoute) {
+                                inclusive = true
+                            }
+                        }
+                    }
                 )
             }
         }

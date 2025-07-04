@@ -73,6 +73,7 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 @Composable
 fun CreateChatScreen(
     onBackPressKeyClick: () -> Unit,
+    onConfirm: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CreateChatViewModel = hiltViewModel()
 ) {
@@ -117,7 +118,9 @@ fun CreateChatScreen(
                     },
                     actions = {
                         AnimatedVisibility(checkedUsers.value.isNotEmpty()) {
-                            TextButton(onClick = {}) {
+                            TextButton(
+                                onClick = { onConfirm(checkedUsers.value.map { it.uid }) }
+                            ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = "${checkedUsers.value.size}  확인",
