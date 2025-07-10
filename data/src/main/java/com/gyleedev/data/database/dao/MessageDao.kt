@@ -21,7 +21,7 @@ interface MessageDao {
     fun updateMessageState(message: MessageEntity)
 
     @Query("SELECT * FROM message WHERE rid = :id ORDER BY time DESC LIMIT 1")
-    fun getLastMessage(id: String): MessageEntity
+    fun getLastMessage(id: String): MessageEntity?
 
     @Query("SELECT * FROM message WHERE rid = :rid AND time = :time AND writer = :writer")
     fun getMessage(rid: String, time: Long, writer: String): Flow<MessageEntity>
