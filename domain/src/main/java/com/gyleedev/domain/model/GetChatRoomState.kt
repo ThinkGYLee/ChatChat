@@ -22,6 +22,7 @@ sealed interface GetChatRoomState {
     data object UpdateFriendData : GetChatRoomState
 
     // ByRid
+    data object StartFromGetRemoteAndInsertToLocal : GetChatRoomState
     data object GetAndSyncReceivers : GetChatRoomState
     data object InsertReceiversToLocal : GetChatRoomState
 
