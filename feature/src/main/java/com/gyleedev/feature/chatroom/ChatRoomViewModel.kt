@@ -114,6 +114,7 @@ class ChatRoomViewModel @Inject constructor(
         if (rid != null && uid != null && participants.isNotEmpty() && getChatRoomState is GetChatRoomState.Success) {
             ChatRoomUiState.Success(
                 userName = if (participants.size == 1) participants[0].name else "${participants[0].name} 외 ${participants.size} 명",
+                participants = participants,
                 uid = requireNotNull(uid),
                 relationState = if (participants.size == 1) participants[0].userRelation else UserRelationState.GROUP
             )
@@ -121,6 +122,7 @@ class ChatRoomViewModel @Inject constructor(
             ChatRoomUiState.Success(
                 userName = if (participants.size == 1) participants[0].name else "${participants[0].name} 외 ${participants.size} 명",
                 uid = uid,
+                participants = participants,
                 relationState = if (participants.size == 1) participants[0].userRelation else UserRelationState.GROUP
             )
         } else {
