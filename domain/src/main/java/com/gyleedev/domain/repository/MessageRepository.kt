@@ -18,7 +18,7 @@ interface MessageRepository {
         userRelationState: UserRelationState
     ): Flow<MessageData?>
 
-    suspend fun getLastMessage(chatRoomId: String): MessageData?
+    suspend fun getLastMessage(chatRoomId: String): MessageData
 
     fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>>
 
