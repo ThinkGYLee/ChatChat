@@ -378,10 +378,48 @@ class UserRepositoryImpl @Inject constructor(
             .flowOn(Dispatchers.IO)
     }
 
-    override fun getFriendAndFavoriteByUid(uid: String): Flow<RelatedUserLocalData> {
-        return userAndFavoriteDao.getUserAndFavoriteByUid(uid)
-            .map { requireNotNull(it).toLocalData() }
-            .flowOn(Dispatchers.IO)
+    override suspend fun getFriendAndFavoriteByUid(uid: String): RelatedUserLocalData {
+        return withContext(Dispatchers.IO) {
+            val localData = userAndFavoriteDao.getUserAndFavoriteByUid(uid).first()
+            return@withContext if (localData == null) {
+                val remoteData = getUserInfoFromRemote(uid).first()
+                val notNullRemoteData = requireNotNull(remoteData)
+                val relatedUserRemoteData = RelatedUserRemoteData(
+                    name = notNullRemoteData.picture,
+                    status = notNullRemoteData.status,
+                    verified = notNullRemoteData.verified,
+                    picture = notNullRemoteData.picture,
+                    favoriteState = false,
+                    userRelation = UserRelationState.UNKNOWN,
+                    email = notNullRemoteData.email,
+                    uid = notNullRemoteData.uid
+                )
+                val id = insertUserToLocal(
+                    relatedUserRemoteData
+                )
+                insertFavoriteToLocal(
+                    user = relatedUserRemoteData,
+                    id = id,
+                    count = getFavoriteCount().toLong()
+                )
+                RelatedUserLocalData(
+                    id = id,
+                    name = requireNotNull(remoteData).picture,
+                    status = remoteData.status,
+                    verified = remoteData.verified,
+                    picture = remoteData.picture,
+                    favoriteState = false,
+                    favoriteNumber = null,
+                    userRelation = UserRelationState.UNKNOWN,
+                    email = requireNotNull(remoteData).email,
+                    uid = requireNotNull(remoteData).uid
+                )
+            } else {
+                println("else")
+                println(localData)
+                return@withContext localData.toLocalData()
+            }
+        }
     }
 
     override fun getMyUidFromLogInData(): String? {
