@@ -13,7 +13,6 @@ import com.gyleedev.domain.usecase.UpdateFriendInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,13 +33,13 @@ class FriendInfoViewModel @Inject constructor(
         viewModelScope.launch {
             val userUid = savedStateHandle.get<String>("friend")
             if (userUid != null) {
-                val friendData = getRelatedUserAndFavoriteDataUseCase(userUid).first()
+                val friendData = getRelatedUserAndFavoriteDataUseCase(userUid)
                 _relatedUserLocalData.emit(
-                    friendData
+                    requireNotNull(friendData)
                 )
                 updateFriendInfoUseCase(friendData.uid)
                 _relatedUserLocalData.emit(
-                    getRelatedUserAndFavoriteDataUseCase(friendData.uid).first()
+                    requireNotNull(getRelatedUserAndFavoriteDataUseCase(friendData.uid))
                 )
             }
         }
@@ -73,7 +72,7 @@ class FriendInfoViewModel @Inject constructor(
 
     private suspend fun updateUser() {
         _relatedUserLocalData.emit(
-            getRelatedUserAndFavoriteDataUseCase(_relatedUserLocalData.value.uid).first()
+            requireNotNull(getRelatedUserAndFavoriteDataUseCase(_relatedUserLocalData.value.uid))
         )
     }
 }
