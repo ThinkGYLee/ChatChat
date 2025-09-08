@@ -27,4 +27,5 @@ interface ChatRoomRepository {
 
     suspend fun resetChatRoomData()
     fun getChatRoomListWithPaging(): Flow<PagingData<ChatRoomAndReceiverLocalData>>
+    suspend fun updateChatRooms(): Boolean
 }

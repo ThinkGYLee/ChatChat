@@ -42,7 +42,7 @@ interface UserRepository {
     fun getBlockedFriends(): Flow<PagingData<RelatedUserLocalData>>
 
     fun getFriendById(uid: String): Flow<RelatedUserLocalData>
-    fun getFriendAndFavoriteByUid(uid: String): Flow<RelatedUserLocalData>
+    suspend fun getFriendAndFavoriteByUid(uid: String): RelatedUserLocalData
 
     fun getMyUidFromLogInData(): String?
 

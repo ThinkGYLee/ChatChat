@@ -156,14 +156,10 @@ class MessageRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLastMessage(chatRoomId: String): MessageData? {
+    override suspend fun getLastMessage(chatRoomId: String): MessageData {
         return withContext(Dispatchers.IO) {
-            try {
-                messageDao.getLastMessage(chatRoomId).toModel()
-            } catch (e: Exception) {
-                println(e)
-                null
-            }
+            val message = messageDao.getLastMessage(chatRoomId)
+            message?.toModel() ?: MessageData()
         }
     }
 

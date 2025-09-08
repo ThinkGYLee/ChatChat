@@ -1,5 +1,6 @@
 package com.gyleedev.feature.chatroom
 
+import android.net.Uri
 import android.os.Build
 import android.text.SpannableString
 import android.text.util.Linkify
@@ -19,6 +20,7 @@ import com.gyleedev.domain.model.RelatedUserLocalData
 import com.gyleedev.domain.model.UserRelationState
 import com.gyleedev.domain.usecase.BlockRelatedUserUseCase
 import com.gyleedev.domain.usecase.CancelMessageUseCase
+import com.gyleedev.domain.usecase.CreateChatRoomByUidsUseCase
 import com.gyleedev.domain.usecase.DeleteMessageUseCase
 import com.gyleedev.domain.usecase.GetChatRoomByRidUseCase
 import com.gyleedev.domain.usecase.GetChatRoomByUidUseCase
@@ -58,6 +60,7 @@ class ChatRoomViewModel @Inject constructor(
     getMyUidFromLogInDataUseCase: GetMyUidFromLogInDataUseCase,
     private val getFriendDataUseCase: GetFriendDataUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
+    private val createChatRoomByUidsUseCase: CreateChatRoomByUidsUseCase,
     private val getMessagesFromLocalUseCase: GetMessagesFromLocalUseCase,
     private val getChatRoomDataStateObserveUseCase: GetChatRoomDataStateObserveUseCase,
     private val resetGetChatDataStateUseCase: ResetGetChatDataStateUseCase,
@@ -111,6 +114,7 @@ class ChatRoomViewModel @Inject constructor(
         if (rid != null && uid != null && participants.isNotEmpty() && getChatRoomState is GetChatRoomState.Success) {
             ChatRoomUiState.Success(
                 userName = if (participants.size == 1) participants[0].name else "${participants[0].name} 외 ${participants.size} 명",
+                participants = participants,
                 uid = requireNotNull(uid),
                 relationState = if (participants.size == 1) participants[0].userRelation else UserRelationState.GROUP
             )
@@ -118,6 +122,7 @@ class ChatRoomViewModel @Inject constructor(
             ChatRoomUiState.Success(
                 userName = if (participants.size == 1) participants[0].name else "${participants[0].name} 외 ${participants.size} 명",
                 uid = uid,
+                participants = participants,
                 relationState = if (participants.size == 1) participants[0].userRelation else UserRelationState.GROUP
             )
         } else {
@@ -137,8 +142,9 @@ class ChatRoomViewModel @Inject constructor(
     init {
         val passedRid = savedStateHandle.get<String>("rid")
         val passedFriendUid = savedStateHandle.get<String>("uid")
+        val passedCreateArray = savedStateHandle.get<String>("create")
 
-        if (passedFriendUid == null && passedRid == null) {
+        if (passedFriendUid == null && passedRid == null && passedCreateArray == null) {
             // TODO 화면 종료 처리
             throw Exception("예외 처리 에러 말고 단거로")
         }
@@ -147,10 +153,33 @@ class ChatRoomViewModel @Inject constructor(
             startChatRoomWithUid(passedFriendUid)
         }
 
+        if (passedCreateArray != null) {
+            val uidList = passedCreateArray.split(",").map { Uri.decode(it) }.orEmpty()
+            createChatRoomByUids(uidList)
+        }
+
         if (passedRid != null) {
             viewModelScope.launch {
                 rid.emit(passedRid)
                 startChatRoomWithRid(passedRid)
+            }
+        }
+    }
+
+    private fun createChatRoomByUids(uidList: List<String>) {
+        viewModelScope.launch {
+            try {
+                val userList = getRelatedUserDataOfParticipantsByUidUseCase(uidList)
+                chatRoomParticipants.emit(userList)
+                observeCurrentState()
+                val getChatRoomData = createChatRoomByUidsUseCase(userList)
+                if (getChatRoomData is GetChatRoomState.Success) {
+                    _chatRoomLocalData.emit(getChatRoomData.data)
+                    resetGetChatDataStateUseCase()
+                    messagesCallback.collectLatest { }
+                }
+            } catch (e: GetChatRoomException) {
+                _getChatRoomEvent.emit(e)
             }
         }
     }

@@ -1,5 +1,8 @@
 package com.gyleedev.chatchat
 
+import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +36,7 @@ import com.gyleedev.feature.R
 import com.gyleedev.feature.blockmanage.BlockManageScreen
 import com.gyleedev.feature.chatlist.ChatListScreen
 import com.gyleedev.feature.chatroom.ChatRoomScreen
+import com.gyleedev.feature.createchat.CreateChatScreen
 import com.gyleedev.feature.finduser.FindUserScreen
 import com.gyleedev.feature.friendedit.FriendEditScreen
 import com.gyleedev.feature.friendinfo.FriendInfoScreen
@@ -51,6 +55,7 @@ import com.gyleedev.feature.setting.myinformation.MyInformationScreen
 import com.gyleedev.feature.signin.SigninScreen
 import com.gyleedev.feature.verifyemail.VerifyEmailScreen
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun ChatChatScreen(
     startDestination: String,
@@ -98,12 +103,17 @@ fun ChatChatScreen(
             }
 
             composable(route = BottomNavItem.ChatList.screenRoute) {
-                ChatListScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    onClick = {
-                        navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?rid=$it")
-                    }
-                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    ChatListScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        onClick = {
+                            navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?rid=$it")
+                        },
+                        onCreateChatClick = {
+                            navController.navigate(BottomNavItem.CreateChat.screenRoute)
+                        }
+                    )
+                }
             }
 
             composable(route = BottomNavItem.Login.screenRoute) {
@@ -188,13 +198,17 @@ fun ChatChatScreen(
             }
 
             composable(
-                route = "${BottomNavItem.ChatRoom.screenRoute}?uid={uid}&rid={rid}",
+                route = "${BottomNavItem.ChatRoom.screenRoute}?uid={uid}&rid={rid}&create={create}",
                 arguments = listOf(
                     navArgument("uid") {
                         type = NavType.StringType
                         nullable = true
                     },
                     navArgument("rid") {
+                        type = NavType.StringType
+                        nullable = true
+                    },
+                    navArgument("create") {
                         type = NavType.StringType
                         nullable = true
                     }
@@ -336,6 +350,21 @@ fun ChatChatScreen(
                     onSigninComplete = {
                         navController.navigate(BottomNavItem.FriendList.screenRoute) {
                             popUpTo(BottomNavItem.FriendList.screenRoute) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+            composable(
+                route = BottomNavItem.CreateChat.screenRoute
+            ) {
+                CreateChatScreen(
+                    onBackPressKeyClick = { navController.navigateUp() },
+                    onConfirm = { list ->
+                        val encoded = list.joinToString(",") { Uri.encode(it) }
+                        navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?create=$encoded") {
+                            popUpTo(BottomNavItem.CreateChat.screenRoute) {
                                 inclusive = true
                             }
                         }
@@ -513,5 +542,10 @@ sealed class BottomNavItem(
     data object VerifyEmail : BottomNavItem(
         Icons.Outlined.ThumbUp,
         VERIFYEMAIL
+    )
+
+    data object CreateChat : BottomNavItem(
+        Icons.Outlined.ThumbUp,
+        CREATECHAT
     )
 }

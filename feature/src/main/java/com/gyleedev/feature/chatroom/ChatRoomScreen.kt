@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -93,6 +94,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -252,6 +254,42 @@ fun ChatRoomScreen(
                     contentType = { messages[it]?.writer }
                 ) {
                     Row {
+                        if ((uiState as ChatRoomUiState.Success).participants.size > 1) {
+                            val user =
+                                if (messages[it]?.writer != (uiState as ChatRoomUiState.Success).uid) {
+                                    (uiState as ChatRoomUiState.Success).participants.find { user ->
+                                        user.uid == messages[it]?.writer
+                                    }
+                                } else {
+                                    null
+                                }
+                            if (user != null) {
+                                GlideImage(
+                                    imageModel = { user.picture.ifEmpty { R.drawable.baseline_person_24 } },
+                                    imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+                                    modifier = Modifier
+                                        .padding(4.dp)
+                                        .size(40.dp)
+                                        .border(
+                                            width = 0.01.dp,
+                                            color = MaterialTheme.colorScheme.outlineVariant,
+                                            shape = CircleShape
+                                        )
+                                        .clip(CircleShape)
+                                        .background(color = colorResource(R.color.avatar_background)),
+                                    component = rememberImageComponent {
+                                        +ShimmerPlugin(
+                                            Shimmer.Flash(
+                                                baseColor = Color.White,
+                                                highlightColor = Color.LightGray
+                                            )
+                                        )
+                                    },
+                                    previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
                         messages[it]?.let { messageData ->
                             when (messageData.type) {
                                 MessageType.Text -> {
