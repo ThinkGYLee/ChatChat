@@ -15,10 +15,9 @@ internal fun Project.configureFirebaseAndroidLibrary() {
     val libs = extensions.libs
     androidExtension.apply {
         dependencies {
-            val bom = libs.findLibrary("firebase.bom").get()
+            val bom = libs.findLibrary("firebase-bom").get()
             add("implementation", platform(bom))
-            add("implementation", libs.findLibrary("firebase.bom").get())
-            add("implementation", libs.findLibrary("firebase.analystics").get())
+            add("implementation", libs.findLibrary("firebase.analytics").get())
             add("implementation", libs.findLibrary("firebase.crashlytics").get())
             add("implementation", libs.findLibrary("firebase.auth").get())
             add("implementation", libs.findLibrary("firebase.services.auth").get())
