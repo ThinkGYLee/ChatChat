@@ -29,14 +29,16 @@ subprojects {
     configure<SpotlessExtension> {
         kotlin {
             target("**/*.kt")
-            ktlint()
-            indentWithSpaces()
+            ktlint("1.5.0")
+                .setEditorConfigPath("$rootDir/.editorconfig")
+            leadingTabsToSpaces(4)
             endWithNewline()
         }
         kotlinGradle {
             target("**/*.gradle.kts")
-            ktlint()
-            indentWithSpaces()
+            ktlint("1.5.0")
+                .setEditorConfigPath("$rootDir/.editorconfig")
+            leadingTabsToSpaces(4)
             endWithNewline()
         }
     }
