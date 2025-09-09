@@ -73,7 +73,7 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 fun FriendEditScreen(
     onBackPressKeyClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FriendEditViewModel = hiltViewModel()
+    viewModel: FriendEditViewModel = hiltViewModel(),
 ) {
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -88,7 +88,7 @@ fun FriendEditScreen(
                 Toast.makeText(
                     context,
                     context.getString(R.string.search_user_failure_message),
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT,
                 ).show()
             }
     }
@@ -100,33 +100,33 @@ fun FriendEditScreen(
                     Text(
                         text = stringResource(R.string.friend_edit_title_text),
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackPressKeyClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description),
                         )
                     }
-                }
+                },
             )
         },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
 
         if (items.itemCount > 0) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
+                    .padding(innerPadding),
             ) {
                 item {
                     FriendFilterTextField(
                         searchQuery = searchQuery.value,
                         onReset = { viewModel.editSearchQuery("") },
-                        onValueChange = viewModel::editSearchQuery
+                        onValueChange = viewModel::editSearchQuery,
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                 }
@@ -136,7 +136,7 @@ fun FriendEditScreen(
                         Text(
                             text = stringResource(R.string.friend_edit_screen_friend_text),
                             style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
                         )
                     }
                 }
@@ -144,13 +144,13 @@ fun FriendEditScreen(
                 items(
                     items.itemCount,
                     key = { "${requireNotNull(items[it]).id}+friendItem" },
-                    contentType = { 0 }
+                    contentType = { 0 },
                 ) {
                     AnimatedVisibility(searchQuery.value.isEmpty()) {
                         items[it]?.let { userData ->
                             FriendData(
                                 relatedUserLocalData = userData,
-                                onHideRequest = { viewModel.hideFriend(userData) }
+                                onHideRequest = { viewModel.hideFriend(userData) },
                             )
                         }
                     }
@@ -161,7 +161,7 @@ fun FriendEditScreen(
                         Text(
                             text = stringResource(R.string.search_result_text),
                             style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
                         )
                     }
                 }
@@ -169,13 +169,13 @@ fun FriendEditScreen(
                 items(
                     count = searchItems.itemCount,
                     key = { "${requireNotNull(searchItems[it]).id}+searchItem" },
-                    contentType = { 0 }
+                    contentType = { 0 },
                 ) {
                     AnimatedVisibility(searchQuery.value.isNotEmpty()) {
                         searchItems[it]?.let { userData ->
                             FriendData(
                                 relatedUserLocalData = userData,
-                                onHideRequest = { viewModel.hideFriend(userData) }
+                                onHideRequest = { viewModel.hideFriend(userData) },
                             )
                         }
                     }
@@ -190,20 +190,20 @@ fun FriendFilterTextField(
     searchQuery: String,
     onValueChange: (String) -> Unit,
     onReset: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(
         modifier = modifier.padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column {
             BasicTextField(
                 modifier = Modifier
                     .background(
                         color = MaterialTheme.colorScheme.surfaceContainer,
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
                     )
                     .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                     .padding(horizontal = 16.dp),
@@ -215,7 +215,7 @@ fun FriendFilterTextField(
                 decorationBox = { innerTextField ->
                     Row(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Box(modifier = Modifier.weight(10f)) {
                             if (searchQuery.isEmpty()) {
@@ -225,7 +225,7 @@ fun FriendFilterTextField(
                                     color = Color(0xFF848484),
                                     modifier = Modifier
                                         .padding(start = 4.dp)
-                                        .align(Alignment.CenterStart)
+                                        .align(Alignment.CenterStart),
                                 )
                             }
                             Row(modifier = Modifier.align(Alignment.CenterStart)) {
@@ -236,11 +236,11 @@ fun FriendFilterTextField(
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = stringResource(R.string.keyboard_reset_button_description),
-                                modifier = Modifier.clickable { onReset() }
+                                modifier = Modifier.clickable { onReset() },
                             )
                         }
                     }
-                }
+                },
             )
         }
     }
@@ -250,7 +250,7 @@ fun FriendFilterTextField(
 fun FriendData(
     onHideRequest: () -> Unit,
     relatedUserLocalData: RelatedUserLocalData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -258,7 +258,7 @@ fun FriendData(
             .clickable { }
             .padding(vertical = 8.dp, horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             GlideImage(
@@ -269,7 +269,7 @@ fun FriendData(
                     .border(
                         width = 0.01.dp,
                         color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = CircleShape
+                        shape = CircleShape,
                     )
                     .clip(CircleShape)
                     .background(color = colorResource(R.color.avatar_background)),
@@ -277,23 +277,23 @@ fun FriendData(
                     +ShimmerPlugin(
                         Shimmer.Flash(
                             baseColor = Color.White,
-                            highlightColor = Color.LightGray
-                        )
+                            highlightColor = Color.LightGray,
+                        ),
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
             )
             Spacer(modifier = Modifier.width(20.dp))
             Text(
                 text = relatedUserLocalData.name,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
         }
 
         TextButton(
             border = BorderStroke(0.5.dp, color = MaterialTheme.colorScheme.onSurface),
-            onClick = onHideRequest
+            onClick = onHideRequest,
         ) {
             Text(text = stringResource(R.string.friend_edit_screen_hide_text))
         }
@@ -312,9 +312,9 @@ fun FriendDataPreview() {
                 status = "status",
                 picture = "",
                 uid = "",
-                userRelation = UserRelationState.FRIEND
+                userRelation = UserRelationState.FRIEND,
             ),
-            onHideRequest = {}
+            onHideRequest = {},
         )
     }
 }
@@ -327,7 +327,7 @@ fun FriendFilterTextFieldPreview() {
         FriendFilterTextField(
             searchQuery = "",
             onReset = {},
-            onValueChange = {}
+            onValueChange = {},
         )
     }
 }

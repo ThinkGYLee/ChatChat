@@ -12,17 +12,17 @@ interface ChatRoomRepository {
 
     suspend fun getChatRoomWithUserData(
         user: RelatedUserLocalData,
-        getChatRoomState: GetChatRoomState
+        getChatRoomState: GetChatRoomState,
     ): GetChatRoomState
 
     suspend fun getChatRoomWithRid(
         rid: String,
-        getChatRoomState: GetChatRoomState
+        getChatRoomState: GetChatRoomState,
     ): GetChatRoomState
 
     suspend fun createGroupChat(
         users: List<RelatedUserLocalData>,
-        getChatRoomState: GetChatRoomState = GetChatRoomState.CreateRemoteGroupChatRoom
+        getChatRoomState: GetChatRoomState = GetChatRoomState.CreateRemoteGroupChatRoom,
     ): GetChatRoomState
 
     suspend fun resetChatRoomData()

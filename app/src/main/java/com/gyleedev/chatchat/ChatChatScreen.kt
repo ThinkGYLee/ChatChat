@@ -60,7 +60,7 @@ import com.gyleedev.feature.verifyemail.VerifyEmailScreen
 fun ChatChatScreen(
     startDestination: String,
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
 ) {
     var isBottomBarVisible: Boolean
 
@@ -78,18 +78,18 @@ fun ChatChatScreen(
             if (isBottomBarVisible) {
                 BottomNavigation(
                     navController = navController,
-                    modifier = Modifier
+                    modifier = Modifier,
                 )
             }
         },
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) { paddingValue ->
         NavHost(
             navController = navController,
             startDestination = startDestination,
             modifier = Modifier
                 .padding(paddingValue)
-                .consumeWindowInsets(paddingValue)
+                .consumeWindowInsets(paddingValue),
         ) {
             composable(route = BottomNavItem.FriendList.screenRoute) {
                 FriendListScreen(
@@ -98,7 +98,7 @@ fun ChatChatScreen(
                     onFindUserButtonClick = { navController.navigate(BottomNavItem.FindUser.screenRoute) },
                     onEditFriendClick = { navController.navigate(BottomNavItem.FriendInfoEdit.screenRoute) },
                     onManageFriendClick = { navController.navigate(BottomNavItem.FriendManage.screenRoute) },
-                    onSettingClick = { navController.navigate(BottomNavItem.Setting.screenRoute) }
+                    onSettingClick = { navController.navigate(BottomNavItem.Setting.screenRoute) },
                 )
             }
 
@@ -111,7 +111,7 @@ fun ChatChatScreen(
                         },
                         onCreateChatClick = {
                             navController.navigate(BottomNavItem.CreateChat.screenRoute)
-                        }
+                        },
                     )
                 }
             }
@@ -124,7 +124,7 @@ fun ChatChatScreen(
                         navController.navigate(BottomNavItem.FriendList.screenRoute) {
                             popUpTo(BottomNavItem.Login.screenRoute) { inclusive = true }
                         }
-                    }
+                    },
                 )
             }
 
@@ -138,7 +138,7 @@ fun ChatChatScreen(
                             }
                         }
                     },
-                    onBackPressed = { navController.navigateUp() }
+                    onBackPressed = { navController.navigateUp() },
                 )
             }
             composable(route = BottomNavItem.Setting.screenRoute) {
@@ -165,7 +165,7 @@ fun ChatChatScreen(
                     onMyInformationRequest = {
                         navController.navigate(BottomNavItem.MyInformationSetting.screenRoute)
                     },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
 
@@ -174,14 +174,14 @@ fun ChatChatScreen(
                     onProcessComplete = {
                         navController.navigate(BottomNavItem.FriendList.screenRoute) {
                             popUpTo(
-                                BottomNavItem.FriendList.screenRoute
+                                BottomNavItem.FriendList.screenRoute,
                             ) {
                                 inclusive = true
                             }
                         }
                     },
                     onBackPressKeyClick = { navController.navigateUp() },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
 
@@ -191,8 +191,8 @@ fun ChatChatScreen(
                     navArgument("friend") {
                         type = NavType.StringType
                         nullable = false
-                    }
-                )
+                    },
+                ),
             ) {
                 ChatRoomScreen(onBackPressKeyClick = { navController.navigateUp() })
             }
@@ -211,8 +211,8 @@ fun ChatChatScreen(
                     navArgument("create") {
                         type = NavType.StringType
                         nullable = true
-                    }
-                )
+                    },
+                ),
             ) {
                 ChatRoomScreen(onBackPressKeyClick = { navController.navigateUp() })
             }
@@ -223,12 +223,12 @@ fun ChatChatScreen(
                     navArgument("friend") {
                         type = NavType.StringType
                         nullable = false
-                    }
-                )
+                    },
+                ),
             ) {
                 FriendInfoScreen(
                     onCloseKeyPressed = { navController.navigateUp() },
-                    onChatRoomClick = { navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?uid=$it") }
+                    onChatRoomClick = { navController.navigate("${BottomNavItem.ChatRoom.screenRoute}?uid=$it") },
                 )
             }
 
@@ -238,13 +238,13 @@ fun ChatChatScreen(
                     navArgument("myInfo") {
                         type = NavType.StringType
                         nullable = false
-                    }
-                )
+                    },
+                ),
             ) {
                 MyInfoScreen(
                     onCloseKeyPressed = { navController.navigateUp() },
                     onChatRoomClick = {},
-                    onProfileEditClick = { navController.navigate("${BottomNavItem.MyInfoEdit.screenRoute}/$it") }
+                    onProfileEditClick = { navController.navigate("${BottomNavItem.MyInfoEdit.screenRoute}/$it") },
                 )
             }
 
@@ -254,90 +254,90 @@ fun ChatChatScreen(
                     navArgument("myInfo") {
                         type = NavType.StringType
                         nullable = false
-                    }
-                )
+                    },
+                ),
             ) {
                 MyInfoEditScreen(
-                    onBackKeyPressed = { navController.navigateUp() }
+                    onBackKeyPressed = { navController.navigateUp() },
                 )
             }
 
             composable(
-                route = BottomNavItem.FriendInfoEdit.screenRoute
+                route = BottomNavItem.FriendInfoEdit.screenRoute,
             ) {
                 FriendEditScreen(
-                    onBackPressKeyClick = { navController.navigateUp() }
+                    onBackPressKeyClick = { navController.navigateUp() },
                 )
             }
 
             composable(
-                route = BottomNavItem.FriendManage.screenRoute
+                route = BottomNavItem.FriendManage.screenRoute,
             ) {
                 FriendManageScreen(
                     onBackPressKeyClick = { navController.navigateUp() },
                     onBlockedClick = { navController.navigate(BottomNavItem.BlockedUserManage.screenRoute) },
-                    onHideClick = { navController.navigate(BottomNavItem.HidenUserManage.screenRoute) }
+                    onHideClick = { navController.navigate(BottomNavItem.HidenUserManage.screenRoute) },
                 )
             }
 
             composable(
-                route = BottomNavItem.HidenUserManage.screenRoute
+                route = BottomNavItem.HidenUserManage.screenRoute,
             ) {
                 HideManageScreen(
-                    onBackPressKeyClick = { navController.navigateUp() }
+                    onBackPressKeyClick = { navController.navigateUp() },
                 )
             }
 
             composable(
-                route = BottomNavItem.BlockedUserManage.screenRoute
+                route = BottomNavItem.BlockedUserManage.screenRoute,
             ) {
                 BlockManageScreen(
-                    onBackPressKeyClick = { navController.navigateUp() }
+                    onBackPressKeyClick = { navController.navigateUp() },
                 )
             }
 
             composable(
-                route = BottomNavItem.ChangeLanguage.screenRoute
+                route = BottomNavItem.ChangeLanguage.screenRoute,
             ) {
                 ChangeLanguageScreen(
-                    onBackPress = { navController.navigateUp() }
+                    onBackPress = { navController.navigateUp() },
                 )
             }
 
             composable(
-                route = BottomNavItem.ChangeTheme.screenRoute
+                route = BottomNavItem.ChangeTheme.screenRoute,
             ) {
                 ChangeThemeScreen(
-                    onBackClick = { navController.navigateUp() }
+                    onBackClick = { navController.navigateUp() },
                 )
             }
 
             composable(
-                route = BottomNavItem.Conversation.screenRoute
+                route = BottomNavItem.Conversation.screenRoute,
             ) {
                 ConversationScreen(
-                    onBackButtonClicked = { navController.navigateUp() }
+                    onBackButtonClicked = { navController.navigateUp() },
                 )
             }
 
             composable(
-                route = BottomNavItem.ManageAccount.screenRoute
+                route = BottomNavItem.ManageAccount.screenRoute,
             ) {
                 ManageAccountScreen(
-                    onBackButtonClicked = { navController.navigateUp() }
+                    onBackButtonClicked = { navController.navigateUp() },
                 )
             }
 
             composable(
-                route = BottomNavItem.MyInformationSetting.screenRoute
+                route = BottomNavItem.MyInformationSetting.screenRoute,
             ) {
                 MyInformationScreen(
-                    onBackButtonClicked = { navController.navigateUp() }
+                    onBackButtonClicked = { navController.navigateUp() },
                 )
             }
 
             composable(
-                route = BottomNavItem.VerifyEmail.screenRoute
+                route = BottomNavItem.VerifyEmail.screenRoute,
             ) {
                 VerifyEmailScreen(
                     onSigninCancel = {
@@ -353,11 +353,11 @@ fun ChatChatScreen(
                                 inclusive = true
                             }
                         }
-                    }
+                    },
                 )
             }
             composable(
-                route = BottomNavItem.CreateChat.screenRoute
+                route = BottomNavItem.CreateChat.screenRoute,
             ) {
                 CreateChatScreen(
                     onBackPressKeyClick = { navController.navigateUp() },
@@ -368,7 +368,7 @@ fun ChatChatScreen(
                                 inclusive = true
                             }
                         }
-                    }
+                    },
                 )
             }
         }
@@ -378,16 +378,16 @@ fun ChatChatScreen(
 @Composable
 fun BottomNavigation(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val items = listOf(
         BottomNavItem.FriendList,
         BottomNavItem.ChatList,
-        BottomNavItem.Setting
+        BottomNavItem.Setting,
     )
     NavigationBar(
         modifier = modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -397,7 +397,7 @@ fun BottomNavigation(
                 icon = {
                     Icon(
                         imageVector = item.icons,
-                        contentDescription = null
+                        contentDescription = null,
                     )
                 },
                 selected = currentRoute == item.screenRoute,
@@ -433,7 +433,7 @@ fun BottomNavigation(
                         }
                     }
                     Text(text = label)
-                }
+                },
             )
         }
     }
@@ -441,111 +441,111 @@ fun BottomNavigation(
 
 sealed class BottomNavItem(
     val icons: ImageVector,
-    val screenRoute: String
+    val screenRoute: String,
 ) {
 
     data object Login : BottomNavItem(
         Icons.Outlined.Settings,
-        LOGIN
+        LOGIN,
     )
 
     data object Signin : BottomNavItem(
         Icons.Outlined.Settings,
-        SIGNIN
+        SIGNIN,
     )
 
     data object FriendList : BottomNavItem(
         Icons.Outlined.AccountCircle,
-        FRIENDLIST
+        FRIENDLIST,
     )
 
     data object ChatList : BottomNavItem(
         Icons.Outlined.Email,
-        CHATLIST
+        CHATLIST,
     )
 
     data object Setting : BottomNavItem(
         Icons.Outlined.Settings,
-        SETTING
+        SETTING,
     )
 
     data object FindUser : BottomNavItem(
         Icons.Outlined.Settings,
-        FINDUSER
+        FINDUSER,
     )
 
     data object ChatRoom : BottomNavItem(
         Icons.Outlined.Menu,
-        CHATROOM
+        CHATROOM,
     )
 
     data object MyInfo : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        MYINFO
+        MYINFO,
     )
 
     data object FriendInfo : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        FRIENDINFO
+        FRIENDINFO,
     )
 
     data object MyInfoEdit : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        MYINFOEDIT
+        MYINFOEDIT,
     )
 
     data object FriendInfoEdit : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        FRIENDEDIT
+        FRIENDEDIT,
     )
 
     data object FriendManage : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        FRIENDMANAGE
+        FRIENDMANAGE,
     )
 
     data object HidenUserManage : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        HIDENUSERMANAGE
+        HIDENUSERMANAGE,
     )
 
     data object BlockedUserManage : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        BLOCKEDUSERMANAGE
+        BLOCKEDUSERMANAGE,
     )
 
     data object ChangeLanguage : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        CHANGELANGUAGE
+        CHANGELANGUAGE,
     )
 
     data object ChangeTheme : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        CHANGETHEME
+        CHANGETHEME,
     )
 
     data object Conversation : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        CONVERSATION
+        CONVERSATION,
     )
 
     data object ManageAccount : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        MANAGEACCOUNT
+        MANAGEACCOUNT,
     )
 
     data object MyInformationSetting : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        MYINFORMATIONSETTING
+        MYINFORMATIONSETTING,
     )
 
     data object VerifyEmail : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        VERIFYEMAIL
+        VERIFYEMAIL,
     )
 
     data object CreateChat : BottomNavItem(
         Icons.Outlined.ThumbUp,
-        CREATECHAT
+        CREATECHAT,
     )
 }

@@ -76,7 +76,7 @@ fun FindUserScreen(
     onBackPressKeyClick: () -> Unit,
     onProcessComplete: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FindUserViewModel = hiltViewModel()
+    viewModel: FindUserViewModel = hiltViewModel(),
 ) {
     val emailQuery = rememberTextFieldState()
     val emailIsAvailable = viewModel.emailIsAvailable.collectAsStateWithLifecycle()
@@ -96,7 +96,7 @@ fun FindUserScreen(
                 Toast.makeText(
                     context,
                     context.getString(R.string.search_user_failure_message),
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT,
                 ).show()
             }
     }
@@ -114,7 +114,7 @@ fun FindUserScreen(
                         Toast.makeText(
                             context,
                             context.getString(R.string.add_user_failure_message),
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_SHORT,
                         ).show()
                     }
 
@@ -122,7 +122,7 @@ fun FindUserScreen(
                         Toast.makeText(
                             context,
                             context.getString(R.string.search_user_failure_message),
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_SHORT,
                         ).show()
                     }
 
@@ -130,7 +130,7 @@ fun FindUserScreen(
                         Toast.makeText(
                             context,
                             context.getString(R.string.block_user_failure_message),
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_SHORT,
                         ).show()
                     }
                 }
@@ -143,47 +143,47 @@ fun FindUserScreen(
                 Text(
                     text = stringResource(R.string.find_user_screen_top_bar_text),
                     style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             },
             navigationIcon = {
                 IconButton(
-                    onClick = onBackPressKeyClick
+                    onClick = onBackPressKeyClick,
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                        contentDescription = stringResource(R.string.navigation_arrow_back_icon_description),
                     )
                 }
             },
             actions = {
                 TextButton(
                     onClick = viewModel::fetchUserData,
-                    enabled = emailIsAvailable.value
+                    enabled = emailIsAvailable.value,
                 ) {
                     Text(text = stringResource(R.string.find_user_screen_action_button_text))
                 }
-            }
+            },
         )
     }) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
             FindUserTextField(
                 idQuery = emailQuery,
                 onReset = {
                     emailQuery.edit { delete(0, emailQuery.text.length) }
-                }
+                },
             )
 
             if (userData.value != null) {
                 FindUserCard(
                     onAddAsFriend = viewModel::addFriend,
                     onBlockUser = viewModel::blockFriend,
-                    userData = requireNotNull(userData.value)
+                    userData = requireNotNull(userData.value),
                 )
             }
         }
@@ -194,20 +194,20 @@ fun FindUserScreen(
 fun FindUserTextField(
     idQuery: TextFieldState,
     onReset: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column {
             BasicTextField(
                 modifier = Modifier
                     .background(
                         color = MaterialTheme.colorScheme.surface,
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
                     )
                     .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                     .padding(horizontal = 16.dp),
@@ -218,7 +218,7 @@ fun FindUserTextField(
                 decorator = { innerTextField ->
                     Row(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Box(modifier = Modifier.weight(10f)) {
                             if (idQuery.text.isEmpty()) {
@@ -228,7 +228,7 @@ fun FindUserTextField(
                                     color = Color(0xFF848484),
                                     modifier = Modifier
                                         .padding(start = 4.dp)
-                                        .align(Alignment.CenterStart)
+                                        .align(Alignment.CenterStart),
                                 )
                             }
                             Row(modifier = Modifier.align(Alignment.CenterStart)) {
@@ -239,11 +239,11 @@ fun FindUserTextField(
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = stringResource(R.string.keyboard_reset_button_description),
-                                modifier = Modifier.clickable { onReset() }
+                                modifier = Modifier.clickable { onReset() },
                             )
                         }
                     }
-                }
+                },
             )
             Spacer(modifier = Modifier.height(4.dp))
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
@@ -256,31 +256,31 @@ fun FindUserCard(
     onAddAsFriend: () -> Unit,
     onBlockUser: () -> Unit,
     userData: UserData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
             .padding(20.dp)
             .fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             GlideImage(
                 imageModel = { userData.picture.ifBlank { R.drawable.baseline_person_24 } },
                 modifier = Modifier
                     .size(
                         width = 80.dp,
-                        height = 80.dp
+                        height = 80.dp,
                     )
                     .border(
                         width = 0.01.dp,
                         color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = CircleShape
+                        shape = CircleShape,
                     )
                     .clip(CircleShape)
                     .background(color = colorResource(R.color.avatar_background)),
@@ -288,18 +288,18 @@ fun FindUserCard(
                     +ShimmerPlugin(
                         Shimmer.Flash(
                             baseColor = Color.White,
-                            highlightColor = Color.LightGray
-                        )
+                            highlightColor = Color.LightGray,
+                        ),
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(text = userData.name)
             Spacer(modifier = Modifier.height(20.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
             ) {
                 OutlinedButton(onClick = onBlockUser) {
                     Text(text = stringResource(R.string.block_friend_action))

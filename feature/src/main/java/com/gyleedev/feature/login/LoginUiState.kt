@@ -7,6 +7,6 @@ sealed interface LoginUiState {
         val passwordQuery: String,
         val idIsAvailable: Boolean,
         val passwordIsAvailable: Boolean,
-        val loginIsAvailable: Boolean
+        val loginIsAvailable: Boolean,
     ) : LoginUiState
 }

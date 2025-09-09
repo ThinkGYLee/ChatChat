@@ -5,11 +5,9 @@ import com.gyleedev.domain.repository.SettingRepository
 import javax.inject.Inject
 
 class SettingRepositoryImpl @Inject constructor(
-    private val preference: ThemePreference
+    private val preference: ThemePreference,
 ) : SettingRepository {
-    override fun getTheme(): Int {
-        return preference.getTheme()
-    }
+    override fun getTheme(): Int = preference.getTheme()
 
     override fun setTheme(mode: Int) {
         preference.setTheme(mode)

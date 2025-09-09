@@ -5,9 +5,7 @@ import com.gyleedev.domain.repository.UserRepository
 import javax.inject.Inject
 
 class GetRelatedUserAndFavoriteDataUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(uid: String): RelatedUserLocalData {
-        return repository.getFriendAndFavoriteByUid(uid)
-    }
+    suspend operator fun invoke(uid: String): RelatedUserLocalData = repository.getFriendAndFavoriteByUid(uid)
 }

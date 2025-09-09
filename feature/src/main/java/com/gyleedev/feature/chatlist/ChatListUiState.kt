@@ -9,12 +9,12 @@ sealed interface ChatListUiState {
     data object Loading : ChatListUiState
 
     data class Success(
-        val pagingData: Flow<PagingData<ChatRoomDataWithAllRelatedUsersAndMessage>>
+        val pagingData: Flow<PagingData<ChatRoomDataWithAllRelatedUsersAndMessage>>,
     ) : ChatListUiState
 }
 
 enum class ChatListLoadingState {
     SUCCESS,
     NONE,
-    FAIL
+    FAIL,
 }

@@ -7,10 +7,10 @@ sealed interface SelectedMessageState {
     data object NotSelected : SelectedMessageState
 
     data class Reply(
-        val messageData: MessageData
+        val messageData: MessageData,
     ) : SelectedMessageState
 
     data class Selected(
-        val messageData: MessageData
+        val messageData: MessageData,
     ) : SelectedMessageState
 }

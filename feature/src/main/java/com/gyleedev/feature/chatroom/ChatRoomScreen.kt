@@ -129,7 +129,7 @@ import kotlinx.coroutines.launch
 fun ChatRoomScreen(
     onBackPressKeyClick: () -> Unit,
     modifier: Modifier = Modifier,
-    chatRoomViewModel: ChatRoomViewModel = hiltViewModel()
+    chatRoomViewModel: ChatRoomViewModel = hiltViewModel(),
 ) {
     val query = rememberTextFieldState()
     val messages = chatRoomViewModel.messages.collectAsLazyPagingItems()
@@ -140,7 +140,7 @@ fun ChatRoomScreen(
 
     val lazyListState = remember {
         mutableStateOf(
-            LazyListState(firstVisibleItemScrollOffset = messages.itemCount)
+            LazyListState(firstVisibleItemScrollOffset = messages.itemCount),
         )
     }
 
@@ -197,7 +197,7 @@ fun ChatRoomScreen(
                     onAddFriendClick = chatRoomViewModel::userToFriend,
                     onBackPressKeyClick = onBackPressKeyClick,
                     state = uiStateCast.relationState,
-                    name = uiStateCast.userName
+                    name = uiStateCast.userName,
                 )
             }
         },
@@ -210,7 +210,7 @@ fun ChatRoomScreen(
                             .fillMaxWidth()
                             .height(52.dp)
                             .padding(vertical = 20.dp),
-                        horizontalArrangement = Arrangement.Center
+                        horizontalArrangement = Arrangement.Center,
                     ) {
                         Text(text = stringResource(R.string.chat_room_blocked_user_bottom_bar_text))
                     }
@@ -218,7 +218,7 @@ fun ChatRoomScreen(
                     UniversalBar(
                         onPhotoButtonClick = {
                             pickMedia.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
                             )
                         },
                         query = query,
@@ -234,11 +234,11 @@ fun ChatRoomScreen(
                         screenWidth = screenWidth,
                         photoUri = photoUri.value,
                         uiState = uiState as ChatRoomUiState.Success,
-                        modifier = Modifier.heightIn(max = screenWidth)
+                        modifier = Modifier.heightIn(max = screenWidth),
                     )
                 }
             }
-        }
+        },
     ) { innerPadding ->
         if (uiState is ChatRoomUiState.Success) {
             LazyColumn(
@@ -246,12 +246,12 @@ fun ChatRoomScreen(
                     .fillMaxSize(),
                 state = lazyListState.value,
                 reverseLayout = true,
-                contentPadding = innerPadding
+                contentPadding = innerPadding,
             ) {
                 items(
                     count = messages.itemCount,
                     key = { requireNotNull(messages[it]?.time) },
-                    contentType = { messages[it]?.writer }
+                    contentType = { messages[it]?.writer },
                 ) {
                     Row {
                         if ((uiState as ChatRoomUiState.Success).participants.size > 1) {
@@ -273,7 +273,7 @@ fun ChatRoomScreen(
                                         .border(
                                             width = 0.01.dp,
                                             color = MaterialTheme.colorScheme.outlineVariant,
-                                            shape = CircleShape
+                                            shape = CircleShape,
                                         )
                                         .clip(CircleShape)
                                         .background(color = colorResource(R.color.avatar_background)),
@@ -281,11 +281,11 @@ fun ChatRoomScreen(
                                         +ShimmerPlugin(
                                             Shimmer.Flash(
                                                 baseColor = Color.White,
-                                                highlightColor = Color.LightGray
-                                            )
+                                                highlightColor = Color.LightGray,
+                                            ),
                                         )
                                     },
-                                    previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                                    previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
                                 )
                             }
                         }
@@ -301,10 +301,10 @@ fun ChatRoomScreen(
                                         cancel = { chatRoomViewModel.cancelMessage(messageData) },
                                         onLongClick = {
                                             chatRoomViewModel.changeReplyTarget(
-                                                SelectedMessageState.Selected(messageData)
+                                                SelectedMessageState.Selected(messageData),
                                             )
                                             openMessageDialog = true
-                                        }
+                                        },
                                     )
                                 }
 
@@ -313,7 +313,7 @@ fun ChatRoomScreen(
                                         me = (uiState as ChatRoomUiState.Success).uid,
                                         messageData = messageData,
                                         resend = { chatRoomViewModel.resendMessage(messageData) },
-                                        cancel = { chatRoomViewModel.cancelMessage(messageData) }
+                                        cancel = { chatRoomViewModel.cancelMessage(messageData) },
                                     )
                                 }
 
@@ -327,7 +327,7 @@ fun ChatRoomScreen(
                                             val customTabsIntent =
                                                 CustomTabsIntent.Builder().build()
                                             customTabsIntent.launchUrl(context, it.toUri())
-                                        }
+                                        },
                                     )
                                 }
 
@@ -358,7 +358,7 @@ fun ChatRoomScreen(
                 openDeleteDialog = {
                     openDeleteDialog = true
                 },
-                resetDialogData = { chatRoomViewModel.changeReplyTarget(SelectedMessageState.NotSelected) }
+                resetDialogData = { chatRoomViewModel.changeReplyTarget(SelectedMessageState.NotSelected) },
             )
         }
 
@@ -370,7 +370,7 @@ fun ChatRoomScreen(
                 onDelete = {
                     chatRoomViewModel.deleteMessage(messageData)
                     chatRoomViewModel.changeReplyTarget(SelectedMessageState.NotSelected)
-                }
+                },
             )
         }
     }
@@ -380,7 +380,7 @@ fun ChatRoomScreen(
 fun ChatBubbleDivider(
     width: Int?,
     modifier: Modifier = Modifier,
-    thickness: Dp = DividerDefaults.Thickness
+    thickness: Dp = DividerDefaults.Thickness,
 ) {
     val density = LocalDensity.current
     val color: Color = if (isSystemInDarkTheme()) {
@@ -396,15 +396,15 @@ fun ChatBubbleDivider(
                     modifier.width(with(density) { width.toDp() })
                 } else {
                     modifier.width(0.dp)
-                }
+                },
             )
-            .height(thickness)
+            .height(thickness),
     ) {
         drawLine(
             color = color,
             strokeWidth = thickness.toPx(),
             start = Offset(0f, thickness.toPx() / 2),
-            end = Offset(size.width, thickness.toPx() / 2)
+            end = Offset(size.width, thickness.toPx() / 2),
         )
     }
 }
@@ -417,7 +417,7 @@ fun ChatBubble(
     me: String,
     replyTo: String,
     messageData: MessageData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val backgroundColor: Color
     val backgroundShape: RoundedCornerShape
@@ -449,7 +449,7 @@ fun ChatBubble(
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth(),
         horizontalArrangement = arrangement,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         if (messageData.messageSendState == MessageSendState.LOADING) {
             CircularProgressIndicator(modifier = Modifier.size(20.dp))
@@ -462,8 +462,8 @@ fun ChatBubble(
             modifier = Modifier
                 .combinedClickable(
                     onLongClick = onLongClick,
-                    onClick = {}
-                )
+                    onClick = {},
+                ),
 
         ) {
             Column(
@@ -471,24 +471,24 @@ fun ChatBubble(
                     .padding(12.dp)
                     .onGloballyPositioned { layoutCoordinates ->
                         dividerWidth = layoutCoordinates.size.width
-                    }
+                    },
             ) {
                 if (messageData.replyTo != null) {
                     Text(
                         text = stringResource(R.string.chatroom_text_reply_to, name),
                         style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
                     )
                     Text(
                         text = requireNotNull(messageData.replyComment),
                         maxLines = 1,
                         style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Light
+                        fontWeight = FontWeight.Light,
                     )
 
                     ChatBubbleDivider(
                         width = dividerWidth,
-                        modifier = Modifier.padding(vertical = 2.dp)
+                        modifier = Modifier.padding(vertical = 2.dp),
                     )
                 }
                 Text(text = messageData.comment, style = MaterialTheme.typography.bodyMedium)
@@ -504,7 +504,7 @@ fun LinkBubble(
     cancel: () -> Unit,
     me: String,
     messageData: MessageData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val backgroundColor: Color
     val backgroundShape: RoundedCornerShape
@@ -552,7 +552,7 @@ fun LinkBubble(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
         horizontalArrangement = arrangement,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         if (messageData.messageSendState == MessageSendState.LOADING) {
             CircularProgressIndicator(modifier = Modifier.size(20.dp))
@@ -561,7 +561,7 @@ fun LinkBubble(
         }
         Surface(
             color = backgroundColor,
-            shape = backgroundShape
+            shape = backgroundShape,
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
@@ -573,7 +573,7 @@ fun LinkBubble(
                     modifier = Modifier.clickable {
                         linkClick(messageData.comment)
                     },
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
 
                 )
                 if (metaData.title.isNotEmpty() || metaData.description.isNotEmpty() || metaData.imageUrl.isNotEmpty()) {
@@ -591,10 +591,10 @@ fun LinkBubble(
                                 +ShimmerPlugin(
                                     Shimmer.Flash(
                                         baseColor = Color.White,
-                                        highlightColor = Color.LightGray
-                                    )
+                                        highlightColor = Color.LightGray,
+                                    ),
                                 )
-                            }
+                            },
                         )
                         Spacer(modifier = Modifier.width(20.dp))
                     }
@@ -605,7 +605,7 @@ fun LinkBubble(
                                 text = metaData.title,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.labelMedium,
                             )
                         }
                         if (metaData.title.isNotEmpty() && metaData.description.isNotEmpty()) {
@@ -617,7 +617,7 @@ fun LinkBubble(
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
                                 style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Light
+                                fontWeight = FontWeight.Light,
                             )
                         }
                     }
@@ -633,7 +633,7 @@ fun PhotoBubble(
     cancel: () -> Unit,
     me: String,
     modifier: Modifier = Modifier,
-    messageData: MessageData = MessageData()
+    messageData: MessageData = MessageData(),
 ) {
     val arrangement: Arrangement.Horizontal = if (messageData.writer == me) {
         Arrangement.End
@@ -648,7 +648,7 @@ fun PhotoBubble(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
         horizontalArrangement = arrangement,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         GlideImage(
             imageModel = {
@@ -658,17 +658,17 @@ fun PhotoBubble(
             modifier = Modifier
                 .sizeIn(
                     maxWidth = 200.dp,
-                    maxHeight = 320.dp
+                    maxHeight = 320.dp,
                 )
                 .clip(RoundedCornerShape(20.dp)),
             component = rememberImageComponent {
                 +ShimmerPlugin(
                     Shimmer.Flash(
                         baseColor = Color.White,
-                        highlightColor = Color.LightGray
-                    )
+                        highlightColor = Color.LightGray,
+                    ),
                 )
-            }
+            },
         )
     }
 }
@@ -679,32 +679,32 @@ fun PhotoBottomBar(
     onSendButtonClick: () -> Unit,
     onCancelButtonClick: () -> Unit,
     uri: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(screenWidth)
+            .height(screenWidth),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Absolute.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onCancelButtonClick) {
                 Icon(
                     imageVector = Icons.Filled.Close,
-                    contentDescription = stringResource(R.string.close_button_description)
+                    contentDescription = stringResource(R.string.close_button_description),
                 )
             }
             Text(
                 text = stringResource(R.string.chat_room_photo_bar_text),
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
             IconButton(onClick = onSendButtonClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = stringResource(R.string.send_button_description)
+                    contentDescription = stringResource(R.string.send_button_description),
                 )
             }
         }
@@ -722,10 +722,10 @@ fun PhotoBottomBar(
                     +ShimmerPlugin(
                         Shimmer.Flash(
                             baseColor = Color.White,
-                            highlightColor = Color.LightGray
-                        )
+                            highlightColor = Color.LightGray,
+                        ),
                     )
-                }
+                },
             )
         }
         Spacer(Modifier.height(8.dp))
@@ -744,7 +744,7 @@ fun UniversalBar(
     selectedMessageData: SelectedMessageState,
     query: TextFieldState,
     photoUri: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
@@ -756,7 +756,7 @@ fun UniversalBar(
                 .background(color = MaterialTheme.colorScheme.surfaceContainerLowest)
                 .padding(bottom = 4.dp)
                 .windowInsetsPadding(BottomAppBarDefaults.windowInsets)
-                .imePadding()
+                .imePadding(),
         ) {
             if (selectedMessageData is SelectedMessageState.Reply) {
                 Column {
@@ -768,29 +768,29 @@ fun UniversalBar(
                     ReplyBar(
                         selectedMessageData = selectedMessageData.messageData,
                         name = name,
-                        replyEnd = replyEnd
+                        replyEnd = replyEnd,
                     )
                 }
             }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp, horizontal = 8.dp)
+                    .padding(vertical = 4.dp, horizontal = 8.dp),
             ) {
                 if (isFocused) {
                     IconButton(
-                        onClick = { focusManager.clearFocus() }
+                        onClick = { focusManager.clearFocus() },
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
                 } else {
                     IconButton(onClick = onPhotoButtonClick) {
                         Icon(
                             imageVector = Icons.Default.Image,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
                 }
@@ -802,7 +802,7 @@ fun UniversalBar(
                         .onFocusChanged {
                             isFocused = it.isFocused
                         }
-                        .weight(1f)
+                        .weight(1f),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(
@@ -810,13 +810,13 @@ fun UniversalBar(
                     enabled = query.text.isNotEmpty(),
                     colors = IconButtonDefaults.iconButtonColors(
                         contentColor = Color.Yellow,
-                        disabledContentColor = LocalContentColor.current.copy(alpha = 0.38f)
-                    )
+                        disabledContentColor = LocalContentColor.current.copy(alpha = 0.38f),
+                    ),
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.Send,
                         contentDescription = stringResource(R.string.reply_icon_description),
-                        modifier = Modifier.padding(horizontal = 8.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp),
                     )
                 }
             }
@@ -827,7 +827,7 @@ fun UniversalBar(
             onSendButtonClick = onPhotoSendButtonClick,
             uri = photoUri,
             screenWidth = screenWidth,
-            modifier = modifier
+            modifier = modifier,
         )
     }
 }
@@ -837,26 +837,26 @@ fun ReplyBar(
     name: String,
     selectedMessageData: MessageData,
     replyEnd: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier
             .fillMaxWidth()
             .padding(start = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column {
             Text(
                 text = "${name}에게 답장",
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Text(
                 text = selectedMessageData.comment,
                 maxLines = 1,
                 style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Light
+                fontWeight = FontWeight.Light,
             )
         }
         IconButton(onClick = replyEnd) {
@@ -868,7 +868,7 @@ fun ReplyBar(
 @Composable
 fun CommentBottomBar(
     query: TextFieldState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val color = if (isSystemInDarkTheme()) Color.White else Color.Black
     BasicTextField(
@@ -880,8 +880,8 @@ fun CommentBottomBar(
             Box(
                 modifier = Modifier.background(
                     MaterialTheme.colorScheme.surfaceContainer,
-                    shape = RoundedCornerShape(20.dp)
-                )
+                    shape = RoundedCornerShape(20.dp),
+                ),
             ) {
                 if (query.text.isEmpty()) {
                     Text(
@@ -890,7 +890,7 @@ fun CommentBottomBar(
                         color = Color(0xFF848484),
                         modifier = Modifier
                             .align(Alignment.CenterStart)
-                            .padding(start = 20.dp)
+                            .padding(start = 20.dp),
                     )
                 }
                 Row(
@@ -898,13 +898,13 @@ fun CommentBottomBar(
                         .padding(start = 20.dp)
                         .height(48.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     innerTextField()
                 }
             }
         },
-        textStyle = TextStyle.Default.copy(color = color)
+        textStyle = TextStyle.Default.copy(color = color),
     )
 }
 
@@ -917,7 +917,7 @@ fun ChatRoomTopBar(
     onBackPressKeyClick: () -> Unit,
     state: UserRelationState,
     name: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         TopAppBar(
@@ -925,19 +925,19 @@ fun ChatRoomTopBar(
                 Text(
                     text = stringResource(
                         R.string.chat_room_screen_title,
-                        name
-                    )
+                        name,
+                    ),
                 )
             },
             navigationIcon = {
                 IconButton(onClick = onBackPressKeyClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                        contentDescription = stringResource(R.string.navigation_arrow_back_icon_description),
                     )
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         when (state) {
             UserRelationState.BLOCKED -> {
@@ -946,7 +946,7 @@ fun ChatRoomTopBar(
                         .fillMaxWidth()
                         .padding(vertical = 24.dp),
                     horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(
                         modifier = Modifier
@@ -954,16 +954,16 @@ fun ChatRoomTopBar(
                             .clip(CircleShape)
                             .clickable { onUnblockClick() },
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Center,
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.RemoveCircleOutline,
                             contentDescription = stringResource(R.string.unblock_icon_description),
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(40.dp),
                         )
                         Text(
                             text = stringResource(R.string.unblock_icon_text),
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
                         )
                     }
 
@@ -973,16 +973,16 @@ fun ChatRoomTopBar(
                             .clip(CircleShape)
                             .clickable {},
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Center,
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.ReportProblem,
                             contentDescription = stringResource(R.string.report_icon_description),
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(40.dp),
                         )
                         Text(
                             text = stringResource(R.string.report_icon_text),
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
                         )
                     }
                 }
@@ -995,20 +995,20 @@ fun ChatRoomTopBar(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(color = TopAppBarDefaults.topAppBarColors().containerColor)
+                        .background(color = TopAppBarDefaults.topAppBarColors().containerColor),
                 ) {
                     Row {
                         Column(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
                                 text = stringResource(R.string.chat_room_not_friend_text_up),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.labelMedium,
                             )
                             Text(
                                 text = stringResource(R.string.chat_room_not_friend_text_down),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.labelMedium,
                             )
                         }
                     }
@@ -1017,7 +1017,7 @@ fun ChatRoomTopBar(
                             .fillMaxWidth()
                             .padding(vertical = 24.dp),
                         horizontalArrangement = Arrangement.SpaceAround,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(
                             modifier = Modifier
@@ -1025,16 +1025,16 @@ fun ChatRoomTopBar(
                                 .clip(CircleShape)
                                 .clickable { onAddFriendClick() },
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.PersonAddAlt,
                                 contentDescription = stringResource(R.string.add_friend_icon_description),
-                                modifier = Modifier.size(40.dp)
+                                modifier = Modifier.size(40.dp),
                             )
                             Text(
                                 text = stringResource(R.string.add_friend_icon_text),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.labelMedium,
                             )
                         }
 
@@ -1044,16 +1044,16 @@ fun ChatRoomTopBar(
                                 .clip(CircleShape)
                                 .clickable { onBlockClick() },
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Block,
                                 contentDescription = stringResource(R.string.block_icon_description),
-                                modifier = Modifier.size(40.dp)
+                                modifier = Modifier.size(40.dp),
                             )
                             Text(
                                 text = stringResource(R.string.block_icon_text),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.labelMedium,
                             )
                         }
 
@@ -1063,16 +1063,16 @@ fun ChatRoomTopBar(
                                 .clip(CircleShape)
                                 .clickable {},
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.ReportProblem,
                                 contentDescription = stringResource(R.string.report_icon_description),
-                                modifier = Modifier.size(40.dp)
+                                modifier = Modifier.size(40.dp),
                             )
                             Text(
                                 text = stringResource(R.string.report_icon_text),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.labelMedium,
                             )
                         }
                     }
@@ -1088,29 +1088,29 @@ fun ChatRoomTopBar(
 fun ResendButton(
     onResendClick: () -> Unit,
     onCancelClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(modifier) {
         Surface(
             color = Color.Red,
             shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
-            modifier = Modifier.clickable { onResendClick() }
+            modifier = Modifier.clickable { onResendClick() },
         ) {
             Icon(
                 imageVector = Icons.Outlined.Refresh,
                 contentDescription = stringResource(R.string.message_resend_icon_description),
-                modifier = Modifier.padding(2.dp)
+                modifier = Modifier.padding(2.dp),
             )
         }
         Surface(
             color = Color.Red,
             shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
-            modifier = Modifier.clickable { onCancelClick() }
+            modifier = Modifier.clickable { onCancelClick() },
         ) {
             Icon(
                 imageVector = Icons.Outlined.Close,
                 contentDescription = stringResource(R.string.message_cancel_icon_description),
-                modifier = Modifier.padding(2.dp)
+                modifier = Modifier.padding(2.dp),
             )
         }
     }
@@ -1125,7 +1125,7 @@ fun MessageDialog(
     openDeleteDialog: () -> Unit,
     resetDialogData: () -> Unit,
     closeDialog: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     BasicAlertDialog(
         onDismissRequest = closeDialog,
@@ -1134,11 +1134,11 @@ fun MessageDialog(
                 modifier = Modifier.wrapContentSize(),
                 shape = MaterialTheme.shapes.medium,
                 tonalElevation = AlertDialogDefaults.TonalElevation,
-                color = AlertDialogDefaults.containerColor
+                color = AlertDialogDefaults.containerColor,
             ) {
                 Column(
                     modifier = Modifier.padding(vertical = 24.dp),
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.Start,
                 ) {
                     Text(
                         text = stringResource(R.string.chat_room_dialog_copy_text),
@@ -1149,7 +1149,7 @@ fun MessageDialog(
                                 resetDialogData()
                                 closeDialog()
                             }
-                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                            .padding(horizontal = 24.dp, vertical = 8.dp),
                     )
 
                     Text(
@@ -1161,7 +1161,7 @@ fun MessageDialog(
                                 resetDialogData()
                                 closeDialog()
                             }
-                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                            .padding(horizontal = 24.dp, vertical = 8.dp),
                     )
                     Text(
                         text = stringResource(R.string.chat_room_dialog_reply_text),
@@ -1171,7 +1171,7 @@ fun MessageDialog(
                                 onReply()
                                 closeDialog()
                             }
-                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                            .padding(horizontal = 24.dp, vertical = 8.dp),
                     )
                     Text(
                         text = stringResource(R.string.chat_room_dialog_delete_text),
@@ -1181,12 +1181,12 @@ fun MessageDialog(
                                 openDeleteDialog()
                                 closeDialog()
                             }
-                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                            .padding(horizontal = 24.dp, vertical = 8.dp),
                     )
                 }
             }
         },
-        modifier = modifier.wrapContentSize()
+        modifier = modifier.wrapContentSize(),
     )
 }
 
@@ -1196,7 +1196,7 @@ fun DeleteDialog(
     isMessageMine: Boolean,
     closeDialog: () -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     BasicAlertDialog(
         onDismissRequest = closeDialog,
@@ -1205,11 +1205,11 @@ fun DeleteDialog(
                 modifier = Modifier.wrapContentSize(),
                 shape = MaterialTheme.shapes.medium,
                 tonalElevation = AlertDialogDefaults.TonalElevation,
-                color = AlertDialogDefaults.containerColor
+                color = AlertDialogDefaults.containerColor,
             ) {
                 Column(
                     modifier = Modifier.padding(vertical = 24.dp),
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.Start,
                 ) {
                     Text(
                         text = if (isMessageMine) {
@@ -1219,22 +1219,22 @@ fun DeleteDialog(
                         },
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 24.dp)
+                        modifier = Modifier.padding(horizontal = 24.dp),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.delete_message_dialog_text),
-                        modifier = Modifier.padding(horizontal = 24.dp)
+                        modifier = Modifier.padding(horizontal = 24.dp),
                     )
                     Spacer(Modifier.height(16.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Absolute.Right
+                        horizontalArrangement = Arrangement.Absolute.Right,
                     ) {
                         TextButton(
                             onClick = {
                                 closeDialog()
-                            }
+                            },
                         ) {
                             Text(text = stringResource(R.string.dialog_dismiss_button_text))
                         }
@@ -1242,7 +1242,7 @@ fun DeleteDialog(
                             onClick = {
                                 onDelete()
                                 closeDialog()
-                            }
+                            },
                         ) {
                             Text(text = stringResource(R.string.dialog_delete_button_text))
                         }
@@ -1250,6 +1250,6 @@ fun DeleteDialog(
                 }
             }
         },
-        modifier = modifier.wrapContentSize()
+        modifier = modifier.wrapContentSize(),
     )
 }

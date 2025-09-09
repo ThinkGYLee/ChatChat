@@ -9,17 +9,15 @@ data class ChatRoomAndReceiverEntity(
     @Embedded val chatroom: ChatRoomEntity,
     @Relation(
         parentColumn = "id",
-        entityColumn = "chatroom_entity_id"
+        entityColumn = "chatroom_entity_id",
     )
-    val receivers: List<ReceiverEntity>
+    val receivers: List<ReceiverEntity>,
 )
 
-fun ChatRoomAndReceiverEntity.toLocalData(): ChatRoomAndReceiverLocalData {
-    return ChatRoomAndReceiverLocalData(
-        id = chatroom.id,
-        rid = chatroom.rid,
-        lastMessage = chatroom.lastMessage,
-        isGroup = chatroom.isGroup,
-        receivers = receivers.map { it.receiver }
-    )
-}
+fun ChatRoomAndReceiverEntity.toLocalData(): ChatRoomAndReceiverLocalData = ChatRoomAndReceiverLocalData(
+    id = chatroom.id,
+    rid = chatroom.rid,
+    lastMessage = chatroom.lastMessage,
+    isGroup = chatroom.isGroup,
+    receivers = receivers.map { it.receiver },
+)

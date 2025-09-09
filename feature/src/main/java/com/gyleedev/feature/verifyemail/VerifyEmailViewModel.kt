@@ -33,7 +33,7 @@ class VerifyEmailViewModel @Inject constructor(
     private val setVerifiedStateUseCase: SetVerifiedStateUseCase,
     private val checkVerifiedUseCase: CheckVerifiedUseCase,
     private val cancelSigninUseCase: CancelSigninUseCase,
-    private val updateMyUserInformationUseCase: UpdateMyInfoUseCase
+    private val updateMyUserInformationUseCase: UpdateMyInfoUseCase,
 ) : BaseViewModel() {
 
     private val _uiEvent = MutableSharedFlow<VerifyEmailUiEvent>()
@@ -42,22 +42,22 @@ class VerifyEmailViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.P)
     private val userData = MutableStateFlow<UserData>(UserData())
     private val verifiedState = MutableStateFlow<VerifiedState>(
-        VerifiedState.LOADING
+        VerifiedState.LOADING,
     )
 
     @RequiresApi(Build.VERSION_CODES.P)
     val uiState = combine(
         userData,
-        verifiedState
+        verifiedState,
     ) { userData, verifiedState ->
         VerifyEmailUiState.Success(
             userData = userData,
-            verifiedState = verifiedState
+            verifiedState = verifiedState,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = VerifyEmailUiState.Loading
+        initialValue = VerifyEmailUiState.Loading,
     )
 
     init {
@@ -94,7 +94,7 @@ class VerifyEmailViewModel @Inject constructor(
             val result = checkVerifiedUseCase()
             if (result) {
                 val updateResult = updateMyUserInformationUseCase(
-                    (uiState.value as VerifyEmailUiState.Success).userData.copy(verified = true)
+                    (uiState.value as VerifyEmailUiState.Success).userData.copy(verified = true),
                 ).first()
                 if (updateResult) {
                     setVerifiedStateUseCase(VerifiedState.VERIFIED)

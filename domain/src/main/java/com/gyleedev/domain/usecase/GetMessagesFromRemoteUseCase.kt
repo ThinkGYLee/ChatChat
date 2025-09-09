@@ -8,12 +8,10 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetMessagesFromRemoteUseCase @Inject constructor(
-    private val repository: MessageRepository
+    private val repository: MessageRepository,
 ) {
     operator fun invoke(
         chatRoom: ChatRoomAndReceiverLocalData,
-        userRelationState: UserRelationState
-    ): Flow<MessageData?> {
-        return repository.getMessageListener(chatRoom, userRelationState)
-    }
+        userRelationState: UserRelationState,
+    ): Flow<MessageData?> = repository.getMessageListener(chatRoom, userRelationState)
 }

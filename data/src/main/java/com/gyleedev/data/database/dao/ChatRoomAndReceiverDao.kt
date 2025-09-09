@@ -16,11 +16,11 @@ interface ChatRoomAndReceiverDao {
         WHERE isGroup = :isGroup AND id IN (
             SELECT chatroom_entity_id FROM receiver WHERE receiver = :receiver
         )
-    """
+    """,
     )
     fun getChatRoomAndReceiverByUid(
         receiver: String,
-        isGroup: Boolean = false
+        isGroup: Boolean = false,
     ): ChatRoomAndReceiverEntity?
 
     @Transaction

@@ -12,19 +12,17 @@ data class RelatedUserRemoteData(
     @SerializedName("status") val status: String = "",
     @SerializedName("userRelation") val userRelation: UserRelationState = UserRelationState.UNKNOWN,
     @SerializedName("favoriteState") val favoriteState: Boolean = false,
-    @SerializedName("verified") val verified: Boolean = false
+    @SerializedName("verified") val verified: Boolean = false,
 )
 
-fun RelatedUserRemoteData.toRelatedUserLocalData(): RelatedUserLocalData {
-    return RelatedUserLocalData(
-        id = 0L,
-        email = email,
-        name = name,
-        uid = uid,
-        picture = picture,
-        status = status,
-        userRelation = userRelation,
-        favoriteState = favoriteState,
-        verified = verified
-    )
-}
+fun RelatedUserRemoteData.toRelatedUserLocalData(): RelatedUserLocalData = RelatedUserLocalData(
+    id = 0L,
+    email = email,
+    name = name,
+    uid = uid,
+    picture = picture,
+    status = status,
+    userRelation = userRelation,
+    favoriteState = favoriteState,
+    verified = verified,
+)

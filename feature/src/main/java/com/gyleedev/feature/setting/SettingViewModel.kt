@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
-    private val logoutProcessUseCase: LogoutProcessUseCase
+    private val logoutProcessUseCase: LogoutProcessUseCase,
 ) : BaseViewModel() {
 
     private val _keys = MutableStateFlow<List<SettingKey>>(emptyList<SettingKey>())
@@ -38,7 +38,7 @@ class SettingViewModel @Inject constructor(
             SettingKey.LANGUAGE,
             SettingKey.THEME,
             SettingKey.DATAMANAGE,
-            SettingKey.CHAT
+            SettingKey.CHAT,
         )
     }
 }

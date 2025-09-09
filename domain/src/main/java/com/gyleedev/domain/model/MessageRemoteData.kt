@@ -12,5 +12,5 @@ data class MessageRemoteData(
     @SerializedName("replyTo") val replyTo: String? = null,
     @SerializedName("replyComment") val replyComment: String? = null,
     @SerializedName("replyType") val replyType: MessageType? = null,
-    @SerializedName("replyKey") val replyKey: Long? = null
+    @SerializedName("replyKey") val replyKey: Long? = null,
 )

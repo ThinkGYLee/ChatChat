@@ -26,7 +26,7 @@ import javax.inject.Inject
 class CreateChatViewModel @Inject constructor(
     getFriendsUseCase: GetFriendsUseCase,
     private val getFriendsWithNameUseCase: GetFriendsWithNameUseCase,
-    private val hideFriendUseCase: HideFriendUseCase
+    private val hideFriendUseCase: HideFriendUseCase,
 ) : BaseViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -48,7 +48,7 @@ class CreateChatViewModel @Inject constructor(
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
-            PagingData.empty()
+            PagingData.empty(),
         )
 
     fun updateCheckedUsers(user: RelatedUserLocalData) {

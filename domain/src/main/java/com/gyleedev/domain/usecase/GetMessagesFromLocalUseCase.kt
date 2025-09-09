@@ -4,7 +4,7 @@ import com.gyleedev.domain.repository.MessageRepository
 import javax.inject.Inject
 
 class GetMessagesFromLocalUseCase @Inject constructor(
-    private val repository: MessageRepository
+    private val repository: MessageRepository,
 ) {
     operator fun invoke(rid: String) = repository.getMessagesFromLocal(rid)
 }

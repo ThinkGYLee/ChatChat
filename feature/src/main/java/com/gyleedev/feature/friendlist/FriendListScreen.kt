@@ -82,7 +82,7 @@ fun FriendListScreen(
     onManageFriendClick: () -> Unit,
     onSettingClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FriendListViewModel = hiltViewModel()
+    viewModel: FriendListViewModel = hiltViewModel(),
 ) {
     var openFriendDialog by remember { mutableStateOf(false) }
     var dialogRelatedUserLocalData by remember { mutableStateOf<RelatedUserLocalData?>(null) }
@@ -119,14 +119,14 @@ fun FriendListScreen(
                     IconButton(onClick = onFindUserButtonClick) {
                         Icon(
                             imageVector = Icons.Outlined.PersonAdd,
-                            contentDescription = stringResource(R.string.add_friend_button_description)
+                            contentDescription = stringResource(R.string.add_friend_button_description),
                         )
                     }
 
                     IconButton(onClick = { dropdownMenuExpanded = true }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
-                            contentDescription = stringResource(R.string.friend_list_setting_button_description)
+                            contentDescription = stringResource(R.string.friend_list_setting_button_description),
                         )
                     }
 
@@ -135,36 +135,36 @@ fun FriendListScreen(
                         onDismiss = { dropdownMenuExpanded = false },
                         editRequest = onEditFriendClick,
                         manageFriendRequest = onManageFriendClick,
-                        settingRequest = onSettingClick
+                        settingRequest = onSettingClick,
                     )
-                }
+                },
             )
         },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
 
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding),
         ) {
             item {
                 AnimatedVisibility(myData != null) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp)
+                            .padding(vertical = 12.dp),
                     ) {
                         MyUserData(
                             onClick = {
                                 onMyInfoClick(requireNotNull(myData).uid)
                             },
-                            userData = requireNotNull(myData)
+                            userData = requireNotNull(myData),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 20.dp),
-                            thickness = 0.3.dp
+                            thickness = 0.3.dp,
                         )
                     }
                 }
@@ -176,14 +176,14 @@ fun FriendListScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .padding(horizontal = 20.dp)
-                            .padding(bottom = 8.dp)
+                            .padding(bottom = 8.dp),
                     ) {
                         Text(
                             text = stringResource(
                                 R.string.friend_list_header_favorite,
-                                favorites.itemCount
+                                favorites.itemCount,
                             ),
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
                         )
                     }
                 }
@@ -192,12 +192,12 @@ fun FriendListScreen(
             items(
                 count = favorites.itemCount,
                 key = { "${requireNotNull(favorites[it]).id}+favorites" },
-                contentType = { 0 }
+                contentType = { 0 },
             ) {
                 AnimatedVisibility(favorites.itemCount > 0) {
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
                     ) {
                         FriendData(
                             onClick = { onFriendClick(requireNotNull(favorites[it]).uid) },
@@ -208,14 +208,14 @@ fun FriendListScreen(
                             picture = requireNotNull(favorites[it]).picture,
                             name = requireNotNull(favorites[it]).name,
                             status = requireNotNull(favorites[it]).status,
-                            modifier = Modifier.animateItem()
+                            modifier = Modifier.animateItem(),
                         )
 
                         if (it == favorites.itemCount - 1) {
                             Spacer(modifier = Modifier.height(8.dp))
                             HorizontalDivider(
                                 modifier = Modifier.padding(horizontal = 20.dp),
-                                thickness = 0.3.dp
+                                thickness = 0.3.dp,
                             )
                         }
                     }
@@ -228,15 +228,15 @@ fun FriendListScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(
                             vertical = 8.dp,
-                            horizontal = 20.dp
-                        )
+                            horizontal = 20.dp,
+                        ),
                     ) {
                         Text(
                             text = stringResource(
                                 R.string.friend_list_header_friend,
-                                friends.itemCount
+                                friends.itemCount,
                             ),
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
                         )
                     }
                 }
@@ -245,7 +245,7 @@ fun FriendListScreen(
             items(
                 count = friends.itemCount,
                 key = { "${requireNotNull(friends[it]).id}+friends" },
-                contentType = { 0 }
+                contentType = { 0 },
             ) {
                 AnimatedVisibility(friends.itemCount > 0) {
                     FriendData(
@@ -257,7 +257,7 @@ fun FriendListScreen(
                         picture = requireNotNull(friends[it]).picture,
                         name = requireNotNull(friends[it]).name,
                         status = requireNotNull(friends[it]).status,
-                        modifier = Modifier.animateItem()
+                        modifier = Modifier.animateItem(),
                     )
                 }
             }
@@ -275,7 +275,7 @@ fun FriendListScreen(
             hideRequest = { viewModel.hideFriend(dialogRelatedUserLocalData) },
             updateFavorite = { viewModel.updateFavorite(dialogRelatedUserLocalData) },
             name = requireNotNull(dialogRelatedUserLocalData).name,
-            favoriteState = requireNotNull(dialogRelatedUserLocalData).favoriteState
+            favoriteState = requireNotNull(dialogRelatedUserLocalData).favoriteState,
         )
     }
 }
@@ -284,14 +284,14 @@ fun FriendListScreen(
 fun MyUserData(
     onClick: () -> Unit,
     userData: UserData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp, horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         GlideImage(
             imageModel = { userData.picture.ifBlank { R.drawable.baseline_person_24 } },
@@ -301,7 +301,7 @@ fun MyUserData(
                 .border(
                     width = 0.01.dp,
                     color = MaterialTheme.colorScheme.outlineVariant,
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(20.dp),
                 )
                 .clip(RoundedCornerShape(20.dp))
                 .background(color = colorResource(R.color.avatar_background)),
@@ -309,11 +309,11 @@ fun MyUserData(
                 +ShimmerPlugin(
                     Shimmer.Flash(
                         baseColor = Color.White,
-                        highlightColor = Color.LightGray
-                    )
+                        highlightColor = Color.LightGray,
+                    ),
                 )
             },
-            previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+            previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
         )
         Spacer(modifier = Modifier.width(20.dp))
         Column(verticalArrangement = Arrangement.Center) {
@@ -321,7 +321,7 @@ fun MyUserData(
             if (userData.status.isNotBlank()) {
                 Text(
                     text = userData.status,
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelMedium,
                 )
             }
         }
@@ -335,17 +335,17 @@ fun FriendData(
     picture: String,
     name: String,
     status: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
                 onLongClick = onLongClick,
-                onClick = onClick
+                onClick = onClick,
             )
             .padding(vertical = 8.dp, horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(modifier = Modifier.wrapContentSize()) {
             GlideImage(
@@ -356,7 +356,7 @@ fun FriendData(
                     .border(
                         width = 0.01.dp,
                         color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(16.dp),
                     )
                     .clip(RoundedCornerShape(16.dp))
                     .background(color = colorResource(R.color.avatar_background)),
@@ -364,11 +364,11 @@ fun FriendData(
                     +ShimmerPlugin(
                         Shimmer.Flash(
                             baseColor = Color.White,
-                            highlightColor = Color.LightGray
-                        )
+                            highlightColor = Color.LightGray,
+                        ),
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
             )
         }
         Spacer(modifier = Modifier.width(20.dp))
@@ -377,7 +377,7 @@ fun FriendData(
             if (status.isNotBlank()) {
                 Text(
                     text = status,
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
                 )
             }
         }
@@ -394,7 +394,7 @@ fun FriendDialog(
     deleteRequest: () -> Unit,
     hideRequest: () -> Unit,
     closeDialog: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     BasicAlertDialog(
         onDismissRequest = closeDialog,
@@ -403,17 +403,17 @@ fun FriendDialog(
                 modifier = Modifier.wrapContentSize(),
                 shape = MaterialTheme.shapes.medium,
                 tonalElevation = AlertDialogDefaults.TonalElevation,
-                color = AlertDialogDefaults.containerColor
+                color = AlertDialogDefaults.containerColor,
             ) {
                 Column(
                     modifier = Modifier.padding(vertical = 24.dp),
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.Start,
                 ) {
                     Text(
                         text = name,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(horizontal = 24.dp)
+                        modifier = Modifier.padding(horizontal = 24.dp),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
@@ -425,7 +425,7 @@ fun FriendDialog(
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = stringResource(
@@ -433,9 +433,9 @@ fun FriendDialog(
                                     R.string.remove_favorite_button_text
                                 } else {
                                     R.string.add_favorite_button_text
-                                }
+                                },
                             ),
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                     Row(
@@ -447,11 +447,11 @@ fun FriendDialog(
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = stringResource(R.string.friend_block_button_text),
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                     Row(
@@ -463,11 +463,11 @@ fun FriendDialog(
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = stringResource(R.string.friend_delete_button_text),
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                     Row(
@@ -479,17 +479,17 @@ fun FriendDialog(
                                 closeDialog()
                             }
                             .padding(horizontal = 24.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = stringResource(R.string.friend_hide_button_text),
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                 }
             }
         },
-        modifier = modifier.wrapContentSize()
+        modifier = modifier.wrapContentSize(),
     )
 }
 
@@ -500,33 +500,33 @@ fun FriendManagementDropDownMenu(
     settingRequest: () -> Unit,
     dropdownMenuExpanded: Boolean,
     modifier: Modifier = Modifier,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     DropdownMenu(
         expanded = dropdownMenuExpanded,
         modifier = modifier,
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
     ) {
         DropdownMenuItem(
             text = { Text(stringResource(R.string.edit_button_text)) },
             onClick = {
                 editRequest()
                 onDismiss()
-            }
+            },
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.manage_friend_button_text)) },
             onClick = {
                 manageFriendRequest()
                 onDismiss()
-            }
+            },
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.setting_text)) },
             onClick = {
                 settingRequest()
                 onDismiss()
-            }
+            },
         )
     }
 }

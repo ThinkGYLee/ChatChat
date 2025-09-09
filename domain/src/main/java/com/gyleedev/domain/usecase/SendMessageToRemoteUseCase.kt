@@ -5,8 +5,7 @@ import com.gyleedev.domain.repository.MessageRepository
 import javax.inject.Inject
 
 class SendMessageToRemoteUseCase @Inject constructor(
-    private val repository: MessageRepository
+    private val repository: MessageRepository,
 ) {
-    operator fun invoke(messageData: MessageData) =
-        repository.insertMessageToRemote(messageData)
+    operator fun invoke(messageData: MessageData) = repository.insertMessageToRemote(messageData)
 }

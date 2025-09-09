@@ -5,5 +5,5 @@ enum class SettingEvent {
     ACCOUNT,
     MYINFORMATION,
     THEME,
-    CHAT
+    CHAT,
 }

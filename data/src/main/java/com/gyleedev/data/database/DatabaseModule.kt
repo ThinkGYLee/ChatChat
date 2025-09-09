@@ -23,51 +23,41 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun providesUserDatabase(@ApplicationContext context: Context): ChatDataDatabase {
-        return Room.databaseBuilder(
-            context,
-            ChatDataDatabase::class.java,
-            "database"
-        ).build()
-    }
+    fun providesUserDatabase(@ApplicationContext context: Context): ChatDataDatabase = Room.databaseBuilder(
+        context,
+        ChatDataDatabase::class.java,
+        "database",
+    ).build()
 
     @Singleton
     @Provides
-    fun providesUserDao(chatDataDatabase: ChatDataDatabase): UserDao =
-        chatDataDatabase.userDao()
+    fun providesUserDao(chatDataDatabase: ChatDataDatabase): UserDao = chatDataDatabase.userDao()
 
     @Singleton
     @Provides
-    fun providesChatRoomDao(chatDataDatabase: ChatDataDatabase): ChatRoomDao =
-        chatDataDatabase.chatRoomDao()
+    fun providesChatRoomDao(chatDataDatabase: ChatDataDatabase): ChatRoomDao = chatDataDatabase.chatRoomDao()
 
     @Singleton
     @Provides
-    fun providesMessageDao(chatDataDatabase: ChatDataDatabase): MessageDao =
-        chatDataDatabase.messageDao()
+    fun providesMessageDao(chatDataDatabase: ChatDataDatabase): MessageDao = chatDataDatabase.messageDao()
 
     @Singleton
     @Provides
-    fun providesChatListWithMessageAndFriendDao(chatDataDatabase: ChatDataDatabase): ChatListWithMessageAndFriendDao =
-        chatDataDatabase.chatListWithMessageAndFriendDao()
+    fun providesChatListWithMessageAndFriendDao(chatDataDatabase: ChatDataDatabase): ChatListWithMessageAndFriendDao = chatDataDatabase.chatListWithMessageAndFriendDao()
 
     @Singleton
     @Provides
-    fun providesFavoriteDao(chatDataDatabase: ChatDataDatabase): FavoriteDao =
-        chatDataDatabase.favoriteDao()
+    fun providesFavoriteDao(chatDataDatabase: ChatDataDatabase): FavoriteDao = chatDataDatabase.favoriteDao()
 
     @Singleton
     @Provides
-    fun providesUserAndFavoriteDao(chatDataDatabase: ChatDataDatabase): UserAndFavoriteDao =
-        chatDataDatabase.userAndFavoriteDao()
+    fun providesUserAndFavoriteDao(chatDataDatabase: ChatDataDatabase): UserAndFavoriteDao = chatDataDatabase.userAndFavoriteDao()
 
     @Singleton
     @Provides
-    fun providesReceiverDao(chatDataDatabase: ChatDataDatabase): ReceiverDao =
-        chatDataDatabase.receiverDao()
+    fun providesReceiverDao(chatDataDatabase: ChatDataDatabase): ReceiverDao = chatDataDatabase.receiverDao()
 
     @Singleton
     @Provides
-    fun providesChatRoomAndReceiverDao(chatDataDatabase: ChatDataDatabase): ChatRoomAndReceiverDao =
-        chatDataDatabase.chatRoomAndReceiverDao()
+    fun providesChatRoomAndReceiverDao(chatDataDatabase: ChatDataDatabase): ChatRoomAndReceiverDao = chatDataDatabase.chatRoomAndReceiverDao()
 }

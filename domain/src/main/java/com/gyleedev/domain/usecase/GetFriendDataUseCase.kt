@@ -6,9 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetFriendDataUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    operator fun invoke(friend: String): Flow<RelatedUserLocalData> {
-        return repository.getFriendById(friend)
-    }
+    operator fun invoke(friend: String): Flow<RelatedUserLocalData> = repository.getFriendById(friend)
 }

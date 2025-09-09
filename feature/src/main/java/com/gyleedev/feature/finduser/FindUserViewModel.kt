@@ -21,10 +21,10 @@ import javax.inject.Inject
 class FindUserViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val addFriendRequestUseCase: AddFriendRequestUseCase,
-    private val blockUnknownUserUseCase: BlockUnknownUserUseCase
+    private val blockUnknownUserUseCase: BlockUnknownUserUseCase,
 ) : BaseViewModel() {
 
-    private val _emailQuery = MutableStateFlow("")
+    private val emailQuery = MutableStateFlow("")
 
     private val _emailIsAvailable = MutableStateFlow(false)
     val emailIsAvailable: StateFlow<Boolean> = _emailIsAvailable
@@ -40,7 +40,7 @@ class FindUserViewModel @Inject constructor(
 
     fun editEmail(email: String) {
         viewModelScope.launch {
-            _emailQuery.emit(email)
+            emailQuery.emit(email)
             emailValidator()
         }
     }
@@ -48,13 +48,13 @@ class FindUserViewModel @Inject constructor(
     private fun emailValidator() {
         viewModelScope.launch {
             val pattern = android.util.Patterns.EMAIL_ADDRESS
-            _emailIsAvailable.emit(pattern.matcher(_emailQuery.value).matches())
+            _emailIsAvailable.emit(pattern.matcher(emailQuery.value).matches())
         }
     }
 
     fun fetchUserData() {
         viewModelScope.launch {
-            val fetchUserdata = getUserDataUseCase(_emailQuery.value).first()
+            val fetchUserdata = getUserDataUseCase(emailQuery.value).first()
             if (fetchUserdata is SearchUserResult.Failure) {
                 _userProcessComplete.emit(FindProcessState.SearchFailure)
             } else {

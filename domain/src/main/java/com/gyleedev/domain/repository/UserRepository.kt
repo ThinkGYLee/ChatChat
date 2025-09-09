@@ -26,7 +26,7 @@ interface UserRepository {
     suspend fun getMyDataFromRemote(): Flow<UserData?>
     suspend fun addRelatedUserToRemote(
         user: UserData,
-        userRelation: UserRelationState = UserRelationState.FRIEND
+        userRelation: UserRelationState = UserRelationState.FRIEND,
     ): Flow<Boolean>
 
     suspend fun getUsersByUid(list: List<String>): List<RelatedUserLocalData>

@@ -5,9 +5,7 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class CheckVerifiedUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(): Boolean {
-        return repository.checkUserVerified().first()
-    }
+    suspend operator fun invoke(): Boolean = repository.checkUserVerified().first()
 }

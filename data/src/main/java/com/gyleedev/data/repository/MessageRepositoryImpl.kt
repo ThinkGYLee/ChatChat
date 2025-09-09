@@ -44,106 +44,100 @@ class MessageRepositoryImpl @Inject constructor(
     private val database: FirebaseDatabase,
     storage: FirebaseStorage,
     private val messageDao: MessageDao,
-    private val myDataPreference: MyDataPreference
+    private val myDataPreference: MyDataPreference,
 ) : MessageRepository {
 
     private val imageStorageReference = storage.getReference("image")
 
-    override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long {
-        return messageDao.insertMessage(
-            message = message.toEntity(
-                roomId = roomId
-            )
-        )
-    }
+    override suspend fun insertMessageToLocal(message: MessageData, roomId: Long): Long = messageDao.insertMessage(
+        message = message.toEntity(
+            roomId = roomId,
+        ),
+    )
 
-    override fun insertMessageToRemote(message: MessageData): Flow<MessageSendState> =
-        callbackFlow {
-            database.reference.child("messages").child(message.chatRoomId)
-                .child(message.time.toString())
-                .setValue(message.toRemoteModel())
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        trySend(MessageSendState.COMPLETE)
-                    } else {
-                        trySend(MessageSendState.FAIL)
-                    }
+    override fun insertMessageToRemote(message: MessageData): Flow<MessageSendState> = callbackFlow {
+        database.reference.child("messages").child(message.chatRoomId)
+            .child(message.time.toString())
+            .setValue(message.toRemoteModel())
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    trySend(MessageSendState.COMPLETE)
+                } else {
+                    trySend(MessageSendState.FAIL)
                 }
-            awaitClose()
-        }.flowOn(Dispatchers.IO)
+            }
+        awaitClose()
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun updateMessageState(
         messageId: Long,
         roomId: Long,
-        message: MessageData
+        message: MessageData,
     ) {
         messageDao.updateMessageState(
             message = message.toUpdateEntity(
                 messageId = messageId,
-                roomId = roomId
-            )
+                roomId = roomId,
+            ),
         )
     }
 
     override fun getMessageListener(
         chatRoom: ChatRoomAndReceiverLocalData,
-        userRelationState: UserRelationState
-    ): Flow<MessageData?> {
-        return messageListener(chatRoom)
-            .onEach { messageData ->
-                if (messageData != null && userRelationState != UserRelationState.BLOCKED) {
-                    insertMessage(messageData, chatRoom.id)
-                }
-            }.flowOn(Dispatchers.IO)
-    }
+        userRelationState: UserRelationState,
+    ): Flow<MessageData?> = messageListener(chatRoom)
+        .onEach { messageData ->
+            if (messageData != null && userRelationState != UserRelationState.BLOCKED) {
+                insertMessage(messageData, chatRoom.id)
+            }
+        }.flowOn(Dispatchers.IO)
 
-    private fun messageListener(chatRoom: ChatRoomAndReceiverLocalData): Flow<MessageData?> =
-        callbackFlow {
-            database.reference.child("messages").child(chatRoom.rid)
-                .addChildEventListener(
-                    object : ChildEventListener {
-                        override fun onChildAdded(
-                            snapshot: DataSnapshot,
-                            previousChildName: String?
-                        ) {
-                            val snap = snapshot.getValue(MessageData::class.java)
-                            if (snap != null) {
-                                trySend(snap)
-                                // insertMessage(snap, chatRoom.id)
-                            }
+    private fun messageListener(chatRoom: ChatRoomAndReceiverLocalData): Flow<MessageData?> = callbackFlow {
+        database.reference.child("messages").child(chatRoom.rid)
+            .addChildEventListener(
+                object : ChildEventListener {
+                    override fun onChildAdded(
+                        snapshot: DataSnapshot,
+                        previousChildName: String?,
+                    ) {
+                        val snap = snapshot.getValue(MessageData::class.java)
+                        if (snap != null) {
+                            trySend(snap)
+                            // insertMessage(snap, chatRoom.id)
                         }
+                    }
 
-                        override fun onChildChanged(
-                            snapshot: DataSnapshot,
-                            previousChildName: String?
-                        ) {
-                            trySend(null)
+                    override fun onChildChanged(
+                        snapshot: DataSnapshot,
+                        previousChildName: String?,
+                    ) {
+                        trySend(null)
                             /*for (ds in snapshot.getChildren()) {
                                 val snap = ds.getValue(MessageData::class.java)
                                 if (snap != null) {
                                     insertMessage(snap, chatRoom.id)
                                 }
                             }*/
-                        }
-
-                        override fun onChildRemoved(snapshot: DataSnapshot) {
-                            trySend(null)
-                        }
-
-                        override fun onChildMoved(
-                            snapshot: DataSnapshot,
-                            previousChildName: String?
-                        ) {
-                            trySend(null)
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            trySend(null)
-                        }
                     }
-                )
-            awaitClose()
-        }
+
+                    override fun onChildRemoved(snapshot: DataSnapshot) {
+                        trySend(null)
+                    }
+
+                    override fun onChildMoved(
+                        snapshot: DataSnapshot,
+                        previousChildName: String?,
+                    ) {
+                        trySend(null)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        trySend(null)
+                    }
+                },
+            )
+        awaitClose()
+    }
 
     private suspend fun insertMessage(message: MessageData, id: Long) {
         val lastMessage = getLastMessage(message.chatRoomId)
@@ -156,37 +150,29 @@ class MessageRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLastMessage(chatRoomId: String): MessageData {
-        return withContext(Dispatchers.IO) {
-            val message = messageDao.getLastMessage(chatRoomId)
-            message?.toModel() ?: MessageData()
-        }
+    override suspend fun getLastMessage(chatRoomId: String): MessageData = withContext(Dispatchers.IO) {
+        val message = messageDao.getLastMessage(chatRoomId)
+        message?.toModel() ?: MessageData()
     }
 
-    override fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>> {
-        return Pager(
-            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-            pagingSourceFactory = {
-                messageDao.getMessagesWithPaging(rid)
-            }
-        ).flow.map { value ->
-            value.map { it.toModel() }
-        }.flowOn(Dispatchers.IO)
+    override fun getMessagesFromLocal(rid: String): Flow<PagingData<MessageData>> = Pager(
+        config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+        pagingSourceFactory = {
+            messageDao.getMessagesWithPaging(rid)
+        },
+    ).flow.map { value ->
+        value.map { it.toModel() }
+    }.flowOn(Dispatchers.IO)
+
+    override fun getMessage(message: MessageData): Flow<MessageData> = messageDao.getMessage(
+        rid = message.chatRoomId,
+        writer = message.writer,
+        time = message.time,
+    ).flowOn(Dispatchers.IO).map {
+        it.toModel()
     }
 
-    override fun getMessage(message: MessageData): Flow<MessageData> {
-        return messageDao.getMessage(
-            rid = message.chatRoomId,
-            writer = message.writer,
-            time = message.time
-        ).flowOn(Dispatchers.IO).map {
-            it.toModel()
-        }
-    }
-
-    override suspend fun deleteLocalMessage(messageId: Long) {
-        return messageDao.deleteMessage(messageId)
-    }
+    override suspend fun deleteLocalMessage(messageId: Long) = messageDao.deleteMessage(messageId)
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun uploadAndGetImage(uri: Uri): Flow<String> = callbackFlow {
@@ -230,42 +216,40 @@ class MessageRepositoryImpl @Inject constructor(
 
     // 지우는 메시지의 작성자를 확인하고 본인이면 리모트에서도 삭제
     // 작성자가 다른사람이면 로컬에서만 삭제
-    override suspend fun deleteMessageRequest(message: MessageData): Flow<ProcessResult> =
-        callbackFlow {
-            if (message.writer == myDataPreference.getMyData().uid) {
-                val remoteRequest = deleteRemoteMessage(message).first()
-                if (remoteRequest == ProcessResult.Success) {
-                    val messageEntity = getMessage(message).firstOrNull()
-                    messageEntity?.let { deleteLocalMessage(it.messageId) }
-                    trySend(ProcessResult.Success)
-                } else {
-                    trySend(ProcessResult.Failure)
-                }
-            } else {
+    override suspend fun deleteMessageRequest(message: MessageData): Flow<ProcessResult> = callbackFlow {
+        if (message.writer == myDataPreference.getMyData().uid) {
+            val remoteRequest = deleteRemoteMessage(message).first()
+            if (remoteRequest == ProcessResult.Success) {
                 val messageEntity = getMessage(message).firstOrNull()
                 messageEntity?.let { deleteLocalMessage(it.messageId) }
                 trySend(ProcessResult.Success)
+            } else {
+                trySend(ProcessResult.Failure)
             }
-            awaitClose()
+        } else {
+            val messageEntity = getMessage(message).firstOrNull()
+            messageEntity?.let { deleteLocalMessage(it.messageId) }
+            trySend(ProcessResult.Success)
         }
+        awaitClose()
+    }
 
-    override suspend fun deleteRemoteMessage(message: MessageData): Flow<ProcessResult> =
-        callbackFlow {
-            database.reference.child("messages").child(message.chatRoomId)
-                .child(message.time.toString()).removeValue()
-                .addOnSuccessListener {
-                    trySend(ProcessResult.Success)
-                }.addOnFailureListener {
-                    trySend(ProcessResult.Failure)
-                }
-            awaitClose()
-        }
+    override suspend fun deleteRemoteMessage(message: MessageData): Flow<ProcessResult> = callbackFlow {
+        database.reference.child("messages").child(message.chatRoomId)
+            .child(message.time.toString()).removeValue()
+            .addOnSuccessListener {
+                trySend(ProcessResult.Success)
+            }.addOnFailureListener {
+                trySend(ProcessResult.Failure)
+            }
+        awaitClose()
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun sendMessage(messageData: MessageData, rid: Long, networkState: Boolean) {
         val message = if (messageData.type == MessageType.Photo) {
             messageData.copy(
-                comment = uploadAndGetImage(messageData.comment.toUri()).first()
+                comment = uploadAndGetImage(messageData.comment.toUri()).first(),
             )
         } else {
             messageData

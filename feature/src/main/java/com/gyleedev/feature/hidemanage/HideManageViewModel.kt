@@ -25,7 +25,7 @@ import javax.inject.Inject
 class HideManageViewModel @Inject constructor(
     getHideFriendsUseCase: GetHideFriendsUseCase,
     private val userToFriendUseCase: UserToFriendUseCase,
-    private val getHideFriendsWithNameUseCase: GetHideFriendsWithNameUseCase
+    private val getHideFriendsWithNameUseCase: GetHideFriendsWithNameUseCase,
 ) : BaseViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -48,7 +48,7 @@ class HideManageViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        PagingData.empty()
+        PagingData.empty(),
     )
 
     fun userToFriend(friend: RelatedUserLocalData) {

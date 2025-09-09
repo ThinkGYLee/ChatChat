@@ -16,24 +16,22 @@ import javax.inject.Inject
 class GetChatRoomDataWithRelatedUserUseCase @Inject constructor(
     private val chatRoomRepository: ChatRoomRepository,
     private val userRepository: UserRepository,
-    private val messageRepository: MessageRepository
+    private val messageRepository: MessageRepository,
 ) {
-    operator fun invoke(): Flow<PagingData<ChatRoomDataWithAllRelatedUsersAndMessage>> {
-        return chatRoomRepository.getChatRoomListWithPaging().map { pagingData ->
-            pagingData.map { chatRoom ->
-                ChatRoomDataWithAllRelatedUsersAndMessage(
-                    chatRoomAndReceiverLocalData = chatRoom,
-                    receiversInfo = chatRoom.receivers.map {
-                        val localUser = userRepository.getFriendAndFavoriteByUid(it)
-                        if (localUser != null) {
-                            localUser
-                        } else {
-                            RelatedUserLocalData()
-                        }
-                    },
-                    lastMessageData = messageRepository.getLastMessage(chatRoom.rid)
-                )
-            }
-        }.flowOn(Dispatchers.IO)
-    }
+    operator fun invoke(): Flow<PagingData<ChatRoomDataWithAllRelatedUsersAndMessage>> = chatRoomRepository.getChatRoomListWithPaging().map { pagingData ->
+        pagingData.map { chatRoom ->
+            ChatRoomDataWithAllRelatedUsersAndMessage(
+                chatRoomAndReceiverLocalData = chatRoom,
+                receiversInfo = chatRoom.receivers.map {
+                    val localUser = userRepository.getFriendAndFavoriteByUid(it)
+                    if (localUser != null) {
+                        localUser
+                    } else {
+                        RelatedUserLocalData()
+                    }
+                },
+                lastMessageData = messageRepository.getLastMessage(chatRoom.rid),
+            )
+        }
+    }.flowOn(Dispatchers.IO)
 }

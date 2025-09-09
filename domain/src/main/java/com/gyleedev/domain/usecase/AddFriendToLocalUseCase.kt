@@ -6,8 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AddFriendToLocalUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(userData: UserData): Flow<Boolean> =
-        repository.insertFriendToLocal(userData)
+    suspend operator fun invoke(userData: UserData): Flow<Boolean> = repository.insertFriendToLocal(userData)
 }

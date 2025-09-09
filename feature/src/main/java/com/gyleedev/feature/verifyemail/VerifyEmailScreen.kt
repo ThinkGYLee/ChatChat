@@ -43,7 +43,7 @@ fun VerifyEmailScreen(
     onSigninCancel: () -> Unit,
     onSigninComplete: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: VerifyEmailViewModel = hiltViewModel()
+    viewModel: VerifyEmailViewModel = hiltViewModel(),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycle = LocalLifecycleOwner.current
@@ -58,20 +58,20 @@ fun VerifyEmailScreen(
                     VerifyEmailUiEvent.Success -> {
                         snackbarHostState.showSnackbar(
                             message = context.getString(R.string.verify_email_success_message),
-                            duration = SnackbarDuration.Short
+                            duration = SnackbarDuration.Short,
                         )
                         onSigninComplete()
                     }
                     VerifyEmailUiEvent.Fail -> {
                         snackbarHostState.showSnackbar(
                             message = context.getString(R.string.verify_email_failure_message),
-                            duration = SnackbarDuration.Short
+                            duration = SnackbarDuration.Short,
                         )
                     }
                     VerifyEmailUiEvent.Cancel -> {
                         snackbarHostState.showSnackbar(
                             message = context.getString(R.string.verify_email_cancel_message),
-                            duration = SnackbarDuration.Short
+                            duration = SnackbarDuration.Short,
                         )
                         onSigninCancel()
                     }
@@ -84,7 +84,7 @@ fun VerifyEmailScreen(
             TopAppBar(title = { Text(stringResource(R.string.verify_email_screen_title)) })
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) { innerPadding ->
         if (uiState.value is VerifyEmailUiState.Success) {
             val successState = uiState.value as VerifyEmailUiState.Success
@@ -94,7 +94,7 @@ fun VerifyEmailScreen(
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
                     .padding(horizontal = 20.dp),
-                horizontalAlignment = Alignment.Start
+                horizontalAlignment = Alignment.Start,
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(stringResource(R.string.verify_email_label))
@@ -102,13 +102,13 @@ fun VerifyEmailScreen(
                 TextField(
                     value = successState.userData.email,
                     onValueChange = {},
-                    enabled = false
+                    enabled = false,
                 )
                 Spacer(modifier = Modifier.height(40.dp))
                 if (successState.verifiedState == VerifiedState.NOTINPROGRESS) {
                     Button(
                         onClick = viewModel::verifyRequest,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(stringResource(R.string.verify_email_button))
                     }
@@ -116,7 +116,7 @@ fun VerifyEmailScreen(
                 if (successState.verifiedState == VerifiedState.INPROGRESS) {
                     Button(
                         onClick = viewModel::checkVerified,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(stringResource(R.string.verify_email_check_button))
                     }
@@ -128,8 +128,8 @@ fun VerifyEmailScreen(
                     colors = ButtonDefaults.buttonColors().copy(
                         containerColor = ButtonDefaults.buttonColors()
                             .copy().disabledContainerColor,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 ) {
                     Text(stringResource(R.string.verify_email_cancel_button))
                 }

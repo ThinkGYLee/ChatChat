@@ -57,7 +57,7 @@ fun SettingScreen(
     onManageAccountRequest: () -> Unit,
     onMyInformationRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SettingViewModel = hiltViewModel()
+    viewModel: SettingViewModel = hiltViewModel(),
 ) {
     var openDialog by remember { mutableStateOf(false) }
     val keys by viewModel.keys.collectAsStateWithLifecycle()
@@ -65,14 +65,14 @@ fun SettingScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { TopAppBar(title = { Text(text = stringResource(R.string.setting_text)) }) }
+        topBar = { TopAppBar(title = { Text(text = stringResource(R.string.setting_text)) }) },
     ) { innerPadding ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
+                .consumeWindowInsets(innerPadding),
         ) {
             items.forEach {
                 if (it is SettingItems.Header) {
@@ -88,7 +88,7 @@ fun SettingScreen(
                                 SettingEvent.CHAT -> onConversationRequest()
                             }
                         },
-                        settingItems = it
+                        settingItems = it,
                     )
                 }
             }
@@ -100,20 +100,20 @@ fun SettingScreen(
                     Surface(
                         modifier = Modifier.wrapContentSize(),
                         shape = MaterialTheme.shapes.large,
-                        tonalElevation = AlertDialogDefaults.TonalElevation
+                        tonalElevation = AlertDialogDefaults.TonalElevation,
                     ) {
                         Column(modifier = Modifier.padding(24.dp)) {
                             Text(
                                 text = stringResource(R.string.logout_dialog_message),
-                                style = MaterialTheme.typography.titleLarge
+                                style = MaterialTheme.typography.titleLarge,
                             )
                             Spacer(Modifier.height(16.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Absolute.Right
+                                horizontalArrangement = Arrangement.Absolute.Right,
                             ) {
                                 TextButton(
-                                    onClick = { openDialog = false }
+                                    onClick = { openDialog = false },
                                 ) {
                                     Text(text = stringResource(R.string.dialog_dismiss_button_text))
                                 }
@@ -122,7 +122,7 @@ fun SettingScreen(
                                         openDialog = false
                                         viewModel.logout()
                                         onLogoutRequest()
-                                    }
+                                    },
                                 ) {
                                     Text(text = stringResource(R.string.dialog_confirm_button_text))
                                 }
@@ -130,7 +130,7 @@ fun SettingScreen(
                         }
                     }
                 },
-                modifier = Modifier.wrapContentSize()
+                modifier = Modifier.wrapContentSize(),
             )
         }
     }
@@ -139,7 +139,7 @@ fun SettingScreen(
 @Composable
 fun SettingHeader(
     title: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -147,13 +147,13 @@ fun SettingHeader(
             .height(40.dp)
             .background(color = MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(start = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = stringResource(title),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.ExtraLight,
-            modifier = Modifier.alpha(0.4f)
+            modifier = Modifier.alpha(0.4f),
         )
     }
 }
@@ -162,7 +162,7 @@ fun SettingHeader(
 fun SettingItem(
     onClick: (SettingEvent) -> Unit,
     settingItems: SettingItems.Item,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -173,14 +173,14 @@ fun SettingItem(
             }
             .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row {
             Icon(imageVector = settingItems.icon, contentDescription = null)
             Spacer(modifier = Modifier.width(20.dp))
             Text(
                 text = stringResource(settingItems.title),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
         }
 
@@ -188,46 +188,44 @@ fun SettingItem(
             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = LocalContentColor.current.copy(alpha = 0.6f)
+            tint = LocalContentColor.current.copy(alpha = 0.6f),
         )
     }
 }
 
-private fun settingItemMapper(list: List<SettingKey>): List<SettingItems> {
-    return list.map {
-        when (it) {
-            SettingKey.PERSONALINFO -> SettingItems.Header(title = R.string.setting_personal_info_header)
-            SettingKey.ACCOUNT -> SettingItems.Item(
-                title = R.string.setting_account_manage_item,
-                Icons.Default.ManageAccounts,
-                SettingEvent.ACCOUNT
-            )
+private fun settingItemMapper(list: List<SettingKey>): List<SettingItems> = list.map {
+    when (it) {
+        SettingKey.PERSONALINFO -> SettingItems.Header(title = R.string.setting_personal_info_header)
+        SettingKey.ACCOUNT -> SettingItems.Item(
+            title = R.string.setting_account_manage_item,
+            Icons.Default.ManageAccounts,
+            SettingEvent.ACCOUNT,
+        )
 
-            SettingKey.MYINFORMATION -> SettingItems.Item(
-                title = R.string.setting_my_info_item,
-                Icons.Default.AccountBox,
-                SettingEvent.MYINFORMATION
-            )
+        SettingKey.MYINFORMATION -> SettingItems.Item(
+            title = R.string.setting_my_info_item,
+            Icons.Default.AccountBox,
+            SettingEvent.MYINFORMATION,
+        )
 
-            SettingKey.GENERALSETTING -> SettingItems.Header(title = R.string.setting_general_setting_header)
-            SettingKey.LANGUAGE -> SettingItems.Item(
-                title = R.string.setting_language_item,
-                Icons.Default.Language,
-                SettingEvent.LANGUAGE
-            )
+        SettingKey.GENERALSETTING -> SettingItems.Header(title = R.string.setting_general_setting_header)
+        SettingKey.LANGUAGE -> SettingItems.Item(
+            title = R.string.setting_language_item,
+            Icons.Default.Language,
+            SettingEvent.LANGUAGE,
+        )
 
-            SettingKey.THEME -> SettingItems.Item(
-                title = R.string.setting_theme_item,
-                Icons.Default.DarkMode,
-                SettingEvent.THEME
-            )
+        SettingKey.THEME -> SettingItems.Item(
+            title = R.string.setting_theme_item,
+            Icons.Default.DarkMode,
+            SettingEvent.THEME,
+        )
 
-            SettingKey.DATAMANAGE -> SettingItems.Header(title = R.string.setting_data_manage_header)
-            SettingKey.CHAT -> SettingItems.Item(
-                title = R.string.setting_chat_item,
-                Icons.Default.ChatBubbleOutline,
-                SettingEvent.CHAT
-            )
-        }
+        SettingKey.DATAMANAGE -> SettingItems.Header(title = R.string.setting_data_manage_header)
+        SettingKey.CHAT -> SettingItems.Item(
+            title = R.string.setting_chat_item,
+            Icons.Default.ChatBubbleOutline,
+            SettingEvent.CHAT,
+        )
     }
 }

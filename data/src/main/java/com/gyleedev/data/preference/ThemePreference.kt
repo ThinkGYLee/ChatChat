@@ -13,9 +13,7 @@ class ThemePreferenceImpl(@ApplicationContext context: Context) : ThemePreferenc
 
     private val themePreferences = context.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
 
-    override fun getTheme(): Int {
-        return themePreferences.getInt("selected_theme", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-    }
+    override fun getTheme(): Int = themePreferences.getInt("selected_theme", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
 
     override fun setTheme(mode: Int) {
         themePreferences.edit { putInt("selectedTheme", mode) }

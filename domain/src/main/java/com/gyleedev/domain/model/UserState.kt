@@ -4,5 +4,5 @@ enum class UserState {
     Loading,
     Verified,
     UnVerified,
-    NoUser
+    NoUser,
 }

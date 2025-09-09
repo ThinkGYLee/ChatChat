@@ -6,9 +6,7 @@ import com.gyleedev.domain.repository.UserRepository
 import javax.inject.Inject
 
 class BlockRelatedUserUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(friend: RelatedUserLocalData): ChangeRelationResult {
-        return repository.blockRelatedUserRequest(friend)
-    }
+    suspend operator fun invoke(friend: RelatedUserLocalData): ChangeRelationResult = repository.blockRelatedUserRequest(friend)
 }

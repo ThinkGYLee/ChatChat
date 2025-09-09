@@ -16,16 +16,14 @@ class MyDataPreferenceImpl(@ApplicationContext context: Context) : MyDataPrefere
     private val myDataPreference: SharedPreferences =
         context.getSharedPreferences("MyData", Context.MODE_PRIVATE)
 
-    override fun getMyData(): UserData {
-        return UserData(
-            email = myDataPreference.getString("Email", "default email") as String,
-            uid = myDataPreference.getString("Uid", "default uid") as String,
-            name = myDataPreference.getString("Name", "default name") as String,
-            picture = myDataPreference.getString("Picture", "default picture") as String,
-            status = myDataPreference.getString("Status", "default status") as String,
-            verified = myDataPreference.getBoolean("Verified", false)
-        )
-    }
+    override fun getMyData(): UserData = UserData(
+        email = myDataPreference.getString("Email", "default email") as String,
+        uid = myDataPreference.getString("Uid", "default uid") as String,
+        name = myDataPreference.getString("Name", "default name") as String,
+        picture = myDataPreference.getString("Picture", "default picture") as String,
+        status = myDataPreference.getString("Status", "default status") as String,
+        verified = myDataPreference.getBoolean("Verified", false),
+    )
 
     override fun setMyData(user: UserData) {
         myDataPreference.edit { putString("Email", user.email) }

@@ -7,7 +7,7 @@ import com.google.firebase.database.ValueEventListener
 import javax.inject.Inject
 
 class FirebaseServerTimeHelper @Inject constructor(
-    firebaseDatabase: FirebaseDatabase
+    firebaseDatabase: FirebaseDatabase,
 ) {
     private var offset: Long = 0L
 
@@ -24,7 +24,7 @@ class FirebaseServerTimeHelper @Inject constructor(
                 override fun onCancelled(error: DatabaseError) {
                     // 에러 처리
                 }
-            }
+            },
         )
     }
 

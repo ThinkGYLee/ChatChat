@@ -4,8 +4,7 @@ import com.gyleedev.domain.repository.ChatRoomRepository
 import javax.inject.Inject
 
 class ResetGetChatDataStateUseCase @Inject constructor(
-    private val repository: ChatRoomRepository
+    private val repository: ChatRoomRepository,
 ) {
-    suspend operator fun invoke() =
-        repository.resetCurrentState()
+    suspend operator fun invoke() = repository.resetCurrentState()
 }

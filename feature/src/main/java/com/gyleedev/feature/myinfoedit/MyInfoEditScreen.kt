@@ -65,7 +65,7 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 fun MyInfoEditScreen(
     onBackKeyPressed: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MyInfoEditViewModel = hiltViewModel()
+    viewModel: MyInfoEditViewModel = hiltViewModel(),
 ) {
     val myName by viewModel.myNameQuery.collectAsStateWithLifecycle()
     val myStatus by viewModel.myStatusQuery.collectAsStateWithLifecycle()
@@ -94,7 +94,7 @@ fun MyInfoEditScreen(
                     Toast.makeText(
                         context,
                         context.getString(R.string.search_user_failure_message),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                 }
             }
@@ -109,20 +109,20 @@ fun MyInfoEditScreen(
                     IconButton(onClick = onBackKeyPressed) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description),
                         )
                     }
                 },
                 actions = {
                     TextButton(
                         onClick = viewModel::updateMyInfo,
-                        enabled = myName.isNotEmpty()
+                        enabled = myName.isNotEmpty(),
                     ) {
                         Text(stringResource(R.string.action_button_complete_message))
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -131,7 +131,7 @@ fun MyInfoEditScreen(
                 .fillMaxSize()
                 .padding(horizontal = 60.dp),
             verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box {
                 GlideImage(
@@ -141,7 +141,7 @@ fun MyInfoEditScreen(
                         .border(
                             width = 0.01.dp,
                             color = MaterialTheme.colorScheme.outlineVariant,
-                            shape = CircleShape
+                            shape = CircleShape,
                         )
                         .clip(CircleShape)
                         .background(color = colorResource(R.color.avatar_background)),
@@ -149,28 +149,28 @@ fun MyInfoEditScreen(
                         +ShimmerPlugin(
                             Shimmer.Flash(
                                 baseColor = Color.White,
-                                highlightColor = Color.LightGray
-                            )
+                                highlightColor = Color.LightGray,
+                            ),
                         )
                     },
-                    previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                    previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
                 )
                 Box(
                     modifier = Modifier
                         .background(
                             color = MaterialTheme.colorScheme.background,
-                            shape = CircleShape
+                            shape = CircleShape,
                         )
                         .align(Alignment.BottomEnd)
                         .clickable {
                             pickMedia.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
                             )
-                        }
+                        },
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = stringResource(R.string.photo_edit_button_description)
+                        contentDescription = stringResource(R.string.photo_edit_button_description),
                     )
                 }
             }
@@ -180,26 +180,26 @@ fun MyInfoEditScreen(
                 Text(
                     stringResource(R.string.edit_name_hint),
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
                 )
                 Row {
                     MyEditTextField(
                         myName,
                         onValueChange = viewModel::changeNameQuery,
-                        onReset = { viewModel.changeNameQuery("") }
+                        onReset = { viewModel.changeNameQuery("") },
                     )
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     stringResource(R.string.edit_status_hint),
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
                 )
                 Row {
                     MyEditTextField(
                         myStatus,
                         onValueChange = viewModel::changeStatusQuery,
-                        onReset = { viewModel.changeStatusQuery("") }
+                        onReset = { viewModel.changeStatusQuery("") },
                     )
                 }
             }
@@ -213,20 +213,20 @@ fun MyEditTextField(
     query: String,
     onValueChange: (String) -> Unit,
     onReset: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column {
             BasicTextField(
                 modifier = Modifier
                     .background(
                         color = MaterialTheme.colorScheme.surface,
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
                     )
                     .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                     .padding(horizontal = 16.dp),
@@ -237,7 +237,7 @@ fun MyEditTextField(
                 decorationBox = { innerTextField ->
                     Row(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Box(modifier = Modifier.weight(10f)) {
                             if (query.isEmpty()) {
@@ -247,7 +247,7 @@ fun MyEditTextField(
                                     color = Color(0xFF848484),
                                     modifier = Modifier
                                         .padding(start = 4.dp)
-                                        .align(Alignment.CenterStart)
+                                        .align(Alignment.CenterStart),
                                 )
                             }
                             Row(modifier = Modifier.align(Alignment.CenterStart)) {
@@ -258,11 +258,11 @@ fun MyEditTextField(
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = stringResource(R.string.edit_query_reset_description),
-                                modifier = Modifier.clickable { onReset() }
+                                modifier = Modifier.clickable { onReset() },
                             )
                         }
                     }
-                }
+                },
             )
             Spacer(modifier = Modifier.height(4.dp))
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))

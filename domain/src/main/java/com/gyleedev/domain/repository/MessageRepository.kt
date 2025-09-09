@@ -15,7 +15,7 @@ interface MessageRepository {
 
     fun getMessageListener(
         chatRoom: ChatRoomAndReceiverLocalData,
-        userRelationState: UserRelationState
+        userRelationState: UserRelationState,
     ): Flow<MessageData?>
 
     suspend fun getLastMessage(chatRoomId: String): MessageData

@@ -6,5 +6,5 @@ enum class UserRelationState {
     FRIEND,
     HIDE,
     BLOCKED,
-    GROUP
+    GROUP,
 }

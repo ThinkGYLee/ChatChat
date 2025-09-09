@@ -1,0 +1,40 @@
+# 루트에 반드시 배치
+root = true
+
+# 공통
+[*]
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Markdown은 공백 트림 비활성화(의도된 공백 보존)
+[*.md]
+trim_trailing_whitespace = false
+
+# Kotlin / KTS
+[*.{kt,kts}]
+indent_style = space
+indent_size = 4
+continuation_indent_size = 8
+
+# ktlint 설정
+ktlint_code_style = intellij_idea           # 또는 android
+max_line_length = off                       # 팀 기준에 맞게 120 등으로 바꿔도 됨
+
+# Compose 등 함수명 예외: 대문자/스크린명 컨벤션 허용
+# (주석: ktlint 1.5.0에서는 아래 속성으로 주석된 애너테이션의 함수명은 무시)
+ktlint_function_naming_ignore_when_annotated_with = Composable,Preview,Test
+
+# 필요 시 개별 룰 끄기 (예: 파일명 규칙)
+# ktlint_standard_filename = disabled
+
+# Gradle Kotlin 스크립트
+[*.gradle.kts]
+indent_style = space
+indent_size = 4
+
+# XML/Manifest
+[*.xml]
+indent_style = space
+indent_size = 4

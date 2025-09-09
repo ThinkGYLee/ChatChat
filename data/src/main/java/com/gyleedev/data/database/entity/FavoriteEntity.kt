@@ -13,12 +13,11 @@ import androidx.room.PrimaryKey
             entity = UserEntity::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("user_entity_id"),
-            onDelete = ForeignKey.CASCADE
-        )
+            onDelete = ForeignKey.CASCADE,
+        ),
     ],
-    indices = [Index(value = ["user_entity_id"])]
+    indices = [Index(value = ["user_entity_id"])],
 )
-
 data class FavoriteEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
@@ -28,5 +27,5 @@ data class FavoriteEntity(
     @ColumnInfo(name = "favorite_state")
     val favoriteState: Boolean,
     @ColumnInfo(name = "favorite_number")
-    val favoriteNumber: Long? = null
+    val favoriteNumber: Long? = null,
 )

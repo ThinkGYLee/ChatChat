@@ -11,6 +11,6 @@ sealed interface ChatRoomUiState {
         val userName: String,
         val participants: List<RelatedUserLocalData>,
         val uid: String,
-        val relationState: UserRelationState
+        val relationState: UserRelationState,
     ) : ChatRoomUiState
 }

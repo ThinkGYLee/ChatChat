@@ -12,6 +12,6 @@ sealed interface SigninUiState {
         val passwordIsAvailable: Boolean,
         val passwordCheckIsAvailable: Boolean,
         val passwordIsSame: Boolean,
-        val signinIsAvailable: Boolean
+        val signinIsAvailable: Boolean,
     ) : SigninUiState
 }

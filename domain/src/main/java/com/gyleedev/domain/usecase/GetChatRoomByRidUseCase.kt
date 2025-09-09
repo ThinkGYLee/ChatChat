@@ -7,14 +7,12 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetChatRoomByRidUseCase @Inject constructor(
-    private val repository: ChatRoomRepository
+    private val repository: ChatRoomRepository,
 ) {
     suspend operator fun invoke(
         rid: String,
-        getChatRoomState: GetChatRoomState = GetChatRoomState.CheckAndGetDataFromLocal
-    ): GetChatRoomState {
-        return withContext(Dispatchers.IO) {
-            repository.getChatRoomWithRid(rid, getChatRoomState)
-        }
+        getChatRoomState: GetChatRoomState = GetChatRoomState.CheckAndGetDataFromLocal,
+    ): GetChatRoomState = withContext(Dispatchers.IO) {
+        repository.getChatRoomWithRid(rid, getChatRoomState)
     }
 }

@@ -32,6 +32,6 @@ sealed interface GetChatRoomState {
     data object InsertReceiversToRemote : GetChatRoomState
 
     data class Success(
-        val data: ChatRoomAndReceiverLocalData
+        val data: ChatRoomAndReceiverLocalData,
     ) : GetChatRoomState
 }
