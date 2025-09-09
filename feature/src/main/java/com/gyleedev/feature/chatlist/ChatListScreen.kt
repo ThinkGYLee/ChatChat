@@ -63,7 +63,7 @@ fun ChatListScreen(
     onClick: (String) -> Unit,
     onCreateChatClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ChatListViewModel = hiltViewModel()
+    viewModel: ChatListViewModel = hiltViewModel(),
 ) {
     val chatRoomList = viewModel.uiState.collectAsLazyPagingItems()
     LaunchedEffect(Unit) {
@@ -85,29 +85,29 @@ fun ChatListScreen(
                     IconButton(onClick = onCreateChatClick) {
                         Icon(
                             imageVector = Icons.Outlined.AddComment,
-                            contentDescription = ""
+                            contentDescription = "",
                         )
                     }
-                }
+                },
             )
         },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
         if (chatRoomList.itemCount > 0) {
             LazyColumn(
                 modifier = modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
+                    .consumeWindowInsets(innerPadding),
             ) {
                 items(
                     chatRoomList.itemCount,
                     key = { requireNotNull(chatRoomList[it]).chatRoomAndReceiverLocalData.id },
-                    contentType = { 0 }
+                    contentType = { 0 },
                 ) { index ->
                     ChatRoomItem(
                         onClick = onClick,
-                        requireNotNull(chatRoomList[index])
+                        requireNotNull(chatRoomList[index]),
                     )
                 }
             }
@@ -120,7 +120,7 @@ fun ChatListScreen(
 fun ChatRoomItem(
     onClick: (String) -> Unit,
     chatRoomDataWithAllRelatedUsersAndMessage: ChatRoomDataWithAllRelatedUsersAndMessage,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val text = when (chatRoomDataWithAllRelatedUsersAndMessage.lastMessageData.type) {
         MessageType.Text -> chatRoomDataWithAllRelatedUsersAndMessage.lastMessageData.comment
@@ -136,7 +136,7 @@ fun ChatRoomItem(
                 onClick(chatRoomDataWithAllRelatedUsersAndMessage.chatRoomAndReceiverLocalData.rid)
             }
             .padding(horizontal = 20.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.Absolute.SpaceBetween
+        horizontalArrangement = Arrangement.Absolute.SpaceBetween,
     ) {
         Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
             GlideImage(
@@ -149,7 +149,7 @@ fun ChatRoomItem(
                     .border(
                         width = 0.01.dp,
                         color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = CircleShape
+                        shape = CircleShape,
                     )
                     .clip(CircleShape)
                     .background(color = colorResource(R.color.avatar_background)),
@@ -157,18 +157,18 @@ fun ChatRoomItem(
                     +ShimmerPlugin(
                         Shimmer.Flash(
                             baseColor = Color.White,
-                            highlightColor = Color.LightGray
-                        )
+                            highlightColor = Color.LightGray,
+                        ),
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
             )
             Spacer(modifier = Modifier.width(20.dp))
             Column(verticalArrangement = Arrangement.Center) {
                 Text(
                     text = chatRoomDataWithAllRelatedUsersAndMessage.receiversInfo[0].name,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 if (chatRoomDataWithAllRelatedUsersAndMessage.receiversInfo[0].status.isNotBlank()) {
@@ -180,11 +180,11 @@ fun ChatRoomItem(
         Text(
             text = LocalDate.ofInstant(
                 Instant.ofEpochMilli(chatRoomDataWithAllRelatedUsersAndMessage.lastMessageData.time),
-                ZoneId.of("Asia/Seoul")
+                ZoneId.of("Asia/Seoul"),
             ).format(
-                DateTimeFormatter.ofPattern("MM-dd")
+                DateTimeFormatter.ofPattern("MM-dd"),
             ),
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.labelMedium,
         )
     }
 }

@@ -8,7 +8,7 @@ import com.gyleedev.domain.model.MessageSendState
 import com.gyleedev.domain.model.MessageType
 
 @Entity(
-    tableName = "message"
+    tableName = "message",
 )
 
 /*
@@ -40,55 +40,49 @@ data class MessageEntity(
     @ColumnInfo(name = "replyType")
     val replyType: MessageType?,
     @ColumnInfo(name = "replyKey")
-    val replyKey: Long?
+    val replyKey: Long?,
 )
 
-fun MessageEntity.toModel(): MessageData {
-    return MessageData(
-        messageId = id,
-        chatRoomId = rid,
-        writer = writer,
-        comment = comment,
-        time = time,
-        type = type,
-        messageSendState = messageSendState,
-        replyTo = replyTo,
-        replyKey = replyKey,
-        replyType = replyType,
-        replyComment = replyComment
-    )
-}
+fun MessageEntity.toModel(): MessageData = MessageData(
+    messageId = id,
+    chatRoomId = rid,
+    writer = writer,
+    comment = comment,
+    time = time,
+    type = type,
+    messageSendState = messageSendState,
+    replyTo = replyTo,
+    replyKey = replyKey,
+    replyType = replyType,
+    replyComment = replyComment,
+)
 
-fun MessageData.toEntity(roomId: Long): MessageEntity {
-    return MessageEntity(
-        id = if (messageId != 0L) messageId else 0L,
-        rid = chatRoomId,
-        writer = writer,
-        comment = comment,
-        time = time,
-        type = type,
-        roomId = roomId,
-        messageSendState = messageSendState,
-        replyTo = replyTo,
-        replyKey = replyKey,
-        replyType = replyType,
-        replyComment = replyComment
-    )
-}
+fun MessageData.toEntity(roomId: Long): MessageEntity = MessageEntity(
+    id = if (messageId != 0L) messageId else 0L,
+    rid = chatRoomId,
+    writer = writer,
+    comment = comment,
+    time = time,
+    type = type,
+    roomId = roomId,
+    messageSendState = messageSendState,
+    replyTo = replyTo,
+    replyKey = replyKey,
+    replyType = replyType,
+    replyComment = replyComment,
+)
 
-fun MessageData.toUpdateEntity(messageId: Long, roomId: Long): MessageEntity {
-    return MessageEntity(
-        id = messageId,
-        rid = chatRoomId,
-        writer = writer,
-        comment = comment,
-        type = type,
-        time = time,
-        roomId = roomId,
-        messageSendState = messageSendState,
-        replyTo = replyTo,
-        replyKey = replyKey,
-        replyType = replyType,
-        replyComment = replyComment
-    )
-}
+fun MessageData.toUpdateEntity(messageId: Long, roomId: Long): MessageEntity = MessageEntity(
+    id = messageId,
+    rid = chatRoomId,
+    writer = writer,
+    comment = comment,
+    type = type,
+    time = time,
+    roomId = roomId,
+    messageSendState = messageSendState,
+    replyTo = replyTo,
+    replyKey = replyKey,
+    replyType = replyType,
+    replyComment = replyComment,
+)

@@ -4,7 +4,13 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
-// 기본값 설정 안해주면 crash남
+/*
+기본값 설정 안해주면 crash남
+replyTo 답장 상대의 uid
+replyComment 답장 상대의 메시지 내용
+replyType 답장 상대의 메시지 타입
+replyKey 로컬 db Key 값으로 쓸것 (고유값인 time)
+ */
 @Parcelize
 data class MessageData(
     @SerializedName("chatRoomId") val chatRoomId: String = "",
@@ -14,22 +20,20 @@ data class MessageData(
     @SerializedName("type") val type: MessageType = MessageType.Text,
     @SerializedName("time") val time: Long = 0L,
     @SerializedName("messageSendState") val messageSendState: MessageSendState = MessageSendState.COMPLETE,
-    @SerializedName("replyTo") val replyTo: String? = null, // 답장 상대의 uid
-    @SerializedName("replyComment") val replyComment: String? = null, // 답장 상대의 메시지 내용
-    @SerializedName("replyType") val replyType: MessageType? = null, // 답장 상대의 메시지 타입
-    @SerializedName("replyKey") val replyKey: Long? = null // 로컬 db Key 값으로 쓸것 (고유값인 time)
+    @SerializedName("replyTo") val replyTo: String? = null,
+    @SerializedName("replyComment") val replyComment: String? = null,
+    @SerializedName("replyType") val replyType: MessageType? = null,
+    @SerializedName("replyKey") val replyKey: Long? = null,
 ) : Parcelable
 
-fun MessageData.toRemoteModel(): MessageRemoteData {
-    return MessageRemoteData(
-        chatRoomId = chatRoomId,
-        writer = writer,
-        comment = comment,
-        type = type,
-        time = time,
-        replyTo = replyTo,
-        replyType = replyType,
-        replyComment = replyComment,
-        replyKey = replyKey
-    )
-}
+fun MessageData.toRemoteModel(): MessageRemoteData = MessageRemoteData(
+    chatRoomId = chatRoomId,
+    writer = writer,
+    comment = comment,
+    type = type,
+    time = time,
+    replyTo = replyTo,
+    replyType = replyType,
+    replyComment = replyComment,
+    replyKey = replyKey,
+)

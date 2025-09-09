@@ -7,11 +7,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SetMyUserInformationUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(userData: UserData) {
-        return withContext(Dispatchers.IO) {
-            repository.setMyUserInformation(userData)
-        }
+    suspend operator fun invoke(userData: UserData) = withContext(Dispatchers.IO) {
+        repository.setMyUserInformation(userData)
     }
 }

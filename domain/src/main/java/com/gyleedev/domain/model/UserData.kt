@@ -10,12 +10,10 @@ data class UserData(
     @SerializedName("uid") val uid: String = "",
     @SerializedName("picture") val picture: String = "",
     @SerializedName("status") val status: String = "",
-    @SerializedName("verified") val verified: Boolean = false
+    @SerializedName("verified") val verified: Boolean = false,
 )
 
-fun UserData.toBlockedUser(): BlockedUser {
-    return BlockedUser(
-        uid = uid,
-        email = email
-    )
-}
+fun UserData.toBlockedUser(): BlockedUser = BlockedUser(
+    uid = uid,
+    email = email,
+)

@@ -23,8 +23,7 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun providesFirebaseDatabase(): FirebaseDatabase =
-        FirebaseDatabase.getInstance("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
+    fun providesFirebaseDatabase(): FirebaseDatabase = FirebaseDatabase.getInstance("https://chat-a332d-default-rtdb.asia-southeast1.firebasedatabase.app/")
 
     @Provides
     @Singleton

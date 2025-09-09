@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val fetchUserStateUseCase: FetchUserStateUseCase,
-    private val updateRelatedUserListUseCase: UpdateRelatedUserListUseCase
+    private val updateRelatedUserListUseCase: UpdateRelatedUserListUseCase,
 ) : ViewModel() {
     private val _isUserExists = MutableStateFlow(UserState.Loading)
     val isUserExists: StateFlow<UserState> = _isUserExists

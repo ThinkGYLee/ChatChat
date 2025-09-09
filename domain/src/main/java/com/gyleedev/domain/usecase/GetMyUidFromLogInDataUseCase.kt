@@ -8,12 +8,10 @@ import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class GetMyUidFromLogInDataUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    operator fun invoke(): Flow<String?> {
-        return flow {
-            val uid = repository.getMyUidFromLogInData()
-            emit(uid)
-        }.flowOn(Dispatchers.IO)
-    }
+    operator fun invoke(): Flow<String?> = flow {
+        val uid = repository.getMyUidFromLogInData()
+        emit(uid)
+    }.flowOn(Dispatchers.IO)
 }

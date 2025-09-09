@@ -5,8 +5,7 @@ import com.gyleedev.domain.repository.UserRepository
 import javax.inject.Inject
 
 class DeleteFriendUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(friend: RelatedUserLocalData) =
-        repository.deleteFriendRequest(friend)
+    suspend operator fun invoke(friend: RelatedUserLocalData) = repository.deleteFriendRequest(friend)
 }

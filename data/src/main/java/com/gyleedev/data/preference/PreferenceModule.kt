@@ -14,19 +14,13 @@ object PreferenceModule {
 
     @Singleton
     @Provides
-    fun providesMyDataPreference(@ApplicationContext context: Context): MyDataPreference {
-        return MyDataPreferenceImpl(context)
-    }
+    fun providesMyDataPreference(@ApplicationContext context: Context): MyDataPreference = MyDataPreferenceImpl(context)
 
     @Singleton
     @Provides
-    fun providesThemePreference(@ApplicationContext context: Context): ThemePreference {
-        return ThemePreferenceImpl(context)
-    }
+    fun providesThemePreference(@ApplicationContext context: Context): ThemePreference = ThemePreferenceImpl(context)
 
     @Singleton
     @Provides
-    fun providesPasswordPreference(@ApplicationContext context: Context): AuthenticationPreference {
-        return AuthenticationPreferenceImpl(context)
-    }
+    fun providesPasswordPreference(@ApplicationContext context: Context): AuthenticationPreference = AuthenticationPreferenceImpl(context)
 }

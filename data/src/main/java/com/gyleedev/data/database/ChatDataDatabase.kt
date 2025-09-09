@@ -24,12 +24,11 @@ import com.gyleedev.data.database.entity.UserFts
         FavoriteEntity::class,
         ChatRoomEntity::class,
         MessageEntity::class,
-        ReceiverEntity::class
+        ReceiverEntity::class,
     ],
     version = 1,
-    exportSchema = true
+    exportSchema = true,
 )
-
 abstract class ChatDataDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun chatRoomDao(): ChatRoomDao

@@ -8,11 +8,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetUserDataUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(email: String): Flow<SearchUserResult> {
-        return withContext(Dispatchers.IO) {
-            repository.searchUserRequest(email)
-        }
+    suspend operator fun invoke(email: String): Flow<SearchUserResult> = withContext(Dispatchers.IO) {
+        repository.searchUserRequest(email)
     }
 }

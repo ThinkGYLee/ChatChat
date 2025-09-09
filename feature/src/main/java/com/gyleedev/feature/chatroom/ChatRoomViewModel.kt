@@ -75,15 +75,15 @@ class ChatRoomViewModel @Inject constructor(
     private val getChatRoomByRidUseCase: GetChatRoomByRidUseCase,
     private val getRelatedUserDataOfParticipantsByUidUseCase: GetRelatedUserDataOfParticipantsByUidUseCase,
     private val firebaseServerTimeHelper: FirebaseServerTimeHelper,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
     private val chatRoomParticipants = MutableStateFlow<List<RelatedUserLocalData>>(emptyList())
     private var uid: String? = null
     private val myUid = getMyUidFromLogInDataUseCase().onEach { uid = it }
     private val rid = MutableStateFlow<String?>(null)
 
-    private val _messageQuery = MutableStateFlow("")
-    private val _chatRoomLocalData = MutableStateFlow(ChatRoomAndReceiverLocalData())
+    private val messageQuery = MutableStateFlow("")
+    private val chatRoomLocalData = MutableStateFlow(ChatRoomAndReceiverLocalData())
 
     private val _photoUri = MutableStateFlow("")
     val photoUri: StateFlow<String> = _photoUri
@@ -101,7 +101,7 @@ class ChatRoomViewModel @Inject constructor(
     private val getChatRoomState = MutableStateFlow<GetChatRoomState>(GetChatRoomState.None)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val messages = _chatRoomLocalData.flatMapLatest {
+    val messages = chatRoomLocalData.flatMapLatest {
         getMessagesFromLocalUseCase(it.rid).cachedIn(viewModelScope)
     }
 
@@ -109,21 +109,21 @@ class ChatRoomViewModel @Inject constructor(
         chatRoomParticipants,
         myUid,
         rid,
-        getChatRoomState
+        getChatRoomState,
     ) { participants, uid, rid, getChatRoomState ->
         if (rid != null && uid != null && participants.isNotEmpty() && getChatRoomState is GetChatRoomState.Success) {
             ChatRoomUiState.Success(
                 userName = if (participants.size == 1) participants[0].name else "${participants[0].name} 외 ${participants.size} 명",
                 participants = participants,
                 uid = requireNotNull(uid),
-                relationState = if (participants.size == 1) participants[0].userRelation else UserRelationState.GROUP
+                relationState = if (participants.size == 1) participants[0].userRelation else UserRelationState.GROUP,
             )
         } else if (rid == null && uid != null && getChatRoomState is GetChatRoomState.Success) {
             ChatRoomUiState.Success(
                 userName = if (participants.size == 1) participants[0].name else "${participants[0].name} 외 ${participants.size} 명",
                 uid = uid,
                 participants = participants,
-                relationState = if (participants.size == 1) participants[0].userRelation else UserRelationState.GROUP
+                relationState = if (participants.size == 1) participants[0].userRelation else UserRelationState.GROUP,
             )
         } else {
             ChatRoomUiState.Loading
@@ -131,12 +131,12 @@ class ChatRoomViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ChatRoomUiState.Loading
+        ChatRoomUiState.Loading,
     )
 
     private val messagesCallback = chatRoomParticipants.flatMapLatest {
         val relation = if (it.size == 1) it[0].userRelation else UserRelationState.GROUP
-        getMessagesFromRemoteUseCase(_chatRoomLocalData.value, relation)
+        getMessagesFromRemoteUseCase(chatRoomLocalData.value, relation)
     }
 
     init {
@@ -174,7 +174,7 @@ class ChatRoomViewModel @Inject constructor(
                 observeCurrentState()
                 val getChatRoomData = createChatRoomByUidsUseCase(userList)
                 if (getChatRoomData is GetChatRoomState.Success) {
-                    _chatRoomLocalData.emit(getChatRoomData.data)
+                    chatRoomLocalData.emit(getChatRoomData.data)
                     resetGetChatDataStateUseCase()
                     messagesCallback.collectLatest { }
                 }
@@ -192,10 +192,10 @@ class ChatRoomViewModel @Inject constructor(
                 observeCurrentState()
                 val getChatRoomData = getChatRoomByUidUseCase(
                     chatRoomParticipants.value[0],
-                    GetChatRoomState.CheckAndGetDataFromLocal
+                    GetChatRoomState.CheckAndGetDataFromLocal,
                 )
                 if (getChatRoomData is GetChatRoomState.Success) {
-                    _chatRoomLocalData.emit(getChatRoomData.data)
+                    chatRoomLocalData.emit(getChatRoomData.data)
                     resetGetChatDataStateUseCase()
                     messagesCallback.collectLatest { }
                 }
@@ -214,10 +214,10 @@ class ChatRoomViewModel @Inject constructor(
                 if (getChatRoomData is GetChatRoomState.Success) {
                     chatRoomParticipants.emit(
                         getRelatedUserDataOfParticipantsByUidUseCase(
-                            getChatRoomData.data.receivers
-                        )
+                            getChatRoomData.data.receivers,
+                        ),
                     )
-                    _chatRoomLocalData.emit(getChatRoomData.data)
+                    chatRoomLocalData.emit(getChatRoomData.data)
                     resetGetChatDataStateUseCase()
                     messagesCallback.collectLatest { }
                 }
@@ -245,7 +245,7 @@ class ChatRoomViewModel @Inject constructor(
 
     fun editMessageQuery(query: String) {
         viewModelScope.launch {
-            _messageQuery.emit(query)
+            messageQuery.emit(query)
         }
     }
 
@@ -264,15 +264,15 @@ class ChatRoomViewModel @Inject constructor(
             _networkState.emit(networkState)
             val message = uid?.let {
                 MessageData(
-                    chatRoomId = _chatRoomLocalData.value.rid,
+                    chatRoomId = chatRoomLocalData.value.rid,
                     writer = it,
                     type = MessageType.Photo,
                     comment = photoUrl,
                     time = firebaseServerTimeHelper.getEstimatedServerTime(),
-                    messageSendState = MessageSendState.LOADING
+                    messageSendState = MessageSendState.LOADING,
                 )
             }
-            val rid = _chatRoomLocalData.value.id
+            val rid = chatRoomLocalData.value.id
             if (message != null) {
                 sendMessageUseCase(message, rid, networkState)
             }
@@ -281,7 +281,7 @@ class ChatRoomViewModel @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun sendMessage(
-        selectedMessage: SelectedMessageState = SelectedMessageState.NotSelected
+        selectedMessage: SelectedMessageState = SelectedMessageState.NotSelected,
     ) {
         viewModelScope.launch {
             val networkState = getNetworkState()
@@ -298,16 +298,16 @@ class ChatRoomViewModel @Inject constructor(
                 replyKey = selectedMessage.messageData.time
             }
 
-            val type = isCommentContainLink(_messageQuery.value)
+            val type = isCommentContainLink(messageQuery.value)
             val comment = if (type == MessageType.Link) {
-                isLinkStartFromHttp(_messageQuery.value)
+                isLinkStartFromHttp(messageQuery.value)
             } else {
-                _messageQuery.value
+                messageQuery.value
             }
 
             val message = uid?.let {
                 MessageData(
-                    chatRoomId = _chatRoomLocalData.value.rid,
+                    chatRoomId = chatRoomLocalData.value.rid,
                     writer = it,
                     type = type,
                     comment = comment,
@@ -316,30 +316,28 @@ class ChatRoomViewModel @Inject constructor(
                     replyKey = replyKey,
                     replyTo = replyTo,
                     replyComment = replyComment,
-                    replyType = replyType
+                    replyType = replyType,
                 )
             }
-            val rid = _chatRoomLocalData.value.id
+            val rid = chatRoomLocalData.value.id
             if (message != null) {
                 sendMessageUseCase(message, rid, networkState)
             }
         }
     }
 
-    private fun getNetworkState(): Boolean {
-        return getNetworkState.checkNetworkState()
-    }
+    private fun getNetworkState(): Boolean = getNetworkState.checkNetworkState()
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun resendMessage(messageData: MessageData) {
         viewModelScope.launch {
             val networkState = getNetworkState()
             _networkState.emit(networkState)
-            val rid = _chatRoomLocalData.value.id
+            val rid = chatRoomLocalData.value.id
             resendMessageUseCase(
                 messageData,
                 rid,
-                networkState
+                networkState,
             )
         }
     }
@@ -359,12 +357,10 @@ class ChatRoomViewModel @Inject constructor(
         }
     }
 
-    private fun isLinkStartFromHttp(query: String): String {
-        return if (query.startsWith("http") || query.startsWith("https")) {
-            query
-        } else {
-            "http://$query"
-        }
+    private fun isLinkStartFromHttp(query: String): String = if (query.startsWith("http") || query.startsWith("https")) {
+        query
+    } else {
+        "http://$query"
     }
 
     fun blockUser() {
@@ -372,7 +368,7 @@ class ChatRoomViewModel @Inject constructor(
             blockRelatedUserUseCase(chatRoomParticipants.value[0])
             val changedData = chatRoomParticipants.value[0].copy(
                 userRelation = UserRelationState.BLOCKED,
-                favoriteState = false
+                favoriteState = false,
             )
             chatRoomParticipants.emit(listOf(changedData))
         }
@@ -382,7 +378,7 @@ class ChatRoomViewModel @Inject constructor(
         viewModelScope.launch {
             userToFriendUseCase(chatRoomParticipants.value[0])
             val changedData = chatRoomParticipants.value[0].copy(
-                userRelation = UserRelationState.FRIEND
+                userRelation = UserRelationState.FRIEND,
             )
             chatRoomParticipants.emit(listOf(changedData))
         }

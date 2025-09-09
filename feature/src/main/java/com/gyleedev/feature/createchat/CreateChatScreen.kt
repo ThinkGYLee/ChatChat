@@ -75,7 +75,7 @@ fun CreateChatScreen(
     onBackPressKeyClick: () -> Unit,
     onConfirm: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CreateChatViewModel = hiltViewModel()
+    viewModel: CreateChatViewModel = hiltViewModel(),
 ) {
     val searchQuery = viewModel.searchQuery.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -92,7 +92,7 @@ fun CreateChatScreen(
                 Toast.makeText(
                     context,
                     context.getString(R.string.search_user_failure_message),
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT,
                 ).show()
             }
     }
@@ -105,49 +105,49 @@ fun CreateChatScreen(
                         Text(
                             text = "채팅방 만들기",
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     },
                     navigationIcon = {
                         IconButton(onClick = onBackPressKeyClick) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                                contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                                contentDescription = stringResource(R.string.navigation_arrow_back_icon_description),
                             )
                         }
                     },
                     actions = {
                         AnimatedVisibility(checkedUsers.value.isNotEmpty()) {
                             TextButton(
-                                onClick = { onConfirm(checkedUsers.value.map { it.uid }) }
+                                onClick = { onConfirm(checkedUsers.value.map { it.uid }) },
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = "${checkedUsers.value.size}  확인",
-                                        style = MaterialTheme.typography.titleMedium
+                                        style = MaterialTheme.typography.titleMedium,
                                     )
                                 }
                             }
                         }
-                    }
+                    },
                 )
                 AnimatedVisibility(checkedUsers.value.isNotEmpty()) {
                     LazyRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 20.dp, horizontal = 12.dp)
+                            .padding(vertical = 20.dp, horizontal = 12.dp),
                     ) {
                         items(
-                            count = checkedUsers.value.size
+                            count = checkedUsers.value.size,
                         ) { index ->
                             Column(
                                 modifier = Modifier.padding(horizontal = 8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Box(
                                     modifier = Modifier.clickable {
                                         viewModel.updateCheckedUsers(checkedUsers.value[index])
-                                    }
+                                    },
                                 ) {
                                     GlideImage(
                                         imageModel = { checkedUsers.value[index].picture.ifBlank { R.drawable.baseline_person_24 } },
@@ -158,7 +158,7 @@ fun CreateChatScreen(
                                             .border(
                                                 width = 0.01.dp,
                                                 color = MaterialTheme.colorScheme.outlineVariant,
-                                                shape = CircleShape
+                                                shape = CircleShape,
                                             )
                                             .clip(CircleShape)
                                             .background(color = colorResource(R.color.avatar_background))
@@ -167,11 +167,11 @@ fun CreateChatScreen(
                                             +ShimmerPlugin(
                                                 Shimmer.Flash(
                                                     baseColor = Color.White,
-                                                    highlightColor = Color.LightGray
-                                                )
+                                                    highlightColor = Color.LightGray,
+                                                ),
                                             )
                                         },
-                                        previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                                        previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
                                     )
                                     Icon(
                                         imageVector = Icons.Filled.Close,
@@ -181,13 +181,13 @@ fun CreateChatScreen(
                                             .clip(CircleShape)
                                             .background(Color.Gray.copy(alpha = 0.6f))
                                             .size(16.dp)
-                                            .align(Alignment.TopEnd)
+                                            .align(Alignment.TopEnd),
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = checkedUsers.value[index].name,
-                                    style = MaterialTheme.typography.labelSmall
+                                    style = MaterialTheme.typography.labelSmall,
                                 )
                             }
                         }
@@ -195,20 +195,20 @@ fun CreateChatScreen(
                 }
             }
         },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
 
         if (items.itemCount > 0) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
+                    .padding(innerPadding),
             ) {
                 item {
                     FriendFilterTextField(
                         searchQuery = searchQuery.value,
                         onReset = { viewModel.editSearchQuery("") },
-                        onValueChange = viewModel::editSearchQuery
+                        onValueChange = viewModel::editSearchQuery,
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                 }
@@ -218,7 +218,7 @@ fun CreateChatScreen(
                         Text(
                             text = stringResource(R.string.friend_edit_screen_friend_text),
                             style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
                         )
                     }
                 }
@@ -226,14 +226,14 @@ fun CreateChatScreen(
                 items(
                     items.itemCount,
                     key = { "${requireNotNull(items[it]).id}+friendItem" },
-                    contentType = { 0 }
+                    contentType = { 0 },
                 ) {
                     AnimatedVisibility(searchQuery.value.isEmpty()) {
                         items[it]?.let { userData ->
                             FriendData(
                                 isChecked = checkedUsers.value.contains(userData),
                                 onRadioButtonClick = { viewModel.updateCheckedUsers(userData) },
-                                relatedUserLocalData = userData
+                                relatedUserLocalData = userData,
                             )
                         }
                     }
@@ -244,7 +244,7 @@ fun CreateChatScreen(
                         Text(
                             text = stringResource(R.string.search_result_text),
                             style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp)
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 20.dp),
                         )
                     }
                 }
@@ -252,14 +252,14 @@ fun CreateChatScreen(
                 items(
                     count = searchItems.itemCount,
                     key = { "${requireNotNull(searchItems[it]).id}+searchItem" },
-                    contentType = { 0 }
+                    contentType = { 0 },
                 ) {
                     AnimatedVisibility(searchQuery.value.isNotEmpty()) {
                         searchItems[it]?.let { userData ->
                             FriendData(
                                 isChecked = checkedUsers.value.contains(userData),
                                 onRadioButtonClick = { viewModel.updateCheckedUsers(userData) },
-                                relatedUserLocalData = userData
+                                relatedUserLocalData = userData,
                             )
                         }
                     }
@@ -274,20 +274,20 @@ fun FriendFilterTextField(
     searchQuery: String,
     onValueChange: (String) -> Unit,
     onReset: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var alpha by remember { mutableFloatStateOf(1f) }
 
     Row(
         modifier = modifier.padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column {
             BasicTextField(
                 modifier = Modifier
                     .background(
                         color = MaterialTheme.colorScheme.surfaceContainer,
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
                     )
                     .onFocusChanged { alpha = if (it.isFocused) 0.6f else 1f }
                     .padding(horizontal = 16.dp),
@@ -299,7 +299,7 @@ fun FriendFilterTextField(
                 decorationBox = { innerTextField ->
                     Row(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Box(modifier = Modifier.weight(10f)) {
                             if (searchQuery.isEmpty()) {
@@ -309,7 +309,7 @@ fun FriendFilterTextField(
                                     color = Color(0xFF848484),
                                     modifier = Modifier
                                         .padding(start = 4.dp)
-                                        .align(Alignment.CenterStart)
+                                        .align(Alignment.CenterStart),
                                 )
                             }
                             Row(modifier = Modifier.align(Alignment.CenterStart)) {
@@ -320,11 +320,11 @@ fun FriendFilterTextField(
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = stringResource(R.string.keyboard_reset_button_description),
-                                modifier = Modifier.clickable { onReset() }
+                                modifier = Modifier.clickable { onReset() },
                             )
                         }
                     }
-                }
+                },
             )
         }
     }
@@ -335,7 +335,7 @@ fun FriendData(
     isChecked: Boolean,
     onRadioButtonClick: () -> Unit,
     relatedUserLocalData: RelatedUserLocalData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -343,7 +343,7 @@ fun FriendData(
             .clickable { }
             .padding(vertical = 8.dp, horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             GlideImage(
@@ -354,7 +354,7 @@ fun FriendData(
                     .border(
                         width = 0.01.dp,
                         color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = CircleShape
+                        shape = CircleShape,
                     )
                     .clip(CircleShape)
                     .background(color = colorResource(R.color.avatar_background)),
@@ -362,23 +362,23 @@ fun FriendData(
                     +ShimmerPlugin(
                         Shimmer.Flash(
                             baseColor = Color.White,
-                            highlightColor = Color.LightGray
-                        )
+                            highlightColor = Color.LightGray,
+                        ),
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
             )
             Spacer(modifier = Modifier.width(20.dp))
             Text(
                 text = relatedUserLocalData.name,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
         }
 
         RadioButton(
             selected = isChecked,
-            onClick = onRadioButtonClick
+            onClick = onRadioButtonClick,
         )
     }
 }
@@ -395,10 +395,10 @@ fun FriendDataPreview() {
                 status = "status",
                 picture = "",
                 uid = "",
-                userRelation = UserRelationState.FRIEND
+                userRelation = UserRelationState.FRIEND,
             ),
             isChecked = false,
-            onRadioButtonClick = {}
+            onRadioButtonClick = {},
         )
     }
 }
@@ -411,7 +411,7 @@ fun FriendFilterTextFieldPreview() {
         FriendFilterTextField(
             searchQuery = "",
             onReset = {},
-            onValueChange = {}
+            onValueChange = {},
         )
     }
 }

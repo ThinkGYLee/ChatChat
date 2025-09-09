@@ -38,7 +38,7 @@ import java.util.Locale
 @Composable
 fun ChangeLanguageScreen(
     onBackPress: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     var selectedLanguage by remember {
@@ -60,7 +60,7 @@ fun ChangeLanguageScreen(
         R.string.language_portuguese,
         R.string.language_spanish,
         R.string.language_turkish,
-        R.string.language_vietnamese
+        R.string.language_vietnamese,
     )
 
     Scaffold(
@@ -72,19 +72,19 @@ fun ChangeLanguageScreen(
                     IconButton(onClick = onBackPress) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description),
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
             languageList.forEach { stringResId ->
                 LanguageItem(
@@ -93,7 +93,7 @@ fun ChangeLanguageScreen(
                     onLanguageClick = { languageCode ->
                         selectedLanguage = languageCode
                         setAppLanguage(languageCode)
-                    }
+                    },
                 )
             }
         }
@@ -104,23 +104,23 @@ fun ChangeLanguageScreen(
 fun LanguageItem(
     languageResId: Int,
     isSelected: Boolean,
-    onLanguageClick: (String) -> Unit
+    onLanguageClick: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onLanguageClick(getLanguageCode(languageResId)) }
             .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = stringResource(languageResId),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         if (isSelected) {
             Icon(
                 imageVector = Icons.Default.Check,
-                contentDescription = null
+                contentDescription = null,
             )
         }
     }
@@ -144,23 +144,21 @@ private fun setAppLanguage(languageCode: String) {
     AppCompatDelegate.setApplicationLocales(localeList)
 }
 
-private fun getLanguageCode(stringResId: Int): String {
-    return when (stringResId) {
-        R.string.language_default -> "default"
-        R.string.language_arabic -> "ar"
-        R.string.language_chinese -> "zh"
-        R.string.language_english -> "en"
-        R.string.language_french -> "fr"
-        R.string.language_german -> "de"
-        R.string.language_indonesian -> "id"
-        R.string.language_italian -> "it"
-        R.string.language_japanese -> "ja"
-        R.string.language_korean -> "ko"
-        R.string.language_persian -> "fa"
-        R.string.language_portuguese -> "pt"
-        R.string.language_spanish -> "es"
-        R.string.language_turkish -> "tr"
-        R.string.language_vietnamese -> "vi"
-        else -> "default"
-    }
+private fun getLanguageCode(stringResId: Int): String = when (stringResId) {
+    R.string.language_default -> "default"
+    R.string.language_arabic -> "ar"
+    R.string.language_chinese -> "zh"
+    R.string.language_english -> "en"
+    R.string.language_french -> "fr"
+    R.string.language_german -> "de"
+    R.string.language_indonesian -> "id"
+    R.string.language_italian -> "it"
+    R.string.language_japanese -> "ja"
+    R.string.language_korean -> "ko"
+    R.string.language_persian -> "fa"
+    R.string.language_portuguese -> "pt"
+    R.string.language_spanish -> "es"
+    R.string.language_turkish -> "tr"
+    R.string.language_vietnamese -> "vi"
+    else -> "default"
 }

@@ -8,11 +8,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class UpdateMyInfoUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(user: UserData): Flow<Boolean> {
-        return withContext(Dispatchers.IO) {
-            repository.updateMyUserInfo(user)
-        }
+    suspend operator fun invoke(user: UserData): Flow<Boolean> = withContext(Dispatchers.IO) {
+        repository.updateMyUserInfo(user)
     }
 }

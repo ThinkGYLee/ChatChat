@@ -20,7 +20,7 @@ import javax.inject.Inject
 class MyInfoEditViewModel @Inject constructor(
     private val getMyDataFromRemoteUseCase: GetMyDataFromRemoteUseCase,
     private val updateMyInfoUseCase: UpdateMyInfoUseCase,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
     private val _myUserData = MutableStateFlow(UserData())
     val myUserData: StateFlow<UserData?> = _myUserData
@@ -75,7 +75,7 @@ class MyInfoEditViewModel @Inject constructor(
             val userData = _myUserData.value.copy(
                 name = _myNameQuery.value,
                 status = _myStatusQuery.value,
-                picture = _myPictureAddress.value
+                picture = _myPictureAddress.value,
             )
             _request.emit(updateMyInfoUseCase(userData).first())
         }

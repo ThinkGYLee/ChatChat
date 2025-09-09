@@ -4,8 +4,7 @@ import com.gyleedev.domain.repository.UserRepository
 import javax.inject.Inject
 
 class GetVerifiedStateUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke() =
-        repository.getVerifiedState()
+    suspend operator fun invoke() = repository.getVerifiedState()
 }

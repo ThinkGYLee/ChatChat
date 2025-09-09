@@ -56,7 +56,7 @@ fun SigninScreen(
     onSignInComplete: () -> Unit,
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SigninViewModel = hiltViewModel()
+    viewModel: SigninViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -105,13 +105,13 @@ fun SigninScreen(
             if (it == SignInResult.Success) {
                 snackbarHostState.showSnackbar(
                     message = context.getString(R.string.sign_in_success_message),
-                    duration = SnackbarDuration.Short
+                    duration = SnackbarDuration.Short,
                 )
                 onSignInComplete()
             } else {
                 snackbarHostState.showSnackbar(
                     message = context.getString(R.string.sign_in_failure_message),
-                    duration = SnackbarDuration.Short
+                    duration = SnackbarDuration.Short,
                 )
             }
         }
@@ -125,10 +125,10 @@ fun SigninScreen(
                     IconButton(onClick = onBackPressed) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description),
                         )
                     }
-                }
+                },
             )
         },
         modifier = modifier,
@@ -140,7 +140,7 @@ fun SigninScreen(
                         .navigationBarsPadding()
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
-                        .imePadding()
+                        .imePadding(),
                 ) {
                     Button(
                         enabled = (uiState as SigninUiState.Success).signinIsAvailable,
@@ -148,17 +148,17 @@ fun SigninScreen(
                             focusManager.clearFocus()
                             viewModel.signInRequest()
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
                             text = stringResource(R.string.signin_button_title),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }
-        }
+        },
     ) { innerPadding ->
         if (uiState is SigninUiState.Success) {
             Column(
@@ -167,7 +167,7 @@ fun SigninScreen(
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
-                    .verticalScroll(columnScrollState)
+                    .verticalScroll(columnScrollState),
             ) {
                 Text(text = stringResource(R.string.id_text_field_hint))
                 Spacer(modifier = Modifier.height(16.dp))
@@ -177,14 +177,14 @@ fun SigninScreen(
                     hint = stringResource(R.string.id_text_field_hint),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Email
+                        keyboardType = KeyboardType.Email,
                     ),
-                    modifier = Modifier.focusRequester(focusRequester)
+                    modifier = Modifier.focusRequester(focusRequester),
                 )
                 Text(
                     text = idComment,
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color.Red
+                    color = Color.Red,
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(text = stringResource(R.string.nickname_text_field_hint))
@@ -194,14 +194,14 @@ fun SigninScreen(
                     onValueChange = { viewModel.editNickname(it) },
                     hint = stringResource(R.string.nickname_text_field_hint),
                     keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next
+                        imeAction = ImeAction.Next,
                     ),
-                    modifier = Modifier.focusRequester(focusRequester)
+                    modifier = Modifier.focusRequester(focusRequester),
                 )
                 Text(
                     text = nickNameComment,
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color.Red
+                    color = Color.Red,
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(text = stringResource(R.string.password_text_field_hint))
@@ -212,16 +212,16 @@ fun SigninScreen(
                     hint = stringResource(R.string.password_text_field_hint),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Password
+                        keyboardType = KeyboardType.Password,
                     ),
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.focusRequester(focusRequester)
+                    modifier = Modifier.focusRequester(focusRequester),
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = passwordComment,
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color.Red
+                    color = Color.Red,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(text = stringResource(R.string.password_check_text_field_hint))
@@ -232,20 +232,20 @@ fun SigninScreen(
                     hint = stringResource(R.string.password_check_text_field_hint),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Password
+                        keyboardType = KeyboardType.Password,
                     ),
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier
                         .focusRequester(focusRequester)
                         .onFocusChanged {
                             isLastTextFieldFocused = it.isFocused
-                        }
+                        },
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = passwordCheckComment,
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color.Red
+                    color = Color.Red,
                 )
                 Spacer(modifier = Modifier.height(28.dp))
             }

@@ -55,26 +55,26 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE name LIKE :query AND relation = :relation")
     fun getFriendsWithName(
         query: String,
-        relation: UserRelationState = UserRelationState.FRIEND
+        relation: UserRelationState = UserRelationState.FRIEND,
     ): PagingSource<Int, UserEntity>
 
     @Query("SELECT * FROM user WHERE name LIKE :query AND relation = :relation")
     fun getHideFriendsWithName(
         query: String,
-        relation: UserRelationState = UserRelationState.HIDE
+        relation: UserRelationState = UserRelationState.HIDE,
     ): PagingSource<Int, UserEntity>
 
     @Query("SELECT * FROM user WHERE name LIKE :query AND relation = :relation")
     fun getBlockedFriendsWithName(
         query: String,
-        relation: UserRelationState = UserRelationState.BLOCKED
+        relation: UserRelationState = UserRelationState.BLOCKED,
     ): PagingSource<Int, UserEntity>
 
     // TODO fts4 관련 쿼리문 수정할것
     @Query("SELECT * FROM user JOIN user_fts ON (user.id = user_fts.id) WHERE user_fts.name MATCH :query AND relation = :relation")
     fun getHideFriendsWithNameFullText(
         query: String,
-        relation: UserRelationState = UserRelationState.HIDE
+        relation: UserRelationState = UserRelationState.HIDE,
     ): PagingSource<Int, UserEntity>
 
     @Query("SELECT * FROM user")

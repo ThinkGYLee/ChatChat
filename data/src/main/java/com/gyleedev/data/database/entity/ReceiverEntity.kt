@@ -14,12 +14,11 @@ import com.gyleedev.domain.model.UserChatRoomReceiver
             entity = ChatRoomEntity::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("chatroom_entity_id"),
-            onDelete = ForeignKey.CASCADE
-        )
+            onDelete = ForeignKey.CASCADE,
+        ),
     ],
-    indices = [Index(value = ["chatroom_entity_id"])]
+    indices = [Index(value = ["chatroom_entity_id"])],
 )
-
 data class ReceiverEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
@@ -27,13 +26,11 @@ data class ReceiverEntity(
     @ColumnInfo(name = "chatroom_entity_id")
     val chatRoomEntityId: Long,
     @ColumnInfo(name = "receiver")
-    val receiver: String
+    val receiver: String,
 )
 
-fun UserChatRoomReceiver.toEntity(chatRoomEntityId: Long): ReceiverEntity {
-    return ReceiverEntity(
-        id = 0L,
-        chatRoomEntityId = chatRoomEntityId,
-        receiver = receiver
-    )
-}
+fun UserChatRoomReceiver.toEntity(chatRoomEntityId: Long): ReceiverEntity = ReceiverEntity(
+    id = 0L,
+    chatRoomEntityId = chatRoomEntityId,
+    receiver = receiver,
+)

@@ -9,22 +9,20 @@ data class UserAndFavoriteEntity(
     @Embedded val user: UserEntity,
     @Relation(
         parentColumn = "id",
-        entityColumn = "user_entity_id"
+        entityColumn = "user_entity_id",
     )
-    val favorite: FavoriteEntity
+    val favorite: FavoriteEntity,
 )
 
-fun UserAndFavoriteEntity.toLocalData(): RelatedUserLocalData {
-    return RelatedUserLocalData(
-        id = user.id,
-        email = user.email,
-        uid = user.uid,
-        picture = user.picture,
-        status = user.status,
-        favoriteState = favorite.favoriteState,
-        favoriteNumber = favorite.favoriteNumber,
-        userRelation = user.relation,
-        name = user.name,
-        verified = user.verified
-    )
-}
+fun UserAndFavoriteEntity.toLocalData(): RelatedUserLocalData = RelatedUserLocalData(
+    id = user.id,
+    email = user.email,
+    uid = user.uid,
+    picture = user.picture,
+    status = user.status,
+    favoriteState = favorite.favoriteState,
+    favoriteNumber = favorite.favoriteNumber,
+    userRelation = user.relation,
+    name = user.name,
+    verified = user.verified,
+)

@@ -8,14 +8,12 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetChatRoomByUidUseCase @Inject constructor(
-    private val repository: ChatRoomRepository
+    private val repository: ChatRoomRepository,
 ) {
     suspend operator fun invoke(
         user: RelatedUserLocalData,
-        getChatRoomState: GetChatRoomState = GetChatRoomState.CheckAndGetDataFromLocal
-    ): GetChatRoomState {
-        return withContext(Dispatchers.IO) {
-            repository.getChatRoomWithUserData(user, getChatRoomState)
-        }
+        getChatRoomState: GetChatRoomState = GetChatRoomState.CheckAndGetDataFromLocal,
+    ): GetChatRoomState = withContext(Dispatchers.IO) {
+        repository.getChatRoomWithUserData(user, getChatRoomState)
     }
 }

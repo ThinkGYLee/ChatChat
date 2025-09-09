@@ -4,5 +4,5 @@ enum class FindProcessState {
     Complete,
     SearchFailure,
     AddFailure,
-    BlockFailure
+    BlockFailure,
 }

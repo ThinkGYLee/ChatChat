@@ -21,7 +21,7 @@ fun TextField(
     enabled: Boolean = true,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions(),
-    hint: String = ""
+    hint: String = "",
 ) {
     TextField(
         value = value,
@@ -29,7 +29,7 @@ fun TextField(
         placeholder = {
             Text(
                 text = hint,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
             )
         },
         visualTransformation = visualTransformation,
@@ -37,10 +37,10 @@ fun TextField(
         colors = TextFieldDefaults.colors().copy(
             focusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            unfocusedIndicatorColor = Color.Transparent,
         ),
         keyboardOptions = keyboardOptions,
         modifier = modifier.fillMaxWidth(),
-        enabled = enabled
+        enabled = enabled,
     )
 }

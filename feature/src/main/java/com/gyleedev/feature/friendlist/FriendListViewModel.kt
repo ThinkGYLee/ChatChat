@@ -38,7 +38,7 @@ class FriendListViewModel @Inject constructor(
     getFavoritesUseCase: GetFavoritesUseCase,
     private val getMyDataFromRemoteUseCase: GetMyDataFromRemoteUseCase,
     private val getMyDataFromPreferenceUseCase: GetMyDataFromPreferenceUseCase,
-    private val updateFavoriteByUserEntityIdUseCase: UpdateFavoriteByUserEntityIdUseCase
+    private val updateFavoriteByUserEntityIdUseCase: UpdateFavoriteByUserEntityIdUseCase,
 ) : BaseViewModel() {
 
     private val _noSuchUserAlert = MutableSharedFlow<Unit>()
@@ -76,9 +76,7 @@ class FriendListViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getFriendsCount(): Long {
-        return getFriendsCountUseCase()
-    }
+    private suspend fun getFriendsCount(): Long = getFriendsCountUseCase()
 
     private fun getMyRelatedUsersFromRemote() {
         viewModelScope.launch {

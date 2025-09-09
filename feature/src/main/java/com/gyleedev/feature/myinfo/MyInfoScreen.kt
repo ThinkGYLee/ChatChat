@@ -53,7 +53,7 @@ fun MyInfoScreen(
     onChatRoomClick: (String) -> Unit,
     onProfileEditClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MyInfoViewModel = hiltViewModel()
+    viewModel: MyInfoViewModel = hiltViewModel(),
 ) {
     val userData by viewModel.userData.collectAsStateWithLifecycle()
 
@@ -70,12 +70,12 @@ fun MyInfoScreen(
                     IconButton(onClick = onCloseKeyPressed) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = stringResource(R.string.message_button_description)
+                            contentDescription = stringResource(R.string.message_button_description),
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -83,7 +83,7 @@ fun MyInfoScreen(
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             GlideImage(
                 imageModel = { requireNotNull(userData).picture.ifBlank { R.drawable.baseline_person_24 } },
@@ -92,7 +92,7 @@ fun MyInfoScreen(
                     .border(
                         width = 0.01.dp,
                         color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = CircleShape
+                        shape = CircleShape,
                     )
                     .clip(CircleShape)
                     .background(color = colorResource(R.color.avatar_background)),
@@ -100,11 +100,11 @@ fun MyInfoScreen(
                     +ShimmerPlugin(
                         Shimmer.Flash(
                             baseColor = Color.White,
-                            highlightColor = Color.LightGray
-                        )
+                            highlightColor = Color.LightGray,
+                        ),
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
             )
             Spacer(modifier = Modifier.height(20.dp))
             Text(text = userData?.name ?: stringResource(R.string.anonymous_user_text))
@@ -115,15 +115,15 @@ fun MyInfoScreen(
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .clickable { onChatRoomClick(requireNotNull(userData).uid) }
+                        .clickable { onChatRoomClick(requireNotNull(userData).uid) },
                 ) {
                     Column(
                         modifier = Modifier.padding(10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Email,
-                            contentDescription = stringResource(R.string.message_button_description)
+                            contentDescription = stringResource(R.string.message_button_description),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = stringResource(R.string.message_button_message))
@@ -132,15 +132,15 @@ fun MyInfoScreen(
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .clickable { onProfileEditClick(requireNotNull(userData?.uid)) }
+                        .clickable { onProfileEditClick(requireNotNull(userData?.uid)) },
                 ) {
                     Column(
                         modifier = Modifier.padding(10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
-                            contentDescription = stringResource(R.string.edit_button_description)
+                            contentDescription = stringResource(R.string.edit_button_description),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = stringResource(R.string.edit_button_message))

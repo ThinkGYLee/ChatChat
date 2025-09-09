@@ -5,7 +5,7 @@ import com.gyleedev.domain.repository.UserRepository
 import javax.inject.Inject
 
 class BlockUnknownUserUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
     suspend operator fun invoke(userData: UserData) = repository.blockUnknownUserRequest(userData)
 }

@@ -55,7 +55,7 @@ fun LoginScreen(
     onLogInComplete: () -> Unit,
     onSignInClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val idComment =
@@ -80,13 +80,13 @@ fun LoginScreen(
             if (it is LogInState.Success) {
                 snackbarHostState.showSnackbar(
                     message = context.getString(R.string.log_in_success_message),
-                    duration = SnackbarDuration.Short
+                    duration = SnackbarDuration.Short,
                 )
                 onLogInComplete()
             } else {
                 snackbarHostState.showSnackbar(
                     message = context.getString(R.string.log_in_failure_message),
-                    duration = SnackbarDuration.Short
+                    duration = SnackbarDuration.Short,
                 )
             }
         }
@@ -95,7 +95,7 @@ fun LoginScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(R.string.login_screen_top_bar_title)) }
+                title = { Text(text = stringResource(R.string.login_screen_top_bar_title)) },
             )
         },
         bottomBar = {
@@ -105,7 +105,7 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
-                        .imePadding()
+                        .imePadding(),
                 ) {
                     Button(
                         enabled = state.loginIsAvailable,
@@ -116,18 +116,18 @@ fun LoginScreen(
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors().copy(
                             disabledContainerColor = ButtonDefaults.buttonColors().containerColor.copy(
-                                alpha = 0.2f
+                                alpha = 0.2f,
                             ),
-                            disabledContentColor = MaterialTheme.colorScheme.onSurface
+                            disabledContentColor = MaterialTheme.colorScheme.onSurface,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 52.dp)
+                            .heightIn(min = 52.dp),
                     ) {
                         Text(
                             text = stringResource(R.string.login_screen_login_button_text),
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
                         )
                     }
                     Spacer(modifier = Modifier.height(12.dp))
@@ -136,16 +136,16 @@ fun LoginScreen(
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors().copy(
                             containerColor = ButtonDefaults.buttonColors().disabledContainerColor.copy(),
-                            contentColor = MaterialTheme.colorScheme.onSurface
+                            contentColor = MaterialTheme.colorScheme.onSurface,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 52.dp)
+                            .heightIn(min = 52.dp),
                     ) {
                         Text(
                             text = stringResource(R.string.login_screen_sign_in_text),
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
                         )
                     }
                     Spacer(modifier = Modifier.height(20.dp))
@@ -153,7 +153,7 @@ fun LoginScreen(
             }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
         if (uiState is LoginUiState.Success) {
             val state = uiState as LoginUiState.Success
@@ -162,7 +162,7 @@ fun LoginScreen(
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = 24.dp),
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
                 TextField(
@@ -173,13 +173,13 @@ fun LoginScreen(
                     hint = stringResource(R.string.id_text_field_hint),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Email
-                    )
+                        keyboardType = KeyboardType.Email,
+                    ),
                 )
                 Text(
                     text = idComment,
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color.Red
+                    color = Color.Red,
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 TextField(
@@ -190,15 +190,15 @@ fun LoginScreen(
                     hint = stringResource(R.string.password_text_field_hint),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Password
+                        keyboardType = KeyboardType.Password,
                     ),
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.focusRequester(focusRequester)
+                    modifier = Modifier.focusRequester(focusRequester),
                 )
                 Text(
                     text = passwordComment,
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color.Red
+                    color = Color.Red,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
@@ -207,7 +207,7 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .clickable {}
+                        .clickable {},
 
                 )
             }

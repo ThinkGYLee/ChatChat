@@ -8,11 +8,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(id: String, password: String): Flow<LogInResult> {
-        return withContext(Dispatchers.IO) {
-            repository.loginRequest(id, password)
-        }
+    suspend operator fun invoke(id: String, password: String): Flow<LogInResult> = withContext(Dispatchers.IO) {
+        repository.loginRequest(id, password)
     }
 }

@@ -9,11 +9,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SignInDatabaseUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(userData: UserData): Flow<SignInResult> {
-        return withContext(Dispatchers.IO) {
-            repository.writeUserToRemote(userData)
-        }
+    suspend operator fun invoke(userData: UserData): Flow<SignInResult> = withContext(Dispatchers.IO) {
+        repository.writeUserToRemote(userData)
     }
 }

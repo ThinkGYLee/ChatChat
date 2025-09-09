@@ -28,7 +28,7 @@ fun FriendManageScreen(
     onBlockedClick: () -> Unit,
     onHideClick: () -> Unit,
     onBackPressKeyClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         topBar = {
@@ -38,29 +38,29 @@ fun FriendManageScreen(
                     IconButton(onClick = onBackPressKeyClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description),
                         )
                     }
-                }
+                },
             )
         },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding),
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onHideClick() }
                     .padding(vertical = 12.dp),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
             ) {
                 Text(
                     text = stringResource(R.string.friend_manage_screen_hide_manage_text),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
             }
             Row(
@@ -68,11 +68,11 @@ fun FriendManageScreen(
                     .fillMaxWidth()
                     .clickable { onBlockedClick() }
                     .padding(vertical = 12.dp),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
             ) {
                 Text(
                     text = stringResource(R.string.friend_manage_screen_block_manage_text),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
             }
         }

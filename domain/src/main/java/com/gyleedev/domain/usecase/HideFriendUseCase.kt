@@ -6,9 +6,7 @@ import com.gyleedev.domain.repository.UserRepository
 import javax.inject.Inject
 
 class HideFriendUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(friend: RelatedUserLocalData): ChangeRelationResult {
-        return repository.hideFriendRequest(friend)
-    }
+    suspend operator fun invoke(friend: RelatedUserLocalData): ChangeRelationResult = repository.hideFriendRequest(friend)
 }

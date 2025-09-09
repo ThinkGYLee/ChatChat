@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SendMessageUseCase @Inject constructor(
-    private val repository: MessageRepository
+    private val repository: MessageRepository,
 ) {
     suspend operator fun invoke(messageData: MessageData, rid: Long, networkState: Boolean) {
         withContext(Dispatchers.IO) {

@@ -11,5 +11,5 @@ data class UriMetaData(
     var name: String = "",
     var description: String = "",
     var url: String = "",
-    var imageUrl: String = ""
+    var imageUrl: String = "",
 ) : Parcelable

@@ -25,7 +25,7 @@ import javax.inject.Inject
 class BlockManageViewModel @Inject constructor(
     getBlockedFriendsUseCase: GetBlockedFriendsUseCase,
     private val userToFriendUseCase: UserToFriendUseCase,
-    private val getBlockedFriendsWithNameUseCase: GetBlockedFriendsWithNameUseCase
+    private val getBlockedFriendsWithNameUseCase: GetBlockedFriendsWithNameUseCase,
 ) : BaseViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -48,7 +48,7 @@ class BlockManageViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        PagingData.empty()
+        PagingData.empty(),
     )
 
     fun userToFriend(friend: RelatedUserLocalData) {

@@ -2,9 +2,9 @@ package com.gyleedev.domain.model
 
 sealed interface SearchUserResult {
     data class Success(
-        val user: UserData
+        val user: UserData,
     ) : SearchUserResult
     data class Failure(
-        val message: String
+        val message: String,
     ) : SearchUserResult
 }

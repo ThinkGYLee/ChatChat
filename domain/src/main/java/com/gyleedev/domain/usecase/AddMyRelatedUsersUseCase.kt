@@ -7,11 +7,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class AddMyRelatedUsersUseCase @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(friends: List<RelatedUserRemoteData>) {
-        return withContext(Dispatchers.IO) {
-            repository.insertMyRelationsToLocal(friends)
-        }
+    suspend operator fun invoke(friends: List<RelatedUserRemoteData>) = withContext(Dispatchers.IO) {
+        repository.insertMyRelationsToLocal(friends)
     }
 }

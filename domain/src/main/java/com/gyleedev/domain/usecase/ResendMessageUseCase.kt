@@ -20,14 +20,14 @@ import javax.inject.Inject
 class ResendMessageUseCase @Inject constructor(
     private val sendMessageToRemoteUseCase: SendMessageToRemoteUseCase,
     private val updateMessageStateUseCase: UpdateMessageStateUseCase,
-    private val getMessageFromLocalUseCase: GetMessageFromLocalUseCase
+    private val getMessageFromLocalUseCase: GetMessageFromLocalUseCase,
 ) {
     @RequiresApi(Build.VERSION_CODES.O)
     suspend operator fun invoke(
         messageData: MessageData,
         rid: Long,
         networkState: Boolean,
-        time: Long = Instant.now().toEpochMilli()
+        time: Long = Instant.now().toEpochMilli(),
     ) {
         if (!networkState) {
             return
@@ -43,7 +43,7 @@ class ResendMessageUseCase @Inject constructor(
             if (request is MessageSendState) {
                 val message = messageData.copy(
                     messageSendState = request,
-                    time = time
+                    time = time,
                 )
                 updateMessageStateUseCase(messageId, rid, message)
             }

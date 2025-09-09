@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyInfoViewModel @Inject constructor(
     private val getMyDataFromRemoteUseCase: GetMyDataFromRemoteUseCase,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
     private val _userData = MutableStateFlow(UserData())
     val userData: StateFlow<UserData?> = _userData

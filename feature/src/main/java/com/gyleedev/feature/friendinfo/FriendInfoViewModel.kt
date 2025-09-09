@@ -24,7 +24,7 @@ class FriendInfoViewModel @Inject constructor(
     private val hideFriendUseCase: HideFriendUseCase,
     private val blockRelatedUserUseCase: BlockRelatedUserUseCase,
     private val updateFavoriteByUserEntityIdUseCase: UpdateFavoriteByUserEntityIdUseCase,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
     private val _relatedUserLocalData = MutableStateFlow(RelatedUserLocalData())
     val relatedUserLocalData: StateFlow<RelatedUserLocalData?> = _relatedUserLocalData
@@ -35,11 +35,11 @@ class FriendInfoViewModel @Inject constructor(
             if (userUid != null) {
                 val friendData = getRelatedUserAndFavoriteDataUseCase(userUid)
                 _relatedUserLocalData.emit(
-                    requireNotNull(friendData)
+                    requireNotNull(friendData),
                 )
                 updateFriendInfoUseCase(friendData.uid)
                 _relatedUserLocalData.emit(
-                    requireNotNull(getRelatedUserAndFavoriteDataUseCase(friendData.uid))
+                    requireNotNull(getRelatedUserAndFavoriteDataUseCase(friendData.uid)),
                 )
             }
         }
@@ -72,7 +72,7 @@ class FriendInfoViewModel @Inject constructor(
 
     private suspend fun updateUser() {
         _relatedUserLocalData.emit(
-            requireNotNull(getRelatedUserAndFavoriteDataUseCase(_relatedUserLocalData.value.uid))
+            requireNotNull(getRelatedUserAndFavoriteDataUseCase(_relatedUserLocalData.value.uid)),
         )
     }
 }

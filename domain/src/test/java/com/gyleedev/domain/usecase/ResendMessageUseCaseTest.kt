@@ -34,7 +34,7 @@ class ResendMessageUseCaseTest {
         resendUseCase = ResendMessageUseCase(
             sendMessageToRemoteUseCase,
             updateMessageStateUseCase,
-            getMessageFromLocalUseCase
+            getMessageFromLocalUseCase,
         )
     }
 
@@ -65,7 +65,7 @@ class ResendMessageUseCaseTest {
         coEvery { sendMessageToRemoteUseCase(messageData) } returns flowOf(sendState)
         val message = messageData.copy(
             messageSendState = sendState,
-            time = time
+            time = time,
         )
         coEvery { updateMessageStateUseCase(messageData.messageId, rid, message) } just runs
         runTest {
@@ -90,7 +90,7 @@ class ResendMessageUseCaseTest {
         coEvery { sendMessageToRemoteUseCase(messageData) } throws Exception("test")
         val message = messageData.copy(
             messageSendState = sendState,
-            time = time
+            time = time,
         )
         coEvery { updateMessageStateUseCase(messageData.messageId, rid, message) } just runs
         runTest {

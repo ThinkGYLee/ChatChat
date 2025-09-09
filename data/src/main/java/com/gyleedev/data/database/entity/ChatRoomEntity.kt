@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.gyleedev.domain.model.ChatRoomLocalData
 
 @Entity(
-    tableName = "chatroom"
+    tableName = "chatroom",
 )
 data class ChatRoomEntity(
     @PrimaryKey(autoGenerate = true)
@@ -17,14 +17,12 @@ data class ChatRoomEntity(
     @ColumnInfo(name = "lastMessage")
     val lastMessage: String,
     @ColumnInfo(name = "isGroup")
-    val isGroup: Boolean
+    val isGroup: Boolean,
 )
 
-fun ChatRoomEntity.toModel(): ChatRoomLocalData {
-    return ChatRoomLocalData(
-        id = id,
-        rid = rid,
-        lastMessage = lastMessage,
-        isGroup = isGroup
-    )
-}
+fun ChatRoomEntity.toModel(): ChatRoomLocalData = ChatRoomLocalData(
+    id = id,
+    rid = rid,
+    lastMessage = lastMessage,
+    isGroup = isGroup,
+)

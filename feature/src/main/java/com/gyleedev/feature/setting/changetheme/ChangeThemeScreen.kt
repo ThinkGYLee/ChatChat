@@ -34,14 +34,14 @@ import com.gyleedev.feature.R
 fun ChangeThemeScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    changeThemeViewModel: ChangeThemeViewModel = hiltViewModel()
+    changeThemeViewModel: ChangeThemeViewModel = hiltViewModel(),
 ) {
     val currentTheme by changeThemeViewModel.currentTheme.collectAsStateWithLifecycle()
 
     val themeList = listOf(
         ThemeOption(R.string.theme_system, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
         ThemeOption(R.string.theme_light, AppCompatDelegate.MODE_NIGHT_NO),
-        ThemeOption(R.string.theme_dark, AppCompatDelegate.MODE_NIGHT_YES)
+        ThemeOption(R.string.theme_dark, AppCompatDelegate.MODE_NIGHT_YES),
     )
 
     Scaffold(
@@ -52,17 +52,17 @@ fun ChangeThemeScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description),
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             themeList.forEach { theme ->
                 ThemeItem(
@@ -71,7 +71,7 @@ fun ChangeThemeScreen(
                     onClick = {
                         AppCompatDelegate.setDefaultNightMode(theme.mode)
                         changeThemeViewModel.setTheme(theme.mode)
-                    }
+                    },
                 )
             }
         }
@@ -82,25 +82,25 @@ fun ChangeThemeScreen(
 fun ThemeItem(
     themeName: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = themeName,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         if (isSelected) {
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
     }
@@ -109,5 +109,5 @@ fun ThemeItem(
 
 data class ThemeOption(
     val nameRes: Int,
-    val mode: Int
+    val mode: Int,
 )

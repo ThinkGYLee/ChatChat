@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val useCase: LoginProcessUseCase
+    private val useCase: LoginProcessUseCase,
 ) : BaseViewModel() {
 
     private val idQuery = MutableStateFlow("")
@@ -32,19 +32,19 @@ class LoginViewModel @Inject constructor(
         passwordQuery,
         idIsAvailable,
         passwordIsAvailable,
-        logInIsAvailable
+        logInIsAvailable,
     ) { idQuery, passwordQuery, idIsAvailable, passwordIsAvailable, loginIsAvailable ->
         LoginUiState.Success(
             idQuery = idQuery,
             passwordQuery = passwordQuery,
             idIsAvailable = idIsAvailable,
             passwordIsAvailable = passwordIsAvailable,
-            loginIsAvailable = loginIsAvailable
+            loginIsAvailable = loginIsAvailable,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = LoginUiState.Loading
+        initialValue = LoginUiState.Loading,
     )
 
     fun editId(id: String) {

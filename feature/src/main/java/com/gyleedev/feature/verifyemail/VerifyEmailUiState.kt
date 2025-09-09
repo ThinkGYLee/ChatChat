@@ -7,6 +7,6 @@ sealed interface VerifyEmailUiState {
     data object Loading : VerifyEmailUiState
     data class Success(
         val userData: UserData,
-        val verifiedState: VerifiedState
+        val verifiedState: VerifiedState,
     ) : VerifyEmailUiState
 }

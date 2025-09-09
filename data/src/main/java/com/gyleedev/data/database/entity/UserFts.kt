@@ -7,5 +7,5 @@ import androidx.room.Fts4
 @Entity(tableName = "user_fts")
 class UserFts(
     val id: Long,
-    val name: String
+    val name: String,
 )

@@ -57,7 +57,7 @@ fun FriendInfoScreen(
     onCloseKeyPressed: () -> Unit,
     onChatRoomClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FriendInfoViewModel = hiltViewModel()
+    viewModel: FriendInfoViewModel = hiltViewModel(),
 ) {
     val friendData by viewModel.relatedUserLocalData.collectAsStateWithLifecycle()
     val starColor = if (requireNotNull(friendData).favoriteState) {
@@ -77,18 +77,18 @@ fun FriendInfoScreen(
                     IconButton(onClick = onCloseKeyPressed) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = stringResource(R.string.close_button_description)
+                            contentDescription = stringResource(R.string.close_button_description),
                         )
                     }
                 },
                 actions = {
                     IconButton(
-                        onClick = { viewModel.updateFavorite() }
+                        onClick = { viewModel.updateFavorite() },
                     ) {
                         // default size 24dp
                         Icon(
                             imageVector = Icons.Default.StarOutline,
-                            contentDescription = null
+                            contentDescription = null,
                         )
 
                         // adjust size 18dp
@@ -96,14 +96,14 @@ fun FriendInfoScreen(
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
                             tint = starColor,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
                         )
                     }
 
                     IconButton(onClick = { dropdownMenuExpanded = true }) {
                         Icon(
                             imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = stringResource(R.string.more_vertical_button_description)
+                            contentDescription = stringResource(R.string.more_vertical_button_description),
                         )
                     }
 
@@ -112,11 +112,11 @@ fun FriendInfoScreen(
                         onDismiss = { dropdownMenuExpanded = false },
                         blockRequest = { viewModel.blockFriend() },
                         deleteRequest = { viewModel.deleteFriend() },
-                        hideRequest = { viewModel.hideFriend() }
+                        hideRequest = { viewModel.hideFriend() },
                     )
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -124,7 +124,7 @@ fun FriendInfoScreen(
                 .consumeWindowInsets(innerPadding)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             GlideImage(
                 imageModel = { requireNotNull(friendData).picture.ifBlank { R.drawable.baseline_person_24 } },
@@ -133,7 +133,7 @@ fun FriendInfoScreen(
                     .border(
                         width = 0.01.dp,
                         color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = CircleShape
+                        shape = CircleShape,
                     )
                     .clip(CircleShape)
                     .background(color = colorResource(R.color.avatar_background)),
@@ -141,11 +141,11 @@ fun FriendInfoScreen(
                     +ShimmerPlugin(
                         Shimmer.Flash(
                             baseColor = Color.White,
-                            highlightColor = Color.LightGray
-                        )
+                            highlightColor = Color.LightGray,
+                        ),
                     )
                 },
-                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24)
+                previewPlaceholder = painterResource(id = R.drawable.baseline_person_24),
             )
             Spacer(modifier = Modifier.height(20.dp))
             Text(text = friendData?.name ?: stringResource(R.string.anonymous_user_text))
@@ -156,16 +156,16 @@ fun FriendInfoScreen(
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .clickable { friendData?.let { onChatRoomClick(it.uid) } }
+                        .clickable { friendData?.let { onChatRoomClick(it.uid) } },
 
                 ) {
                     Column(
                         modifier = Modifier.padding(10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Email,
-                            contentDescription = stringResource(R.string.message_button_description)
+                            contentDescription = stringResource(R.string.message_button_description),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = stringResource(R.string.message_button_message))
@@ -184,33 +184,33 @@ fun FriendDropDownMenu(
     hideRequest: () -> Unit,
     dropdownMenuExpanded: Boolean,
     modifier: Modifier = Modifier,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     DropdownMenu(
         expanded = dropdownMenuExpanded,
         modifier = modifier,
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
     ) {
         DropdownMenuItem(
             text = { Text(stringResource(R.string.friend_block_button_text)) },
             onClick = {
                 blockRequest()
                 onDismiss()
-            }
+            },
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.friend_delete_button_text)) },
             onClick = {
                 deleteRequest()
                 onDismiss()
-            }
+            },
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.friend_hide_button_text)) },
             onClick = {
                 hideRequest()
                 onDismiss()
-            }
+            },
         )
     }
 }

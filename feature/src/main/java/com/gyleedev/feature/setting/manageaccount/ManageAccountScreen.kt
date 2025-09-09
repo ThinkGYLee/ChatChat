@@ -21,7 +21,7 @@ import com.gyleedev.feature.R
 @Composable
 fun ManageAccountScreen(
     onBackButtonClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -30,21 +30,21 @@ fun ManageAccountScreen(
                 title = { Text(text = stringResource(R.string.setting_account_manage_item)) },
                 navigationIcon = {
                     IconButton(
-                        onClick = onBackButtonClicked
+                        onClick = onBackButtonClicked,
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description)
+                            contentDescription = stringResource(R.string.navigation_arrow_back_icon_description),
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
+                .consumeWindowInsets(innerPadding),
         ) { }
     }
 }

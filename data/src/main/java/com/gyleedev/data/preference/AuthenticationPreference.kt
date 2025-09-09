@@ -14,15 +14,12 @@ interface AuthenticationPreference {
     fun setState(state: VerifiedState)
 }
 
-class AuthenticationPreferenceImpl(@ApplicationContext context: Context) :
-    AuthenticationPreference {
+class AuthenticationPreferenceImpl(@ApplicationContext context: Context) : AuthenticationPreference {
 
     private val authenticationPreference: SharedPreferences =
         context.getSharedPreferences("Authentication", Context.MODE_PRIVATE)
 
-    override fun getPassword(): String {
-        return authenticationPreference.getString("Password", "default_password") as String
-    }
+    override fun getPassword(): String = authenticationPreference.getString("Password", "default_password") as String
 
     override fun setPassword(password: String) {
         authenticationPreference.edit { putString("Password", password) }

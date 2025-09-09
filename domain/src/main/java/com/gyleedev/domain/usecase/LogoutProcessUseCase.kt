@@ -9,15 +9,13 @@ class LogoutProcessUseCase @Inject constructor(
     private val myUserResetUseCase: MyUserResetUseCase,
     private val friendResetUseCase: FriendResetUseCase,
     private val chatRoomResetUseCase: ChatRoomResetUseCase,
-    private val messageResetUseCase: MessageResetUseCase
+    private val messageResetUseCase: MessageResetUseCase,
 ) {
-    suspend operator fun invoke() {
-        return withContext(Dispatchers.IO) {
-            logoutUseCase()
-            myUserResetUseCase()
-            friendResetUseCase()
-            chatRoomResetUseCase()
-            messageResetUseCase()
-        }
+    suspend operator fun invoke() = withContext(Dispatchers.IO) {
+        logoutUseCase()
+        myUserResetUseCase()
+        friendResetUseCase()
+        chatRoomResetUseCase()
+        messageResetUseCase()
     }
 }

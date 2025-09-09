@@ -4,5 +4,5 @@ class GetChatRoomException(
     val problemState: GetChatRoomState,
     val restartState: GetChatRoomState,
     message: String,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : Exception(message, cause)

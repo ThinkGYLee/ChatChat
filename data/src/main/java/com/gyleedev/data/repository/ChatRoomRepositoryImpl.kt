@@ -65,7 +65,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
     private val chatRoomAndReceiverDao: ChatRoomAndReceiverDao,
     private val receiverDao: ReceiverDao,
     private val database: FirebaseDatabase,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
 ) : ChatRoomRepository {
 
     private val _currentState: MutableStateFlow<GetChatRoomState> = MutableStateFlow(None)
@@ -134,7 +134,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
      */
     override suspend fun getChatRoomWithUserData(
         user: RelatedUserLocalData,
-        getChatRoomState: GetChatRoomState
+        getChatRoomState: GetChatRoomState,
     ): GetChatRoomState {
         var chatRoomData: ChatRoomData? = null
         var localCurrentState = getChatRoomState
@@ -170,7 +170,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         requireChatRoomData(
                             data = chatRoomData,
                             problemState = GetRemoteData,
-                            restartState = GetRemoteData
+                            restartState = GetRemoteData,
                         )
                         _currentState.emit(CheckingMyDataExists)
                         localCurrentState = CheckingMyDataExists
@@ -209,7 +209,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                 message = "Can't create ChatRoom",
                                 cause = null,
                                 problemState = CreatingRemoteChatRoomData,
-                                restartState = CreatingRemoteChatRoomData
+                                restartState = CreatingRemoteChatRoomData,
                             )
                             break
                         }
@@ -219,7 +219,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = UpdateMyData,
-                            restartState = CheckingRemoteGetChatRoomExists
+                            restartState = CheckingRemoteGetChatRoomExists,
                         )
                         val result = createMyUserChatRoom(data).first()
                         if (result == ProcessResult.Success) {
@@ -230,7 +230,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                 message = "Can't update MyData",
                                 cause = null,
                                 problemState = UpdateMyData,
-                                restartState = GetRemoteData
+                                restartState = GetRemoteData,
                             )
                             break
                         }
@@ -240,7 +240,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = UpdateFriendData,
-                            restartState = CheckingRemoteGetChatRoomExists
+                            restartState = CheckingRemoteGetChatRoomExists,
                         )
                         val result = createFriendUserChatRoom(user, data).first()
                         if (result == ProcessResult.Success) {
@@ -251,7 +251,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                 message = "Can't update FriendData",
                                 cause = null,
                                 problemState = UpdateFriendData,
-                                restartState = GetRemoteData
+                                restartState = GetRemoteData,
                             )
                             break
                         }
@@ -261,7 +261,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = CheckingMyReceiverExists,
-                            restartState = CheckingRemoteGetChatRoomExists
+                            restartState = CheckingRemoteGetChatRoomExists,
                         )
                         auth.currentUser?.uid?.let {
                             val result = checkReceiverRemote(data.rid, it).first()
@@ -279,7 +279,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = CheckingFriendReceiverExists,
-                            restartState = CheckingRemoteGetChatRoomExists
+                            restartState = CheckingRemoteGetChatRoomExists,
                         )
                         val result = checkReceiverRemote(data.rid, user.uid).first()
                         if (result) {
@@ -295,7 +295,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = InsertMyDataToReceiver,
-                            restartState = CheckingRemoteGetChatRoomExists
+                            restartState = CheckingRemoteGetChatRoomExists,
                         )
                         auth.currentUser?.uid?.let {
                             val result = addReceiverToRemote(data.rid, uid = it).first()
@@ -307,7 +307,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                     message = "Can't update FriendData",
                                     cause = null,
                                     problemState = InsertMyDataToReceiver,
-                                    restartState = GetRemoteData
+                                    restartState = GetRemoteData,
                                 )
                             }
                         }
@@ -317,7 +317,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = InsertFriendDataToReceiver,
-                            restartState = CheckingRemoteGetChatRoomExists
+                            restartState = CheckingRemoteGetChatRoomExists,
                         )
                         val result = addReceiverToRemote(data.rid, uid = user.uid).first()
                         if (result == ProcessResult.Success) {
@@ -328,7 +328,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                 message = "Can't update FriendData",
                                 cause = null,
                                 problemState = InsertFriendDataToReceiver,
-                                restartState = GetRemoteData
+                                restartState = GetRemoteData,
                             )
                         }
                     }
@@ -337,7 +337,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = SavingGetChatRoomToLocal,
-                            restartState = CheckingRemoteGetChatRoomExists
+                            restartState = CheckingRemoteGetChatRoomExists,
                         )
                         val id = insertChatRoomToLocal(data, false)
                         insertReceiverToLocal(id, user.uid)
@@ -361,10 +361,8 @@ class ChatRoomRepositoryImpl @Inject constructor(
 
     private fun getPersonalChatRoomAndReceiverByUid(
         uid: String,
-        isGroup: Boolean = false
-    ): ChatRoomAndReceiverLocalData? {
-        return chatRoomAndReceiverDao.getChatRoomAndReceiverByUid(uid, isGroup)?.toLocalData()
-    }
+        isGroup: Boolean = false,
+    ): ChatRoomAndReceiverLocalData? = chatRoomAndReceiverDao.getChatRoomAndReceiverByUid(uid, isGroup)?.toLocalData()
 
     /*
     Flow 정리
@@ -378,7 +376,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
      */
     override suspend fun createGroupChat(
         users: List<RelatedUserLocalData>,
-        getChatRoomState: GetChatRoomState
+        getChatRoomState: GetChatRoomState,
     ): GetChatRoomState {
         var chatRoomData: ChatRoomData? = null
         var localCurrentState = getChatRoomState
@@ -400,7 +398,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                 message = "Can't Make ChatRoom",
                                 cause = null,
                                 problemState = CreateRemoteGroupChatRoom,
-                                restartState = CreateRemoteGroupChatRoom
+                                restartState = CreateRemoteGroupChatRoom,
                             )
                         }
                     }
@@ -408,7 +406,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     InsertUserChatRoomsToRemote -> {
                         val result = insertUserChatRooms(
                             data = requireNotNull(chatRoomData),
-                            uids = userList
+                            uids = userList,
                         )
                         if (result) {
                             _currentState.emit(InsertReceiversToRemote)
@@ -418,7 +416,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                 message = "Can't Upload UserChatRooms",
                                 cause = null,
                                 problemState = InsertUserChatRoomsToRemote,
-                                restartState = CreateRemoteGroupChatRoom
+                                restartState = CreateRemoteGroupChatRoom,
                             )
                         }
                     }
@@ -426,7 +424,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                     InsertReceiversToRemote -> {
                         val result = insertReceiversToRemote(
                             data = requireNotNull(chatRoomData),
-                            uids = userList
+                            uids = userList,
                         )
                         if (result) {
                             _currentState.emit(SavingGetChatRoomToLocal)
@@ -436,7 +434,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                 message = "Can't Upload Receivers",
                                 cause = null,
                                 problemState = InsertReceiversToRemote,
-                                restartState = CreateRemoteGroupChatRoom
+                                restartState = CreateRemoteGroupChatRoom,
                             )
                         }
                     }
@@ -445,7 +443,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomData(
                             data = chatRoomData,
                             problemState = SavingGetChatRoomToLocal,
-                            restartState = CheckingRemoteGetChatRoomExists
+                            restartState = CheckingRemoteGetChatRoomExists,
                         )
                         val id = insertChatRoomToLocal(data, true)
                         insertReceiversToLocal(id, users.map { it.uid })
@@ -464,7 +462,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                 message = "Room Problem",
                                 cause = null,
                                 problemState = ReturnChatRoom,
-                                restartState = CreateRemoteGroupChatRoom
+                                restartState = CreateRemoteGroupChatRoom,
                             )
                         }
                     }
@@ -481,7 +479,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
 
     private suspend fun insertUserChatRooms(
         data: ChatRoomData,
-        uids: List<String>
+        uids: List<String>,
     ): Boolean = coroutineScope {
         val results = uids.map { uid ->
             async {
@@ -496,7 +494,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
 
     private suspend fun insertReceiversToRemote(
         data: ChatRoomData,
-        uids: List<String>
+        uids: List<String>,
     ): Boolean = coroutineScope {
         val results = uids.map { uid ->
             async {
@@ -541,7 +539,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
 
     override suspend fun getChatRoomWithRid(
         rid: String,
-        getChatRoomState: GetChatRoomState
+        getChatRoomState: GetChatRoomState,
     ): GetChatRoomState {
         var chatRoomData: ChatRoomAndReceiverLocalData? = null
         var localCurrentState = getChatRoomState
@@ -561,7 +559,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                 message = "Room Problem",
                                 cause = null,
                                 problemState = CheckAndGetDataFromLocal,
-                                restartState = CheckAndGetDataFromLocal
+                                restartState = CheckAndGetDataFromLocal,
                             )
                         }
                     }
@@ -573,14 +571,14 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         if (checkLocal == null) {
                             val id = insertChatRoomToLocal(
                                 requireNotNull(localData),
-                                isGroup = remoteReceivers.size > 1
+                                isGroup = remoteReceivers.size > 1,
                             )
                             chatRoomData =
                                 ChatRoomAndReceiverLocalData(
                                     id = id,
                                     rid = rid,
                                     lastMessage = localData.lastMessage,
-                                    isGroup = remoteReceivers.size > 1
+                                    isGroup = remoteReceivers.size > 1,
                                 )
                         } else {
                             chatRoomData = checkLocal
@@ -593,7 +591,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomAndReceiver(
                             chatRoomData,
                             problemState = GetAndSyncReceivers,
-                            restartState = CheckAndGetDataFromLocal
+                            restartState = CheckAndGetDataFromLocal,
                         )
                         val remoteReceivers = getReceiversFromRemote(rid).first().sortedDescending()
                         val localReceivers = data.receivers.sortedDescending()
@@ -615,7 +613,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         val data = requireChatRoomAndReceiver(
                             chatRoomData,
                             problemState = InsertReceiversToLocal,
-                            restartState = CheckAndGetDataFromLocal
+                            restartState = CheckAndGetDataFromLocal,
                         )
                         insertReceiversToLocal(data.id, requireNotNull(insertReceivers))
                         _currentState.emit(ReturnChatRoom)
@@ -633,7 +631,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                                 message = "Room Problem",
                                 cause = null,
                                 problemState = ReturnChatRoom,
-                                restartState = CheckAndGetDataFromLocal
+                                restartState = CheckAndGetDataFromLocal,
                             )
                         }
                     }
@@ -658,112 +656,105 @@ class ChatRoomRepositoryImpl @Inject constructor(
     private fun requireChatRoomData(
         data: ChatRoomData?,
         problemState: GetChatRoomState,
-        restartState: GetChatRoomState
-    ): ChatRoomData {
-        return data ?: throw GetChatRoomException(
-            message = "No ChatRoomData",
-            cause = null,
-            problemState = problemState,
-            restartState = restartState
-        )
-    }
+        restartState: GetChatRoomState,
+    ): ChatRoomData = data ?: throw GetChatRoomException(
+        message = "No ChatRoomData",
+        cause = null,
+        problemState = problemState,
+        restartState = restartState,
+    )
 
     private fun requireChatRoomAndReceiver(
         data: ChatRoomAndReceiverLocalData?,
         problemState: GetChatRoomState,
-        restartState: GetChatRoomState
-    ): ChatRoomAndReceiverLocalData {
-        return data ?: throw GetChatRoomException(
-            message = "No ChatRoomData",
-            cause = null,
-            problemState = problemState,
-            restartState = restartState
-        )
-    }
+        restartState: GetChatRoomState,
+    ): ChatRoomAndReceiverLocalData = data ?: throw GetChatRoomException(
+        message = "No ChatRoomData",
+        cause = null,
+        problemState = problemState,
+        restartState = restartState,
+    )
 
-    private fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean> =
-        callbackFlow {
-            try {
-                auth.currentUser?.uid?.let {
-                    database.reference.child("userChatRooms").child(it).orderByChild("receiver")
-                        .equalTo(relatedUserLocalData.uid)
-                }?.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val result = snapshot.value != null
-                        trySend(result)
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        trySend(false)
-                    }
-                })
-            } catch (e: Exception) {
-                GetChatRoomException(
-                    problemState = CheckingRemoteGetChatRoomExists,
-                    restartState = CheckingRemoteGetChatRoomExists,
-                    message = requireNotNull(e.message),
-                    cause = e.cause
-                )
-            }
-            awaitClose()
-        }.flowOn(Dispatchers.IO)
-
-    private fun createChatRoomData(): Flow<ChatRoomData?> =
-        callbackFlow {
-            try {
-                val rid = UUID.randomUUID().toString()
-                val chatRoomData = ChatRoomData(rid = rid, lastMessage = "")
-                auth.currentUser?.uid?.let {
-                    database.reference.child("chatRooms").child(rid)
-                        .setValue(ChatRoomData(rid = rid)).addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                trySend(chatRoomData)
-                            } else {
-                                trySend(null)
-                            }
-                        }
+    private fun checkChatRoomExistsInRemote(relatedUserLocalData: RelatedUserLocalData): Flow<Boolean> = callbackFlow {
+        try {
+            auth.currentUser?.uid?.let {
+                database.reference.child("userChatRooms").child(it).orderByChild("receiver")
+                    .equalTo(relatedUserLocalData.uid)
+            }?.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val result = snapshot.value != null
+                    trySend(result)
                 }
-            } catch (e: Exception) {
-                GetChatRoomException(
-                    problemState = CreatingRemoteChatRoomData,
-                    restartState = CreatingRemoteChatRoomData,
-                    message = requireNotNull(e.message),
-                    cause = e.cause
-                )
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(false)
+                }
+            })
+        } catch (e: Exception) {
+            GetChatRoomException(
+                problemState = CheckingRemoteGetChatRoomExists,
+                restartState = CheckingRemoteGetChatRoomExists,
+                message = requireNotNull(e.message),
+                cause = e.cause,
+            )
+        }
+        awaitClose()
+    }.flowOn(Dispatchers.IO)
+
+    private fun createChatRoomData(): Flow<ChatRoomData?> = callbackFlow {
+        try {
+            val rid = UUID.randomUUID().toString()
+            val chatRoomData = ChatRoomData(rid = rid, lastMessage = "")
+            auth.currentUser?.uid?.let {
+                database.reference.child("chatRooms").child(rid)
+                    .setValue(ChatRoomData(rid = rid)).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            trySend(chatRoomData)
+                        } else {
+                            trySend(null)
+                        }
+                    }
             }
-            awaitClose()
-        }.flowOn(Dispatchers.IO)
+        } catch (e: Exception) {
+            GetChatRoomException(
+                problemState = CreatingRemoteChatRoomData,
+                restartState = CreatingRemoteChatRoomData,
+                message = requireNotNull(e.message),
+                cause = e.cause,
+            )
+        }
+        awaitClose()
+    }.flowOn(Dispatchers.IO)
 
     private fun addReceiverToRemote(
         rid: String,
-        uid: String
-    ): Flow<ProcessResult> =
-        callbackFlow {
-            val isMe = auth.currentUser?.uid?.let { it == uid }
-            try {
-                database.reference.child("receivers").child(rid).child(uid)
-                    .setValue((UserChatRoomReceiver(receiver = uid)))
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            trySend(ProcessResult.Success)
-                        } else {
-                            trySend(ProcessResult.Failure)
-                        }
+        uid: String,
+    ): Flow<ProcessResult> = callbackFlow {
+        val isMe = auth.currentUser?.uid?.let { it == uid }
+        try {
+            database.reference.child("receivers").child(rid).child(uid)
+                .setValue((UserChatRoomReceiver(receiver = uid)))
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(ProcessResult.Success)
+                    } else {
+                        trySend(ProcessResult.Failure)
                     }
-            } catch (e: Exception) {
-                GetChatRoomException(
-                    problemState = if (requireNotNull(isMe)) InsertMyDataToReceiver else InsertFriendDataToReceiver,
-                    restartState = GetRemoteData,
-                    message = requireNotNull(e.message),
-                    cause = e.cause
-                )
-            }
-            awaitClose()
-        }.flowOn(Dispatchers.IO)
+                }
+        } catch (e: Exception) {
+            GetChatRoomException(
+                problemState = if (requireNotNull(isMe)) InsertMyDataToReceiver else InsertFriendDataToReceiver,
+                restartState = GetRemoteData,
+                message = requireNotNull(e.message),
+                cause = e.cause,
+            )
+        }
+        awaitClose()
+    }.flowOn(Dispatchers.IO)
 
     private fun checkReceiverRemote(
         rid: String,
-        uid: String
+        uid: String,
     ): Flow<Boolean> = callbackFlow {
         val isMe = auth.currentUser?.uid?.let { it == uid }
         try {
@@ -778,14 +769,14 @@ class ChatRoomRepositoryImpl @Inject constructor(
                         override fun onCancelled(error: DatabaseError) {
                             trySend(false)
                         }
-                    }
+                    },
                 )
         } catch (e: Exception) {
             throw GetChatRoomException(
                 cause = e.cause,
                 message = e.message.toString(),
                 problemState = if (requireNotNull(isMe)) CheckingMyReceiverExists else CheckingFriendReceiverExists,
-                restartState = GetRemoteData
+                restartState = GetRemoteData,
             )
         }
 
@@ -793,7 +784,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
     private fun getReceiversFromRemote(
-        rid: String
+        rid: String,
     ): Flow<List<String>> = callbackFlow {
         try {
             database.reference.child("receivers").child(rid).get()
@@ -816,21 +807,21 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 cause = e.cause,
                 message = e.message.toString(),
                 problemState = GetAndSyncReceivers,
-                restartState = CheckAndGetDataFromLocal
+                restartState = CheckAndGetDataFromLocal,
             )
         }
         awaitClose()
     }.flowOn(Dispatchers.IO)
 
     private fun createMyUserChatRoom(
-        chatRoomData: ChatRoomData
+        chatRoomData: ChatRoomData,
     ): Flow<ProcessResult> = callbackFlow {
         try {
             UserChatRoomData(rid = chatRoomData.rid)
             auth.currentUser?.uid?.let {
                 database.reference.child("userChatRooms").child(it).child(chatRoomData.rid)
                     .setValue(
-                        UserChatRoomData(rid = chatRoomData.rid)
+                        UserChatRoomData(rid = chatRoomData.rid),
                     ).addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             trySend(ProcessResult.Success)
@@ -844,14 +835,14 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 problemState = UpdateMyData,
                 restartState = CheckingRemoteGetChatRoomExists,
                 message = requireNotNull(e.message),
-                cause = e.cause
+                cause = e.cause,
             )
         }
         awaitClose()
     }.flowOn(Dispatchers.IO)
 
     private fun checkMyRoomDataRemote(
-        relatedUserLocalData: RelatedUserLocalData
+        relatedUserLocalData: RelatedUserLocalData,
     ): Flow<Boolean> = callbackFlow {
         try {
             auth.currentUser?.uid?.let {
@@ -866,7 +857,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                             override fun onCancelled(error: DatabaseError) {
                                 trySend(false)
                             }
-                        }
+                        },
                     )
             }
         } catch (e: Exception) {
@@ -874,7 +865,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 cause = e.cause,
                 message = e.message.toString(),
                 problemState = CheckingMyDataExists,
-                restartState = GetRemoteData
+                restartState = GetRemoteData,
             )
         }
 
@@ -882,7 +873,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
     private fun checkFriendRoomDataRemote(
-        relatedUserLocalData: RelatedUserLocalData
+        relatedUserLocalData: RelatedUserLocalData,
     ): Flow<Boolean> = callbackFlow {
         try {
             auth.currentUser?.uid?.let {
@@ -898,7 +889,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                             override fun onCancelled(error: DatabaseError) {
                                 trySend(false)
                             }
-                        }
+                        },
                     )
             }
         } catch (e: Exception) {
@@ -906,7 +897,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 cause = e.cause,
                 message = e.message.toString(),
                 problemState = CheckingFriendDataExists,
-                restartState = GetRemoteData
+                restartState = GetRemoteData,
             )
         }
         awaitClose()
@@ -914,7 +905,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
 
     private fun createFriendUserChatRoom(
         relatedUserLocalData: RelatedUserLocalData,
-        chatRoomData: ChatRoomData
+        chatRoomData: ChatRoomData,
     ): Flow<ProcessResult> = callbackFlow {
         try {
             auth.currentUser?.uid?.let {
@@ -934,7 +925,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 problemState = UpdateFriendData,
                 message = requireNotNull(e.message),
                 restartState = CheckingRemoteGetChatRoomExists,
-                cause = e.cause
+                cause = e.cause,
             )
         }
         awaitClose()
@@ -942,7 +933,7 @@ class ChatRoomRepositoryImpl @Inject constructor(
 
     private fun createUserChatRoom(
         uid: String,
-        chatRoomData: ChatRoomData
+        chatRoomData: ChatRoomData,
     ): Flow<ProcessResult> = callbackFlow {
         try {
             auth.currentUser?.uid?.let {
@@ -962,88 +953,81 @@ class ChatRoomRepositoryImpl @Inject constructor(
                 problemState = InsertUserChatRoomsToRemote,
                 message = requireNotNull(e.message),
                 restartState = CreateRemoteGroupChatRoom,
-                cause = e.cause
+                cause = e.cause,
             )
         }
         awaitClose()
     }.flowOn(Dispatchers.IO)
 
-    private fun getChatRoomByRid(rid: String): ChatRoomAndReceiverLocalData? {
-        return try {
-            chatRoomAndReceiverDao.getChatRoomAndReceiverByRid(rid)?.toLocalData()
-        } catch (e: Exception) {
-            throw GetChatRoomException(
-                problemState = CheckAndGetDataFromLocal,
-                restartState = CheckAndGetDataFromLocal,
-                message = requireNotNull(e.message),
-                cause = e.cause
-            )
-        }
+    private fun getChatRoomByRid(rid: String): ChatRoomAndReceiverLocalData? = try {
+        chatRoomAndReceiverDao.getChatRoomAndReceiverByRid(rid)?.toLocalData()
+    } catch (e: Exception) {
+        throw GetChatRoomException(
+            problemState = CheckAndGetDataFromLocal,
+            restartState = CheckAndGetDataFromLocal,
+            message = requireNotNull(e.message),
+            cause = e.cause,
+        )
     }
 
-    fun getChatRoomFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<ChatRoomData?> =
-        callbackFlow {
-            try {
-                auth.currentUser?.uid?.let {
-                    database.reference.child("userChatRooms").child(it).orderByChild("receiver")
-                        .equalTo(relatedUserLocalData.uid)
-                }?.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        for (ds in snapshot.children) {
-                            val snap = ds.getValue(ChatRoomData::class.java)
-                            if (snap != null) {
-                                trySend(snap)
-                            } else {
-                                trySend(null)
-                            }
+    fun getChatRoomFromRemote(relatedUserLocalData: RelatedUserLocalData): Flow<ChatRoomData?> = callbackFlow {
+        try {
+            auth.currentUser?.uid?.let {
+                database.reference.child("userChatRooms").child(it).orderByChild("receiver")
+                    .equalTo(relatedUserLocalData.uid)
+            }?.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (ds in snapshot.children) {
+                        val snap = ds.getValue(ChatRoomData::class.java)
+                        if (snap != null) {
+                            trySend(snap)
+                        } else {
+                            trySend(null)
                         }
                     }
+                }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        trySend(null)
-                    }
-                })
-            } catch (e: Exception) {
-                GetChatRoomException(
-                    problemState = CheckingRemoteGetChatRoomExists,
-                    restartState = CheckingRemoteGetChatRoomExists,
-                    message = requireNotNull(e.message),
-                    cause = e.cause
-                )
-            }
-            awaitClose()
-        }.flowOn(Dispatchers.IO)
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(null)
+                }
+            })
+        } catch (e: Exception) {
+            GetChatRoomException(
+                problemState = CheckingRemoteGetChatRoomExists,
+                restartState = CheckingRemoteGetChatRoomExists,
+                message = requireNotNull(e.message),
+                cause = e.cause,
+            )
+        }
+        awaitClose()
+    }.flowOn(Dispatchers.IO)
 
     private fun insertChatRoomToLocal(
         chatRoomData: ChatRoomData,
-        isGroup: Boolean
-    ): Long {
-        return chatRoomDao.insertChatRoom(
-            ChatRoomEntity(
-                id = 0L,
-                lastMessage = "",
-                rid = chatRoomData.rid,
-                isGroup = isGroup
-            )
-        )
-    }
+        isGroup: Boolean,
+    ): Long = chatRoomDao.insertChatRoom(
+        ChatRoomEntity(
+            id = 0L,
+            lastMessage = "",
+            rid = chatRoomData.rid,
+            isGroup = isGroup,
+        ),
+    )
 
     override suspend fun resetChatRoomData() {
         chatRoomDao.resetChatRoomDatabase()
     }
 
-    override fun getChatRoomListWithPaging(): Flow<PagingData<ChatRoomAndReceiverLocalData>> {
-        return Pager(
-            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-            pagingSourceFactory = {
-                chatRoomAndReceiverDao.getChatRoomsWithPaging()
-            }
-        ).flow.map {
-            it.map {
-                it.toLocalData()
-            }
-        }.flowOn(Dispatchers.IO)
-    }
+    override fun getChatRoomListWithPaging(): Flow<PagingData<ChatRoomAndReceiverLocalData>> = Pager(
+        config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+        pagingSourceFactory = {
+            chatRoomAndReceiverDao.getChatRoomsWithPaging()
+        },
+    ).flow.map {
+        it.map {
+            it.toLocalData()
+        }
+    }.flowOn(Dispatchers.IO)
 
     private fun getUserChatRooms(): Flow<List<String>> = callbackFlow {
         auth.currentUser?.uid?.let {

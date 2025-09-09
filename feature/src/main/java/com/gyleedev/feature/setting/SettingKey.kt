@@ -8,5 +8,5 @@ enum class SettingKey {
     LANGUAGE,
     THEME,
     DATAMANAGE,
-    CHAT
+    CHAT,
 }

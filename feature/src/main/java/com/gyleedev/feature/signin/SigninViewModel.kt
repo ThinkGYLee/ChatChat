@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SigninViewModel @Inject constructor(
     private val signInAuthUseCase: SignInAuthUseCase,
-    private val signInDatabaseUseCase: SignInDatabaseUseCase
+    private val signInDatabaseUseCase: SignInDatabaseUseCase,
 ) : BaseViewModel() {
 
     private val idQuery = MutableStateFlow("")
@@ -47,7 +47,7 @@ class SigninViewModel @Inject constructor(
         passwordIsAvailable,
         passwordCheckIsAvailable,
         passwordIsSame,
-        signInIsAvailable
+        signInIsAvailable,
     ) { idQuery, nicknameQuery, passwordQuery, passwordCheckQuery, idIsAvailable, nicknameIsAvailable, passwordIsAvailable, passwordCheckIsAvailable, passwordIsSame, signinIsAvailable ->
         SigninUiState.Success(
             idQuery = idQuery,
@@ -59,12 +59,12 @@ class SigninViewModel @Inject constructor(
             passwordIsAvailable = passwordIsAvailable,
             passwordCheckIsAvailable = passwordCheckIsAvailable,
             passwordIsSame = passwordIsSame,
-            signinIsAvailable = signinIsAvailable
+            signinIsAvailable = signinIsAvailable,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = SigninUiState.Loading
+        initialValue = SigninUiState.Loading,
     )
 
     fun editId(id: String) {
@@ -113,7 +113,7 @@ class SigninViewModel @Inject constructor(
                 signInAuthUseCase(
                     id = idQuery.value,
                     password = passwordQuery.value,
-                    nickname = nicknameQuery.value
+                    nickname = nicknameQuery.value,
                 ).first()
 
             if (process != null) {

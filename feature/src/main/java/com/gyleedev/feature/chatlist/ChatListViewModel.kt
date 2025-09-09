@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatListViewModel @Inject constructor(
     getChatRoomDataWithRelatedUserUseCase: GetChatRoomDataWithRelatedUserUseCase,
-    repository: ChatRoomRepository
+    repository: ChatRoomRepository,
 ) : BaseViewModel() {
     private val loadingState = MutableStateFlow(ChatListLoadingState.NONE)
 
@@ -37,7 +37,7 @@ class ChatListViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
-            PagingData.empty()
+            PagingData.empty(),
         )
 
     init {

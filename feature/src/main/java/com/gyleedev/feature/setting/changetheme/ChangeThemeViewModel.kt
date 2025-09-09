@@ -13,15 +13,13 @@ import javax.inject.Inject
 @HiltViewModel
 class ChangeThemeViewModel @Inject constructor(
     private val getThemeUseCase: GetThemeUseCase,
-    private val setThemeUseCase: SetThemeUseCase
+    private val setThemeUseCase: SetThemeUseCase,
 ) : BaseViewModel() {
 
     private val _currentTheme = MutableStateFlow<Int>(getTheme())
     val currentTheme: StateFlow<Int> = _currentTheme
 
-    private fun getTheme(): Int {
-        return getThemeUseCase()
-    }
+    private fun getTheme(): Int = getThemeUseCase()
 
     fun setTheme(mode: Int) {
         viewModelScope.launch {
