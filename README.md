@@ -3,11 +3,14 @@
 
 ## 주요 구현
 - 회원가입 / 로그인
-- 메세지 전송 / 수신
+- 1:1 채팅 / 그룹채팅
 - 프로필 변경
 - 친구 검색 / 추가
+- 친구 관리 (숨김, 차단, 삭제)
 - 미디어 전송 / 수신
-- 프로필 수정
+
+## 모듈 구조
+<src="https://github.com/user-attachments/assets/5986afaf-1511-45eb-a020-a2d2a1b8af2a" width="800"/>
 
 ## 기술 스택
 | 구분                      | 내용                                                       |
@@ -15,10 +18,12 @@
 | Jetpack                 | Navigation, Compose, Lifecycle, ViewModel, Paging3, Room |
 | Asynchronous Processing | Coroutine, Flow                                          |
 | Dependency Injection    | Hilt                                                     |
-| Third Party Library     | Glide                                                    |
-| Architecture            | MVVM                                                     |
+| Third Party Library     | Glide, Landscapist                                       |
+| Architecture            | MVVM, CleanArchitecture                                  |
 | Other                   | Firebase                                                 |
-| Test                    | Junit                                                    |
+| Test                    | Junit, Mockk                                             |
+| Convention              | Spotless, ktlint                                         |
+| Ai Coding Assistant     | Codex, Gemini                                            |
 
 ## 스크린샷
 | 친구 목록 | 채팅 목록 | 내 프로필 |
@@ -41,6 +46,26 @@
 | 메세지 송신 | 친구 검색 |
 | --- | --- |
 | <img src="https://github.com/user-attachments/assets/c1a8eea2-54fa-42e6-8c38-3c5b9cc50c85" width="200"/> | <img src="https://github.com/user-attachments/assets/e0e7035c-99f0-47ae-bd19-f31d07d6bad4" width="200"/> |
+
+## Module 구조
+```
+🗂️ Project
+├─📂app
+│  ├─📂di
+├─📂build-logic
+├─📂core
+├─📂data
+│  ├─📂database
+│  ├─📂preference
+│  ├─📂repository
+├─📂domain
+│  ├─📂model
+│  ├─📂repository
+│  ├─📂usecase
+├─📂feature
+└─📂util
+
+```
 
 ## Firebase를 프로젝트에 추가
 
