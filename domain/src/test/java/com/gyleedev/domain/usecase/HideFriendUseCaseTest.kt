@@ -25,7 +25,7 @@ class HideFriendUseCaseTest {
     }
 
     @Test
-    fun `친구 숨기기 기능 테스트`() {
+    fun `친구 숨기기 성공 테스트`() {
         val friend = RelatedUserLocalData()
         val result = ChangeRelationResult.SUCCESS
 
@@ -37,6 +37,51 @@ class HideFriendUseCaseTest {
             val answer = useCase.invoke(friend)
 
             assertEquals(result, answer)
+
+            coVerify {
+                repository.hideFriendRequest(friend)
+            }
+        }
+    }
+
+    @Test
+    fun `친구 숨기기 실패 테스트`() {
+        val friend = RelatedUserLocalData()
+        val result = ChangeRelationResult.FAILURE
+
+        coEvery {
+            repository.hideFriendRequest(friend)
+        } returns result
+
+        runTest {
+            val answer = useCase.invoke(friend)
+
+            assertEquals(result, answer)
+
+            coVerify {
+                repository.hideFriendRequest(friend)
+            }
+        }
+    }
+
+    @Test
+    fun `친구 숨기기 예외 테스트`() {
+        val friend = RelatedUserLocalData()
+        val result = RuntimeException("test")
+
+        coEvery {
+            repository.hideFriendRequest(friend)
+        } throws result
+
+        runTest {
+            var thrown = false
+            try {
+                useCase.invoke(friend)
+            } catch (e: Throwable) {
+                thrown = true
+                assertEquals(result.message, e.message)
+            }
+            assertEquals(true, thrown)
 
             coVerify {
                 repository.hideFriendRequest(friend)
