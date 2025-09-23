@@ -77,7 +77,7 @@ class MyInfoEditViewModel @Inject constructor(
                 status = _myStatusQuery.value,
                 picture = _myPictureAddress.value,
             )
-            _request.emit(updateMyInfoUseCase(userData).first())
+            _request.emit(updateMyInfoUseCase(userData))
         }
     }
 }

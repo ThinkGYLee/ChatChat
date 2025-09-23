@@ -7,7 +7,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -26,7 +25,7 @@ class UpdateMyInfoUseCaseTest {
     }
 
     @Test
-    fun `내정보 업데이트 테스트`() {
+    fun `내정보 업데이트 성공 테스트`() {
         val user = UserData()
         val result = true
 
@@ -35,11 +34,31 @@ class UpdateMyInfoUseCaseTest {
         } returns flowOf(result)
 
         runTest {
-            val answer = useCase.invoke(user).first()
+            val answer = useCase.invoke(user)
 
             assertEquals(result, answer)
 
-            coVerify {
+            coVerify(exactly = 1) {
+                repository.updateMyUserInfo(user)
+            }
+        }
+    }
+
+    @Test
+    fun `내정보 업데이트 실패 테스트`() {
+        val user = UserData()
+        val result = false
+
+        coEvery {
+            repository.updateMyUserInfo(user)
+        } returns flowOf(result)
+
+        runTest {
+            val answer = useCase.invoke(user)
+
+            assertEquals(result, answer)
+
+            coVerify(exactly = 1) {
                 repository.updateMyUserInfo(user)
             }
         }
