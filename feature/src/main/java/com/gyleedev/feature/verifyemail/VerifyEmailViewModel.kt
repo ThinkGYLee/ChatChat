@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -95,7 +94,7 @@ class VerifyEmailViewModel @Inject constructor(
             if (result) {
                 val updateResult = updateMyUserInformationUseCase(
                     (uiState.value as VerifyEmailUiState.Success).userData.copy(verified = true),
-                ).first()
+                )
                 if (updateResult) {
                     setVerifiedStateUseCase(VerifiedState.VERIFIED)
                     _uiEvent.emit(VerifyEmailUiEvent.Success)
