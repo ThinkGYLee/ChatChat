@@ -907,6 +907,7 @@ class UserRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
+    // reload 를 해야 currentUser 가 업데이트 됨
     override fun checkUserVerified(): Flow<Boolean> = callbackFlow {
         requireNotNull(auth.currentUser).reload().addOnCompleteListener { task ->
             if (task.isSuccessful) {
