@@ -112,12 +112,12 @@ class MessageRepositoryImpl @Inject constructor(
                         previousChildName: String?,
                     ) {
                         trySend(null)
-                            /*for (ds in snapshot.getChildren()) {
-                                val snap = ds.getValue(MessageData::class.java)
-                                if (snap != null) {
-                                    insertMessage(snap, chatRoom.id)
-                                }
-                            }*/
+                        /*for (ds in snapshot.getChildren()) {
+                            val snap = ds.getValue(MessageData::class.java)
+                            if (snap != null) {
+                                insertMessage(snap, chatRoom.id)
+                            }
+                        }*/
                     }
 
                     override fun onChildRemoved(snapshot: DataSnapshot) {

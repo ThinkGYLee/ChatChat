@@ -386,7 +386,7 @@ class ChatRoomViewModel @Inject constructor(
 
     fun deleteMessage(messageData: MessageData) {
         viewModelScope.launch {
-            deleteMessageUseCase(messageData).first()
+            deleteMessageUseCase(messageData)
         }
     }
 

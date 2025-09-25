@@ -9,7 +9,9 @@ import javax.inject.Inject
 class AddMyRelatedUsersUseCase @Inject constructor(
     private val repository: UserRepository,
 ) {
-    suspend operator fun invoke(friends: List<RelatedUserRemoteData>) = withContext(Dispatchers.IO) {
-        repository.insertMyRelationsToLocal(friends)
+    suspend operator fun invoke(friends: List<RelatedUserRemoteData>) {
+        withContext(Dispatchers.IO) {
+            repository.insertMyRelationsToLocal(friends)
+        }
     }
 }

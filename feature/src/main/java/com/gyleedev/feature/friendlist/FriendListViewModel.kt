@@ -78,15 +78,15 @@ class FriendListViewModel @Inject constructor(
 
     private suspend fun getFriendsCount(): Long = getFriendsCountUseCase()
 
-    private fun getMyRelatedUsersFromRemote() {
-        viewModelScope.launch {
-            val request = getMyRelatedUserListFromRemoteUseCase().first()
-            if (request != null) {
-                addMyRelatedUsersToLocal(request)
-            }
+    // 리모트에서 아는 유저 리스트를 가져오고 로컬에 추가
+    private suspend fun getMyRelatedUsersFromRemote() {
+        val request = getMyRelatedUserListFromRemoteUseCase().first()
+        if (request != null) {
+            addMyRelatedUsersToLocal(request)
         }
     }
 
+    // 로컬에 아는 유저 리스트를 로컬에 추가
     private suspend fun addMyRelatedUsersToLocal(friends: List<RelatedUserRemoteData>) {
         addMyRelatedUsersUseCase(friends)
     }

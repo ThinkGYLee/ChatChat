@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -16,9 +15,9 @@ class AddFriendRequestUseCase @Inject constructor(
 ) {
     operator fun invoke(userData: UserData): Flow<Boolean> = callbackFlow {
         withContext(Dispatchers.IO) {
-            val remoteRequest = addFriendToRemoteUseCase(userData).first()
+            val remoteRequest = addFriendToRemoteUseCase(userData)
             if (remoteRequest) {
-                val localRequest = addFriendToLocalUseCase(userData).first()
+                val localRequest = addFriendToLocalUseCase(userData)
                 if (localRequest) {
                     trySend(true)
                 } else {

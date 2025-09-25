@@ -6,5 +6,5 @@ import javax.inject.Inject
 class CancelSigninUseCase @Inject constructor(
     private val repository: UserRepository,
 ) {
-    suspend operator fun invoke() = repository.cancelSigninRequest()
+    suspend operator fun invoke(): Boolean = repository.cancelSigninRequest()
 }
