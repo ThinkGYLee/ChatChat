@@ -1,0 +1,12 @@
+schema_version = 1
+project_id = "chatchat"
+central_branch = "main"
+profiles = ["android-compose-default"]
+target_branch = "main"
+promotion_scan = true
+publication_mode = "deferred-hg-final"
+
+[ownership]
+managed = "central-updater-only"
+project = "project-owned"
+generated_agents = "central-renderer-only"
